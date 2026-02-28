@@ -4,14 +4,15 @@ import { formatGameLogAsText } from '../utils/gameLogger';
 import './GameBoard.css';
 
 const iconStyle = { width: '1.2em', height: '1.2em', verticalAlign: 'middle' };
+const BASE_URL = import.meta.env.BASE_URL;
 const RULES = [
-    { icon: <img src="/images/dice.png" alt="dice" style={iconStyle} />, text: 'Each player holds 5 dice, kept secret from others.' },
-    { icon: <img src="/images/megaphone.png" alt="megaphone" style={iconStyle} />, text: 'On your turn, bid how many dice of a face value exist across ALL hands (e.g. "three 4s").' },
-    { icon: <img src="/images/ace-of-spades.png" alt="ace" style={iconStyle} />, text: 'Each bid must raise the count — or same count with a higher face.' },
-    { icon: <img src="/images/cards.png" alt="cards" style={iconStyle} />, text: '1s are wild — they count as any face.' },
-    { icon: <img src="/images/bell.png" alt="bell" style={iconStyle} />, text: 'Call "Liar!" to challenge the last bid.' },
-    { icon: <img src="/images/scales.png" alt="scales" style={iconStyle} />, text: 'If the actual count ≥ the bid → challenger loses a die. Otherwise the bidder loses.' },
-    { icon: <img src="/images/skull.png" alt="skull" style={iconStyle} />, text: 'Lose all your dice and you\'re out. Last crew standing wins!' },
+    { icon: <img src={`${BASE_URL}images/dice.png`} alt="dice" style={iconStyle} />, text: 'Each player holds 5 dice, kept secret from others.' },
+    { icon: <img src={`${BASE_URL}images/megaphone.png`} alt="megaphone" style={iconStyle} />, text: 'On your turn, bid how many dice of a face value exist across ALL hands (e.g. "three 4s").' },
+    { icon: <img src={`${BASE_URL}images/ace-of-spades.png`} alt="ace" style={iconStyle} />, text: 'Each bid must raise the count — or same count with a higher face.' },
+    { icon: <img src={`${BASE_URL}images/cards.png`} alt="cards" style={iconStyle} />, text: '1s are wild — they count as any face.' },
+    { icon: <img src={`${BASE_URL}images/bell.png`} alt="bell" style={iconStyle} />, text: 'Call "Liar!" to challenge the last bid.' },
+    { icon: <img src={`${BASE_URL}images/scales.png`} alt="scales" style={iconStyle} />, text: 'If the actual count ≥ the bid → challenger loses a die. Otherwise the bidder loses.' },
+    { icon: <img src={`${BASE_URL}images/skull.png`} alt="skull" style={iconStyle} />, text: 'Lose all your dice and you\'re out. Last crew standing wins!' },
 ];
 
 const CHEAT_LABELS = {
@@ -211,7 +212,7 @@ const GameBoard = ({
                 <div className="result-overlay">
                     <div className="result-panel parchment-panel">
                         <div className="result-icon">
-                            <img src="/images/win.png" alt="Victory" style={{ width: '80px', height: '80px' }} />
+                            <img src={`${BASE_URL}images/win.png`} alt="Victory" style={{ width: '80px', height: '80px' }} />
                         </div>
                         <h2>Game Over!</h2>
                         <p className="result-subtitle">
@@ -234,7 +235,7 @@ const GameBoard = ({
                     <div className="result-panel parchment-panel">
                         <div className="result-icon">
                             <img 
-                                src={challengeResult.loserId === peerId ? "/images/lose.png" : "/images/win.png"} 
+                                src={challengeResult.loserId === peerId ? `${BASE_URL}images/lose.png` : `${BASE_URL}images/win.png`} 
                                 alt={challengeResult.loserId === peerId ? "You Lost" : "Victory"} 
                                 style={{ width: '120px', height: '120px' }} 
                             />

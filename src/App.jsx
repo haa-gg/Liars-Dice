@@ -88,7 +88,7 @@ function App() {
         <div className="lobby-overlay">
           <div className="parchment-panel">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'left', gap: '1.5rem', marginBottom: '1.5rem' }}>
-              <img src="/images/dice-hero-v2.png" alt="Hero Dice" style={{ width: '120px', height: 'auto', flexShrink: 0 }} />
+              <img src={`${import.meta.env.BASE_URL}images/dice-hero-v2.png`} alt="Hero Dice" style={{ width: '120px', height: 'auto', flexShrink: 0 }} />
               <div style={{ textAlign: 'left' }}>
                 <h1 style={{ margin: 0, paddingBottom: '0.2rem', borderBottom: 'none' }}>Liar&apos;s Dice</h1>
                 <p style={{ margin: 0, fontStyle: 'italic', opacity: 0.8 }}>
