@@ -1,0 +1,432 @@
+import React, { useState, useEffect } from 'react';
+import Dice from './Dice';
+import { formatGameLogAsText } from '../utils/gameLogger';
+import './GameBoard.css';
+
+const iconStyle = { width: '1.2em', height: '1.2em', verticalAlign: 'middle' };
+const RULES = [
+    { icon: <img src="/images/dice.png" alt="dice" style={iconStyle} />, text: 'Each player holds 5 dice, kept secret from others.' },
+    { icon: <img src="/images/megaphone.png" alt="megaphone" style={iconStyle} />, text: 'On your turn, bid how many dice of a face value exist across ALL hands (e.g. "three 4s").' },
+    { icon: <img src="/images/ace-of-spades.png" alt="ace" style={iconStyle} />, text: 'Each bid must raise the count — or same count with a higher face.' },
+    { icon: <img src="/images/cards.png" alt="cards" style={iconStyle} />, text: '1s are wild — they count as any face.' },
+    { icon: <img src="/images/bell.png" alt="bell" style={iconStyle} />, text: 'Call "Liar!" to challenge the last bid.' },
+    { icon: <img src="/images/scales.png" alt="scales" style={iconStyle} />, text: 'If the actual count ≥ the bid → challenger loses a die. Otherwise the bidder loses.' },
+    { icon: <img src="/images/skull.png" alt="skull" style={iconStyle} />, text: 'Lose all your dice and you\'re out. Last crew standing wins!' },
+];
+
+const CHEAT_LABELS = {
+    peek: 'Peek',
+    shield: 'Shield',
+    loaded_die: 'Loaded Die',
+    slip: 'Slip',
+};
+
+const GameBoard = ({
+    players = [],
+    myDice = [],
+    currentTurn,
+    currentBid,
+    onBid,
+    onChallenge,
+    isMyTurn,
+    gameState,
+    challengeResult,
+    isHost,
+    onNextRound,
+    peerId,
+    myCheat = null,
+    myCheatUsed = false,
+    peekInfo = null,
+    loadedDieActive = false,
+    gameLog = [],
+    gameOptions = {},
+    onUsePeek,
+    onActivateLoadedDie,
+    onRerollDie,
+    onDismissPeek,
+    onUseSlip,
+    onSelectCheat,
+    onDownloadTextLog,
+    onDownloadJSONLog,
+}) => {
+    const [bidCount, setBidCount] = useState(currentBid?.count || 1);
+    const [bidFace, setBidFace] = useState(currentBid?.face || 2);
+    const [showRules, setShowRules] = useState(false);
+    const [showGameLog, setShowGameLog] = useState(false);
+    const [showCheatInfo, setShowCheatInfo] = useState(false);
+    
+    // Generate text preview of game log
+    const gameLogText = formatGameLogAsText(gameLog, gameOptions);
+
+    // Keep bid inputs in sync when currentBid updates (new round, etc.)
+    useEffect(() => {
+        setBidCount(currentBid?.count || 1);
+        setBidFace(currentBid?.face || 2);
+    }, [currentBid]);
+
+    if (!players || players.length === 0) {
+        return <div className="parchment-panel">Gathering the crew...</div>;
+    }
+
+    // Resolve loser name for challenge result display
+    const loserName = challengeResult
+        ? players.find(p => p.id === challengeResult.loserId)?.name ?? 'Someone'
+        : null;
+
+    const me = players.find(p => p.id === peerId);
+    const myBaseDiceCount = me ? me.diceCount : 0;
+
+    const isGameOver = gameState === 'GAME_OVER';
+    const isRoundOver = gameState === 'ROUND_END' || gameState === 'REVEALING';
+
+    // Find winner for GAME_OVER
+    const winner = isGameOver
+        ? players.find(p => p.active)
+        : null;
+
+    return (
+        <div className="game-board-layout">
+            {/* ── RULES BUTTON ── */}
+            <button
+                className="rules-btn"
+                onClick={() => setShowRules(v => !v)}
+                title="Rules"
+                aria-label="Toggle rules"
+            >
+                ?
+            </button>
+
+            {/* ── GAME LOG BUTTON ── */}
+            {gameLog && gameLog.length > 0 && (
+                <button
+                    className="log-btn"
+                    onClick={() => setShowGameLog(v => !v)}
+                    title="View Game Log"
+                    aria-label="Toggle game log"
+                >
+                    📜
+                </button>
+            )}
+
+            {/* ── RULES POPOVER ── */}
+            {showRules && (
+                <div className="rules-overlay" onClick={() => setShowRules(false)}>
+                    <div className="rules-panel parchment-panel" onClick={e => e.stopPropagation()}>
+                        <button className="rules-close" onClick={() => setShowRules(false)}>✕</button>
+                        <h2>How to Play</h2>
+                        <ul className="rules-list">
+                            {RULES.map((r, i) => (
+                                <li key={i}><span className="rules-icon">{r.icon}</span>{r.text}</li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+            )}
+
+            {/* ── GAME LOG PANEL ── */}
+            {showGameLog && (
+                <div className="rules-overlay" onClick={() => setShowGameLog(false)}>
+                    <div className="history-panel parchment-panel" onClick={e => e.stopPropagation()}>
+                        <button className="rules-close" onClick={() => setShowGameLog(false)}>✕</button>
+                        <h2>Game Log</h2>
+                        <p className="history-subtitle">Complete game history</p>
+                        
+                        <div className="log-actions" style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+                            <button className="btn-nautical" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }} onClick={onDownloadTextLog}>
+                                Download as Text
+                            </button>
+                            <button className="btn-nautical" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }} onClick={onDownloadJSONLog}>
+                                Download as JSON
+                            </button>
+                        </div>
+                        
+                        <div className="game-log-content" style={{ 
+                            maxHeight: '400px', 
+                            overflowY: 'auto', 
+                            background: 'rgba(0,0,0,0.05)', 
+                            padding: '1rem', 
+                            borderRadius: '4px',
+                            fontFamily: 'monospace',
+                            fontSize: '0.85rem',
+                            whiteSpace: 'pre-wrap',
+                            lineHeight: '1.5'
+                        }}>
+                            {gameLogText}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ── CHEAT INFO POPUP ── */}
+            {showCheatInfo && (
+                <div className="rules-overlay" onClick={() => setShowCheatInfo(false)}>
+                    <div className="rules-panel parchment-panel" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px' }}>
+                        <button className="rules-close" onClick={() => setShowCheatInfo(false)}>✕</button>
+                        <h2>Cheat Abilities</h2>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
+                            <div>
+                                <h3 style={{ margin: '0 0 0.3rem 0', fontSize: '1rem', color: 'var(--color-ink)' }}>Peek</h3>
+                                <p style={{ margin: 0, fontSize: '0.9rem', opacity: 0.8 }}>
+                                    See one random die from an opponent's hand. Use this to gather information before making your bid.
+                                </p>
+                            </div>
+                            <div>
+                                <h3 style={{ margin: '0 0 0.3rem 0', fontSize: '1rem', color: 'var(--color-ink)' }}>Shield</h3>
+                                <p style={{ margin: 0, fontSize: '0.9rem', opacity: 0.8 }}>
+                                    Absorb one hit when you lose a challenge. You won't lose a die this round. Use it to stay in the game longer.
+                                </p>
+                            </div>
+                            <div>
+                                <h3 style={{ margin: '0 0 0.3rem 0', fontSize: '1rem', color: 'var(--color-ink)' }}>Loaded Die</h3>
+                                <p style={{ margin: 0, fontSize: '0.9rem', opacity: 0.8 }}>
+                                    Re-roll one of your dice to get a better value. Click the die you want to re-roll after activating this cheat.
+                                </p>
+                            </div>
+                            <div>
+                                <h3 style={{ margin: '0 0 0.3rem 0', fontSize: '1rem', color: 'var(--color-ink)' }}>Slip</h3>
+                                <p style={{ margin: 0, fontSize: '0.9rem', opacity: 0.8 }}>
+                                    Secretly gain 1 extra die in your hand. Other players won't know you have more dice than expected.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ── PEEK MODAL ── */}
+            {peekInfo && (
+                <div className="result-overlay">
+                    <div className="result-panel parchment-panel">
+                        <h3>You Peeked!</h3>
+                        <p>You sneak a glance at <strong>{peekInfo.playerName}</strong>'s hand...</p>
+                        <div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0' }}>
+                            <div style={{ transform: 'scale(1.5)' }}><Dice value={peekInfo.dieValue} /></div>
+                        </div>
+                        <button className="btn-nautical" onClick={onDismissPeek}>Keep it secret</button>
+                    </div>
+                </div>
+            )}
+
+            {isGameOver && (
+                <div className="result-overlay">
+                    <div className="result-panel parchment-panel">
+                        <div className="result-icon">
+                            <img src="/images/win.png" alt="Victory" style={{ width: '80px', height: '80px' }} />
+                        </div>
+                        <h2>Game Over!</h2>
+                        <p className="result-subtitle">
+                            {winner
+                                ? `${winner.name} rules the seas!`
+                                : 'The seas have claimed all pirates!'}
+                        </p>
+                        {isHost && (
+                            <button className="btn-nautical" style={{ marginTop: '1.5rem' }} onClick={onNextRound}>
+                                Play Again
+                            </button>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* ── ROUND END / REVEAL OVERLAY ── */}
+            {isRoundOver && challengeResult && (
+                <div className="result-overlay">
+                    <div className="result-panel parchment-panel">
+                        <div className="result-icon">
+                            <img 
+                                src={challengeResult.loserId === peerId ? "/images/lose.png" : "/images/win.png"} 
+                                alt={challengeResult.loserId === peerId ? "You Lost" : "Victory"} 
+                                style={{ width: '120px', height: '120px' }} 
+                            />
+                        </div>
+                        <h2>
+                            {challengeResult.loserId === peerId ? 'Ye Lost a Die!' : 'Challenge!'}
+                        </h2>
+                        <p className="result-detail">
+                            <strong>{loserName}</strong> loses a die.
+                        </p>
+                        <p className="result-detail result-count">
+                            The bid was <strong>{currentBid.count}×{currentBid.face}</strong>.
+                            <br />
+                            Actual count on the table: <strong>{challengeResult.count}</strong>
+                        </p>
+                        
+                        {isHost && (
+                            <button className="btn-nautical" style={{ marginTop: '1.5rem' }} onClick={onNextRound}>
+                                Next Round
+                            </button>
+                        )}
+                        {!isHost && (
+                            <p style={{ marginTop: '1rem', opacity: 0.7, fontStyle: 'italic' }}>
+                                Waiting for the host to start the next round...
+                            </p>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            <div className="table-container">
+                {/* Render other players in a circle */}
+                <div className="players-circle">
+                    {players.map((p) => {
+                        if (!p || !p.id) return null;
+                        return (
+                            <div key={p.id} className={`player-node ${currentTurn === p.id ? 'active-turn' : ''} ${!p.active ? 'eliminated' : ''}`}>
+                                <div className="player-avatar">{p.active ? '🏴‍☠️' : '💀'}</div>
+                                <div className="player-name">{p.name || 'Unknown Pirate'}</div>
+                                <div className="player-dice-count">
+                                    {p.active ? `Dice: ${p.diceCount || 0}` : 'Eliminated'}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                <div className="center-board">
+                    <div className="current-bid-display parchment-panel">
+                        <h3>Current Bid</h3>
+                        {currentBid.count > 0 ? (
+                            <div className="bid-info">
+                                <span className="bid-count">{currentBid.count}</span>
+                                <span className="bid-x">×</span>
+                                <Dice value={currentBid.face} />
+                            </div>
+                        ) : (
+                            <p>Waiting for first bid...</p>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            <div className="my-hand-area">
+                {myCheat && gameState !== 'GAME_OVER' && (
+                    <div className="cheat-badge parchment-panel" style={{ padding: '0.4rem 1rem', display: 'flex', gap: '1rem', alignItems: 'center', boxShadow: 'none' }}>
+                        <span>
+                            <strong>Secret:</strong> {CHEAT_LABELS[myCheat]}
+                        </span>
+                        <span style={{ fontSize: '0.8rem', opacity: myCheatUsed ? 0.5 : 1 }}>
+                            {myCheatUsed ? ' (Used)' : ' (Ready)'}
+                        </span>
+                        {isMyTurn && gameState === 'BIDDING' && !myCheatUsed && (
+                            <div className="cheat-actions">
+                                {myCheat === 'peek' && (
+                                    <button className="btn-nautical" style={{ fontSize: '0.7rem', padding: '0.3rem 0.6rem' }} onClick={onUsePeek}>Use Peek</button>
+                                )}
+                                {myCheat === 'loaded_die' && !loadedDieActive && (
+                                    <button className="btn-nautical" style={{ fontSize: '0.7rem', padding: '0.3rem 0.6rem' }} onClick={onActivateLoadedDie}>Use Loaded Die</button>
+                                )}
+                                {myCheat === 'slip' && (
+                                    <button className="btn-nautical" style={{ fontSize: '0.7rem', padding: '0.3rem 0.6rem' }} onClick={onUseSlip}>Use Slip</button>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Honor System Cheat Selection */}
+                {!myCheat && gameState === 'BIDDING' && gameOptions.honorSystemCheats && !myCheatUsed && (
+                    <div className="cheat-selection parchment-panel" style={{ padding: '0.8rem 1rem', marginBottom: '1rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                            <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 'bold' }}>Choose Your Cheat:</p>
+                            <button 
+                                onClick={() => setShowCheatInfo(true)}
+                                style={{ 
+                                    background: 'none', 
+                                    border: 'none', 
+                                    fontSize: '1.2rem', 
+                                    cursor: 'pointer',
+                                    padding: '0.2rem',
+                                    color: 'var(--color-ink)',
+                                    opacity: 0.7,
+                                    lineHeight: 1
+                                }}
+                                title="Cheat descriptions"
+                                aria-label="Show cheat information"
+                            >
+                                🛈
+                            </button>
+                        </div>
+                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                            {['peek', 'shield', 'loaded_die', 'slip'].map(cheatType => (
+                                <button 
+                                    key={cheatType}
+                                    className="btn-nautical cheat-btn" 
+                                    style={{ fontSize: '0.75rem', padding: '0.4rem 0.7rem' }} 
+                                    onClick={() => onSelectCheat(cheatType)}
+                                >
+                                    {cheatType === 'loaded_die' ? 'Loaded Die' : cheatType.charAt(0).toUpperCase() + cheatType.slice(1)}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {loadedDieActive && (
+                    <div style={{ color: 'var(--color-gold)', fontWeight: 'bold', animation: 'pulse 1s infinite' }}>
+                        Pick a die to re-roll!
+                    </div>
+                )}
+
+                <div className={`my-dice ${loadedDieActive ? 'loaded-die-active' : ''}`}>
+                    {myDice.map((val, i) => (
+                        <div key={i} className={`die-wrapper ${loadedDieActive ? 'clickable' : ''}`} onClick={() => { if (loadedDieActive) onRerollDie(i); }}>
+                            <Dice value={val} isSlipped={i >= myBaseDiceCount} />
+                        </div>
+                    ))}
+                    {myDice.length === 0 && gameState === 'LOBBY' && (
+                        <p style={{ opacity: 0.5, fontStyle: 'italic' }}>Your dice will appear here when the round starts.</p>
+                    )}
+                </div>
+
+                {isMyTurn && (gameState === 'BIDDING') && !loadedDieActive && (
+                    <div className="bidding-controls parchment-panel">
+                        <h3>Your Turn, Good Luck!</h3>
+                        <div className="bid-inputs">
+                            <div className="custom-stepper">
+                                <button
+                                    className="stepper-btn"
+                                    onClick={() => setBidCount(Math.max((currentBid.count || 1), bidCount - 1))}
+                                >
+                                    −
+                                </button>
+                                <div className="stepper-value">{bidCount}</div>
+                                <button
+                                    className="stepper-btn"
+                                    onClick={() => setBidCount(bidCount + 1)}
+                                >
+                                    +
+                                </button>
+                            </div>
+                            <select
+                                value={bidFace}
+                                onChange={(e) => setBidFace(parseInt(e.target.value))}
+                                className="input-nautical"
+                            >
+                                {[2, 3, 4, 5, 6].map(f => (
+                                    <option key={f} value={f}>{f}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="bid-btns">
+                            <button className="btn-nautical" onClick={() => onBid(bidCount, bidFace)}>Raise Bid</button>
+                            {currentBid.count > 0 && (
+                                <button className="btn-nautical danger" onClick={onChallenge}>Liar!</button>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {isHost && gameState === 'LOBBY' && players.length > 0 && (
+                    <div className="bidding-controls parchment-panel" style={{ textAlign: 'center', marginTop: '1rem' }}>
+                        <h3 style={{ marginBottom: '1rem' }}>Ready to bet the farm?</h3>
+                        <button className="btn-nautical" style={{ fontSize: '1.2rem', padding: '0.8rem 2rem' }} onClick={onNextRound}>
+                            Start Round
+                        </button>
+                    </div>
+                )}
+            </div>
+        </div >
+    );
+};
+
+export default GameBoard;

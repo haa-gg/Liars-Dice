@@ -1,0 +1,160 @@
+:root {
+  --color-sand: #d2b48c;
+  --color-wood-dark: #3e2723;
+  --color-wood-mid: #5d4037;
+  --color-ocean-dark: #1a2a3a;
+  --color-parchment: #f4ecd8;
+  --color-ink: #2c2c2c;
+  --color-gold: #ffd700;
+  --color-blood: #8b0000;
+
+  --font-main: 'Inter', sans-serif;
+  --font-header: 'Pirata One', cursive;
+
+  --shadow-deep: 0 10px 30px rgba(0, 0, 0, 0.8);
+  --border-weathered: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--color-ocean-dark);
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+    url('./assets/dark-wood.png');
+  color: var(--color-parchment);
+  font-family: var(--font-main);
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+}
+
+
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-header), serif;
+  letter-spacing: 2px;
+  color: var(--color-ocean-dark);
+}
+
+h1 {
+  color: var(--color-blood);
+}
+
+.parchment-panel {
+  background: var(--color-parchment);
+  color: var(--color-ink);
+  padding: 2.5rem;
+  border-radius: 4px;
+  box-shadow: var(--shadow-deep), inset 0 0 50px rgba(0, 0, 0, 0.2);
+  border: 1px solid #dcd3b6;
+  position: relative;
+  overflow: hidden;
+  max-width: 600px;
+  margin: 40px auto 0px auto;
+}
+
+
+
+.btn-nautical {
+  background: var(--color-wood-dark);
+  color: var(--color-gold);
+  border: 2px solid var(--color-gold);
+  padding: 0.8rem 1.8rem;
+  font-family: var(--font-header);
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+  box-shadow: 0 5px 0 var(--color-wood-mid);
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+}
+
+.btn-nautical:hover {
+  background: var(--color-wood-mid);
+  transform: translateY(-2px);
+  box-shadow: 0 7px 0 var(--color-wood-dark);
+}
+
+.btn-nautical:active {
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 var(--color-wood-dark);
+}
+
+.input-nautical {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--color-wood-mid);
+  color: var(--color-ink);
+  padding: 0.5rem 1rem;
+  font-family: var(--font-main);
+  border-radius: 4px;
+}
+
+.lobby-footer {
+  position: absolute;
+  bottom: 1rem;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  opacity: 0.7;
+  font-size: 0.85rem;
+  color: var(--color-parchment);
+}
+
+/* ════════════════════════════════════════
+   RESPONSIVE / MOBILE – Global
+   ════════════════════════════════════════ */
+@media (max-width: 640px) {
+
+  /* Lobby panel */
+  .lobby-overlay {
+    padding: 1rem;
+    align-items: stretch;
+  }
+
+  .parchment-panel {
+    padding: 1.5rem;
+  }
+
+  /* Main buttons — slightly smaller on mobile */
+  .btn-nautical {
+    font-size: 1rem;
+    padding: 0.65rem 1.2rem;
+    box-shadow: 0 3px 0 var(--color-wood-mid);
+  }
+
+  .btn-nautical:hover {
+    box-shadow: 0 5px 0 var(--color-wood-dark);
+  }
+
+  /* Inputs — ensure proper touch target */
+  .input-nautical {
+    padding: 0.65rem 0.9rem;
+    font-size: 1rem;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  h3 {
+    font-size: 1rem;
+  }
+
+  .lobby-footer {
+    position: static;
+    margin-top: 1.5rem;
+  }
+}
