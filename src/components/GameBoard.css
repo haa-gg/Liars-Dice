@@ -461,15 +461,19 @@
 
     /* Layout */
     .game-board-layout {
-        padding: 0.75rem 0.5rem;
-        gap: 0.5rem;
+        padding: 0.5rem 0.5rem;
+        gap: 0.25rem;
     }
 
     /* Room info bar */
     .room-info {
-        top: 6px;
-        left: 6px;
-        gap: 0.4rem;
+        top: 4px;
+        left: 4px;
+        gap: 0.3rem;
+    }
+
+    .room-id-badge {
+        padding: 0.25rem 0.5rem;
     }
 
     .room-id-value {
@@ -487,7 +491,7 @@
         width: 100%;
         height: auto;
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 0.25rem;
     }
 
     .players-circle {
@@ -497,7 +501,7 @@
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
-        gap: 0.5rem;
+        gap: 0.4rem;
         padding: 0.25rem;
     }
 
@@ -517,12 +521,12 @@
         bottom: auto;
         background: rgba(0, 0, 0, 0.3);
         border-radius: 8px;
-        padding: 0.4rem 0.6rem;
+        padding: 0.3rem 0.5rem;
         min-width: 70px;
     }
 
     .player-avatar {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
     }
 
     .player-name {
@@ -541,33 +545,36 @@
     }
 
     .current-bid-display {
-        padding: 0.75rem 1rem !important;
+        padding: 0.5rem 0.75rem !important;
         text-align: center;
     }
 
     .current-bid-display h3 {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
+        margin: 0;
     }
 
     /* Dice hand */
     .my-hand-area {
-        gap: 0.75rem;
+        gap: 0.5rem;
     }
 
     .my-dice {
         flex-wrap: wrap;
         justify-content: center;
-        gap: 0.4rem;
+        gap: 0.3rem;
     }
 
     /* Bidding controls */
     .bidding-controls {
-        padding: 1rem !important;
+        padding: 0.75rem !important;
         width: 100%;
+        gap: 0.75rem;
     }
 
     .bidding-controls h3 {
-        font-size: 0.95rem;
+        font-size: 0.9rem;
+        margin: 0 0 0.5rem 0;
     }
 
     .bid-inputs {
@@ -576,19 +583,23 @@
     }
 
     .custom-stepper {
-        /* width: 100%; */
         max-width: 250px;
-        height: 40px;
+        height: 38px;
     }
 
     .stepper-btn {
-        width: 40px;
-        font-size: 1.2rem;
+        width: 38px;
+        font-size: 1.1rem;
+    }
+
+    .stepper-value {
+        font-size: 1.1rem;
     }
 
     .bid-inputs select {
         flex: 1;
         min-width: 80px;
+        padding: 0.5rem;
     }
 
     .bid-btns {
@@ -598,6 +609,8 @@
 
     .bid-btns .btn-nautical {
         flex: 1;
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
     }
 
     /* Rules button */
@@ -605,8 +618,8 @@
         width: 40px;
         height: 40px;
         font-size: 1.2rem;
-        bottom: 1rem;
-        right: 1rem;
+        bottom: 0.75rem;
+        right: 0.75rem;
     }
 
     /* Game Log button */
@@ -614,21 +627,27 @@
         width: 40px;
         height: 40px;
         font-size: 1rem;
-        bottom: 1rem;
-        right: 3.5rem;
+        bottom: 0.75rem;
+        right: 3.25rem;
     }
 
     /* Result / Game Over panels */
     .result-panel {
-        padding: 2rem !important;
+        padding: 1.5rem !important;
     }
 
     .result-icon {
-        font-size: 3rem;
+        font-size: 2.5rem;
+        margin-bottom: 0.75rem;
     }
 
     .result-subtitle {
         font-size: 1rem;
+    }
+
+    .result-detail {
+        font-size: 0.9rem;
+        margin-top: 0.75rem;
     }
 }
 
