@@ -122,6 +122,9 @@ h1 {
 
   .parchment-panel {
     padding: 1.5rem;
+    margin: 20px auto;
+    max-width: 100%;
+    width: calc(100% - 2rem);
   }
 
   /* Main buttons — slightly smaller on mobile */
@@ -139,6 +142,18 @@ h1 {
   .input-nautical {
     padding: 0.65rem 0.9rem;
     font-size: 1rem;
+  }
+
+  /* Form group with button - prevent overflow */
+  .form-group > div {
+    flex-wrap: wrap;
+  }
+
+  .form-group .btn-nautical {
+    font-size: 0.9rem;
+    padding: 0.65rem 1rem;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
   h1 {

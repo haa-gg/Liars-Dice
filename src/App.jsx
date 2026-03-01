@@ -102,19 +102,19 @@ function App() {
 
             <div className="form-group" style={{ marginBottom: '1rem' }}>
               <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Player Name</label>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'stretch' }}>
                 <input
                   className="input-nautical"
                   type="text"
                   placeholder="Captain Redbeard"
                   value={playerName}
                   onChange={(e) => setPlayerName(e.target.value)}
-                  style={{ flex: 1 }}
+                  style={{ flex: 1, minWidth: 0 }}
                 />
                 <button 
                   className="btn-nautical" 
                   onClick={handleRandomName}
-                  style={{ padding: '0.5rem 1rem', whiteSpace: 'nowrap' }}
+                  style={{ padding: '0.5rem 1rem', whiteSpace: 'nowrap', flexShrink: 0 }}
                   title="Generate random pirate name"
                 >
                   Randomize

@@ -531,7 +531,7 @@
 
     .player-name {
         font-size: 0.7rem;
-        color: var(--color-ink);
+        color: var(--color-parchment);
     }
 
     .player-dice-count {
@@ -557,6 +557,7 @@
     /* Dice hand */
     .my-hand-area {
         gap: 0.5rem;
+        padding-bottom:1.5rem;
     }
 
     .my-dice {
