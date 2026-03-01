@@ -1,16 +1,48 @@
-# React + Vite
+# Liar's Dice, Baby!
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A multiplayer pirate-themed bluffing game with peer-to-peer connection
+- Each player holds 5 dice, kept secret from others.
+- On your turn, bid how many dice of a face value exist across ALL hands (e.g. "three 4s").
+- Each bid must raise the count — or same count with a higher face.
+- 1s are wild — they count as any face.
+- Call "Liar!" to challenge the last bid.
+- If the actual count ≥ the bid → challenger loses a die. Otherwise the bidder loses.
+- Lose all your dice and you're out
+- Downloadable game logs (text and JSON)
+- Mobile-friendly interface
 
-Currently, two official plugins are available:
+## How to Play
+- Each player holds 5 dice, kept secret from others
+- On your turn, bid how many dice of a face value exist across ALL hands (e.g. "three 4s")
+- Each bid must raise the count — or same count with a higher face
+- 1's are wild — they count as any face
+- Call "Liar!" to challenge the last bid
+- If the actual count ≥ the bid → challenger loses a die. Otherwise the bidder loses
+- Lose all your dice and you're out. Last crew standing wins!
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+![Instructions on how to set up a lobby and join it](https://github.com/haa-gg/liars-dice/tree/main/public/images/how-to-join.gif)
 
-## React Compiler
+## Development Setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Want to mod it up? Here's how:
 
-## Expanding the ESLint configuration
+1. Clone or download the repo
+2. Open a terminal in the project folder
+3. Run these commands:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+npm run dev
+```
+
+To build for production:
+```bash
+npm run build
+```
+
+## Tech Stack
+- React + Vite
+- PeerJS for WebRTC connections
+
+## License
+GPL-3.0
