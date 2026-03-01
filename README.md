@@ -20,7 +20,7 @@ A multiplayer pirate-themed bluffing game with peer-to-peer connection
 - If the actual count ≥ the bid → challenger loses a die. Otherwise the bidder loses
 - Lose all your dice and you're out. Last crew standing wins!
 
-![Instructions on how to set up a lobby and join it](https://github.com/haa-gg/liars-dice/tree/main/public/images/how-to-join.gif?raw=true)
+![Instructions on how to set up a lobby and join it](/haa-gg/liars-dice/raw/main/public/images/how-to-join.gif)
 
 ## Development Setup
 
