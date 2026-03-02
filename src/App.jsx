@@ -13,6 +13,7 @@ const CHEAT_OPTIONS = [
   { value: 'shield', label: 'Shield', description: 'Absorb one hit' },
   { value: 'loaded_die', label: 'Loaded Die', description: 'Re-roll one die' },
   { value: 'slip', label: 'Slip', description: 'Gain 1 extra die' },
+  { value: 'magic_dice', label: 'Magic Dice', description: 'Gain 2 extra dice' },
 ];
 
 function App() {
@@ -23,7 +24,7 @@ function App() {
     gameOptions, myCheat, myCheatUsed, peekInfo, loadedDieActive, gameLog,
     setGameOptions, assignCheat,
     startRoom, joinRoom, startRound, placeBid, challenge,
-    usePeek, activateLoadedDie, rerollDie, dismissPeek, useSlip, selectCheat,
+    usePeek, activateLoadedDie, rerollDie, dismissPeek, useSlip, useMagicDice, selectCheat,
     downloadTextLog, downloadJSONLog,
   } = game;
 
@@ -300,16 +301,15 @@ function App() {
             onRerollDie={rerollDie}
             onDismissPeek={dismissPeek}
             onUseSlip={useSlip}
+            onUseMagicDice={useMagicDice}
             onSelectCheat={selectCheat}
             onDownloadTextLog={downloadTextLog}
             onDownloadJSONLog={downloadJSONLog}
           />
         </div>
-      )
-      }
-    </div >
+      )}
+    </div>
   );
 }
-
 
 export default App;

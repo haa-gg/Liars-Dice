@@ -12,6 +12,7 @@ export const CHEATS = {
     SHIELD: 'shield',
     LOADED_DIE: 'loaded_die',
     SLIP: 'slip',
+    MAGIC_DICE: 'magic_dice',
 };
 
 export const CHEAT_LABELS = {
@@ -19,6 +20,7 @@ export const CHEAT_LABELS = {
     shield: 'Shield',
     loaded_die: 'Loaded Die',
     slip: 'Slip',
+    magic_dice: 'Magic Dice',
 };
 
 const DEFAULT_OPTIONS = { startingDice: 5, eliminationThreshold: 0, wildsEnabled: true, honorSystemCheats: false };
@@ -137,6 +139,28 @@ class GameEngine {
             playerId: playerId,
             playerName: player.name,
             details: 'Added 1 extra die'
+        });
+        
+        return [...player.dice];
+    }
+
+    // Magic Dice: add 2 extra dice to hand mid-round
+    useMagicDice(playerId) {
+        const player = this.players.find(p => p.id === playerId);
+        if (!player || player.cheat !== CHEATS.MAGIC_DICE || player.cheatUsed || this.gameState !== GAME_STATES.BIDDING) return null;
+        player.dice.push(Math.floor(Math.random() * 6) + 1);
+        player.dice.push(Math.floor(Math.random() * 6) + 1);
+        player.cheatUsed = true;
+        
+        // Log magic dice use
+        this.gameLog.push({
+            timestamp: new Date().toISOString(),
+            round: this.currentRoundNumber,
+            event: 'CHEAT_USED',
+            cheatType: 'MAGIC_DICE',
+            playerId: playerId,
+            playerName: player.name,
+            details: 'Added 2 extra dice'
         });
         
         return [...player.dice];

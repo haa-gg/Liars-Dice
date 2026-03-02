@@ -91,6 +91,12 @@ export const useGame = () => {
                     syncState({}, { [lastMessage.from]: { myDice: newDice } });
                 }
             }
+            if (type === 'USE_MAGIC_DICE') {
+                const newDice = engine.useMagicDice(lastMessage.from);
+                if (newDice) {
+                    syncState({}, { [lastMessage.from]: { myDice: newDice } });
+                }
+            }
             if (type === 'REROLL_DIE') {
                 const newDice = engine.rerollDie(lastMessage.from, data.index);
                 if (newDice) {
@@ -201,6 +207,16 @@ export const useGame = () => {
         }
     };
 
+    const useMagicDice = () => {
+        if (myCheat !== CHEATS.MAGIC_DICE || myCheatUsed) return;
+        if (isHost) {
+            const newDice = engine.useMagicDice(peerId);
+            if (newDice) { setMyDice([...newDice]); syncState(); }
+        } else {
+            broadcast({ type: 'USE_MAGIC_DICE', data: {} });
+        }
+    };
+
     const activateLoadedDie = () => {
         if (myCheat !== CHEATS.LOADED_DIE || myCheatUsed) return;
         setLoadedDieActive(true);
@@ -268,7 +284,7 @@ export const useGame = () => {
         peekInfo, loadedDieActive, gameLog,
         setGameOptions, assignCheat,
         startRoom, joinRoom, startRound, placeBid, challenge,
-        usePeek, activateLoadedDie, rerollDie, dismissPeek, useSlip, selectCheat,
+        usePeek, activateLoadedDie, rerollDie, dismissPeek, useSlip, useMagicDice, selectCheat,
         downloadTextLog, downloadJSONLog,
     };
 };

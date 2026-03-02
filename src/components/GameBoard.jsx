@@ -20,6 +20,7 @@ const CHEAT_LABELS = {
     shield: 'Shield',
     loaded_die: 'Loaded Die',
     slip: 'Slip',
+    magic_dice: 'Magic Dice',
 };
 
 const GameBoard = ({
@@ -46,6 +47,7 @@ const GameBoard = ({
     onRerollDie,
     onDismissPeek,
     onUseSlip,
+    onUseMagicDice,
     onSelectCheat,
     onDownloadTextLog,
     onDownloadJSONLog,
@@ -55,6 +57,7 @@ const GameBoard = ({
     const [showRules, setShowRules] = useState(false);
     const [showGameLog, setShowGameLog] = useState(false);
     const [showCheatInfo, setShowCheatInfo] = useState(false);
+    const [bidError, setBidError] = useState('');
     
     // Generate text preview of game log
     const gameLogText = formatGameLogAsText(gameLog, gameOptions);
@@ -63,7 +66,22 @@ const GameBoard = ({
     useEffect(() => {
         setBidCount(currentBid?.count || 1);
         setBidFace(currentBid?.face || 2);
+        setBidError(''); // Clear error on new round
     }, [currentBid]);
+
+    // Handle bid with validation
+    const handleRaiseBid = () => {
+        // Check if bid is actually higher
+        const isValidBid = bidCount > currentBid.count || (bidCount === currentBid.count && bidFace > currentBid.face);
+        
+        if (!isValidBid) {
+            setBidError('You must raise the bid! Increase the count or choose a higher face value.');
+            return;
+        }
+        
+        setBidError('');
+        onBid(bidCount, bidFace);
+    };
 
     if (!players || players.length === 0) {
         return <div className="parchment-panel">Gathering the crew...</div>;
@@ -189,6 +207,12 @@ const GameBoard = ({
                                     Secretly gain 1 extra die in your hand. Other players won't know you have more dice than expected.
                                 </p>
                             </div>
+                            <div>
+                                <h3 style={{ margin: '0 0 0.3rem 0', fontSize: '1rem', color: 'var(--color-ink)' }}>Magic Dice</h3>
+                                <p style={{ margin: 0, fontSize: '0.9rem', opacity: 0.8 }}>
+                                    Secretly gain 2 extra dice in your hand. A more powerful version of Slip for aggressive plays.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -241,7 +265,7 @@ const GameBoard = ({
                             />
                         </div>
                         <h2>
-                            {challengeResult.loserId === peerId ? 'Ye Lost a Die!' : 'Challenge!'}
+                            {challengeResult.loserId === peerId ? 'Ye Lost a Die!' : 'Round Winner!'}
                         </h2>
                         <p className="result-detail">
                             <strong>{loserName}</strong> loses a die.
@@ -319,6 +343,9 @@ const GameBoard = ({
                                 {myCheat === 'slip' && (
                                     <button className="btn-nautical" style={{ fontSize: '0.7rem', padding: '0.3rem 0.6rem' }} onClick={onUseSlip}>Use Slip</button>
                                 )}
+                                {myCheat === 'magic_dice' && (
+                                    <button className="btn-nautical" style={{ fontSize: '0.7rem', padding: '0.3rem 0.6rem' }} onClick={onUseMagicDice}>Use Magic Dice</button>
+                                )}
                             </div>
                         )}
                     </div>
@@ -348,14 +375,14 @@ const GameBoard = ({
                             </button>
                         </div>
                         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                            {['peek', 'shield', 'loaded_die', 'slip'].map(cheatType => (
+                            {['peek', 'shield', 'loaded_die', 'slip', 'magic_dice'].map(cheatType => (
                                 <button 
                                     key={cheatType}
                                     className="btn-nautical cheat-btn" 
                                     style={{ fontSize: '0.75rem', padding: '0.4rem 0.7rem' }} 
                                     onClick={() => onSelectCheat(cheatType)}
                                 >
-                                    {cheatType === 'loaded_die' ? 'Loaded Die' : cheatType.charAt(0).toUpperCase() + cheatType.slice(1)}
+                                    {cheatType === 'loaded_die' ? 'Loaded Die' : cheatType === 'magic_dice' ? 'Magic Dice' : cheatType.charAt(0).toUpperCase() + cheatType.slice(1)}
                                 </button>
                             ))}
                         </div>
@@ -409,11 +436,16 @@ const GameBoard = ({
                             </select>
                         </div>
                         <div className="bid-btns">
-                            <button className="btn-nautical" onClick={() => onBid(bidCount, bidFace)}>Raise Bid</button>
+                            <button className="btn-nautical" onClick={handleRaiseBid}>Raise Bid</button>
                             {currentBid.count > 0 && (
                                 <button className="btn-nautical danger" onClick={onChallenge}>Liar!</button>
                             )}
                         </div>
+                        {bidError && (
+                            <p style={{ color: 'var(--color-blood)', marginTop: '0.5rem', fontSize: '0.9rem', textAlign: 'center', margin: '0.5rem 0 0 0', wordWrap: 'break-word', overflowWrap: 'break-word' }}>
+                                {bidError}
+                            </p>
+                        )}
                     </div>
                 )}
 
