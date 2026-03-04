@@ -93,9 +93,10 @@ function App() {
               <div style={{ textAlign: 'left' }}>
                 <h1 style={{ margin: 0, paddingBottom: '0.2rem', borderBottom: 'none' }}>Liar&apos;s Dice</h1>
                 <p style={{ margin: 0, fontStyle: 'italic', opacity: 0.8 }}>
-                  Need a gambling system in your D&D game?<br />
+                  A multiplayer pirate-themed bluffing game<br />
                   <span style={{ fontSize: '0.8rem', color: 'var(--color-ink)' }}>
-                    Here you go! Minimal BS.
+                    "But I have no idea how to play this :("<br />
+                    Fear not! Tap the (?) button in the bottom right once you're in a lobby for rules.
                   </span>
                 </p>
               </div>
@@ -112,8 +113,8 @@ function App() {
                   onChange={(e) => setPlayerName(e.target.value)}
                   style={{ flex: 1, minWidth: 0 }}
                 />
-                <button 
-                  className="btn-nautical" 
+                <button
+                  className="btn-nautical"
                   onClick={handleRandomName}
                   style={{ padding: '0.5rem 1rem', whiteSpace: 'nowrap', flexShrink: 0 }}
                   title="Generate random pirate name"

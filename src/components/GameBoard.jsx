@@ -204,7 +204,7 @@ const GameBoard = ({
                             <div>
                                 <h3 style={{ margin: '0 0 0.3rem 0', fontSize: '1rem', color: 'var(--color-ink)' }}>Shield</h3>
                                 <p style={{ margin: 0, fontSize: '0.9rem', opacity: 0.8 }}>
-                                    Absorb one hit when you lose a challenge. You won't lose a die this round. Use it to stay in the game longer.
+                                    Absorb one hit when you lose a challenge. You won't lose a die this round. Use it to stay in the game longer. This move is more broken than most new LoL champs and mostly in for testing purposes.
                                 </p>
                             </div>
                             <div>
@@ -216,7 +216,7 @@ const GameBoard = ({
                             <div>
                                 <h3 style={{ margin: '0 0 0.3rem 0', fontSize: '1rem', color: 'var(--color-ink)' }}>Slip</h3>
                                 <p style={{ margin: 0, fontSize: '0.9rem', opacity: 0.8 }}>
-                                    Secretly gain 1 extra die in your hand. Other players won't know you have more dice than expected.
+                                    Secretly gain 1 extra die in your hand. Other players won't know you have more dice than expected. I mean it's in the game logs but meh!
                                 </p>
                             </div>
                             <div>
