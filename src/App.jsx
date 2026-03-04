@@ -21,11 +21,11 @@ function App() {
   const {
     gameState, players, currentTurn, currentBid, myDice,
     isHost, error, peerId, connections, challengeResult,
-    gameOptions, myCheat, myCheatUsed, peekInfo, loadedDieActive, gameLog,
+    gameOptions, myCheat, myCheatUsed, peekInfo, loadedDieActive, gameLog, nextRoundVotes,
     setGameOptions, assignCheat,
     startRoom, joinRoom, startRound, placeBid, challenge,
     usePeek, activateLoadedDie, rerollDie, dismissPeek, useSlip, useMagicDice, selectCheat,
-    downloadTextLog, downloadJSONLog,
+    downloadTextLog, downloadJSONLog, voteNextRound,
   } = game;
 
   const [playerName, setPlayerName] = useState('');
@@ -184,7 +184,27 @@ function App() {
           {/* ── HOST SETTINGS PANEL ── */}
           {isHost && showSettings && (
             <div className="settings-panel parchment-panel">
-              <h3>⚙ Game Settings</h3>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <h3 style={{ margin: 0 }}>⚙ Game Settings</h3>
+                <button
+                  onClick={() => setShowSettings(false)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    fontSize: '1.5rem',
+                    cursor: 'pointer',
+                    padding: '0.2rem 0.5rem',
+                    color: 'var(--color-ink)',
+                    opacity: 0.7,
+                    lineHeight: 1,
+                    fontWeight: 'bold'
+                  }}
+                  title="Close settings"
+                  aria-label="Close settings"
+                >
+                  ×
+                </button>
+              </div>
 
               <div className="settings-section">
                 <h4>Global Rules</h4>
@@ -288,7 +308,7 @@ function App() {
             gameState={gameState}
             challengeResult={challengeResult}
             isHost={isHost}
-            onNextRound={startRound}
+            onNextRound={voteNextRound}
             peerId={peerId}
             myCheat={myCheat}
             myCheatUsed={myCheatUsed}
@@ -296,6 +316,7 @@ function App() {
             loadedDieActive={loadedDieActive}
             gameLog={gameLog}
             gameOptions={gameOptions}
+            nextRoundVotes={nextRoundVotes}
             onUsePeek={usePeek}
             onActivateLoadedDie={activateLoadedDie}
             onRerollDie={rerollDie}

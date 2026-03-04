@@ -49,6 +49,12 @@ class GameEngine {
     }
 
     addPlayer(id, name) {
+        // Check if player already exists
+        if (this.players.some(p => p.id === id)) {
+            console.warn(`Player with id ${id} already exists`);
+            return false;
+        }
+        
         if (this.players.length < 10) {
             let uniqueName = name;
             let counter = 2;
@@ -76,15 +82,61 @@ class GameEngine {
     }
 
     removePlayer(id) {
+        const removedIndex = this.players.findIndex(p => p.id === id);
+        if (removedIndex === -1) return;
+        
         this.players = this.players.filter(p => p.id !== id);
+        
+        // Adjust currentTurnIndex if needed
+        if (this.players.length === 0) {
+            this.currentTurnIndex = 0;
+            return;
+        }
+        
+        // If we removed a player before current turn, shift index back
+        if (removedIndex < this.currentTurnIndex) {
+            this.currentTurnIndex--;
+        }
+        
+        // If current turn index is now out of bounds or pointing to inactive player
+        if (this.currentTurnIndex >= this.players.length) {
+            this.currentTurnIndex = 0;
+        }
+        
+        // Make sure we're pointing to an active player
+        const activePlayers = this.players.filter(p => p.active);
+        if (activePlayers.length > 0 && !this.players[this.currentTurnIndex]?.active) {
+            // Find next active player
+            let attempts = 0;
+            while (!this.players[this.currentTurnIndex]?.active && attempts < this.players.length) {
+                this.currentTurnIndex = (this.currentTurnIndex + 1) % this.players.length;
+                attempts++;
+            }
+        }
     }
 
     startRound() {
+        // Check if this is a new game (after GAME_OVER) BEFORE changing state
+        const isNewGame = this.gameState === GAME_STATES.GAME_OVER;
+        
         this.gameState = GAME_STATES.ROLLING;
         this.currentRoundSnapshot = null;  // Clear previous round snapshot
+        
+        if (isNewGame) {
+            // Reset all players for new game
+            this.players.forEach(p => {
+                p.active = true;
+                p.diceCount = this.options.startingDice;
+                p.dice = [];
+                p.cheat = this.options.honorSystemCheats ? null : p.cheat; // Keep assigned cheats unless honor system
+                p.cheatUsed = false;
+            });
+            this.currentRoundNumber = 0; // Reset round counter for new game
+        }
+        
         this.currentRoundNumber++;
         
-        if (!this.gameStartTime) {
+        if (!this.gameStartTime || isNewGame) {
             this.gameStartTime = new Date().toISOString();
         }
         
@@ -120,6 +172,21 @@ class GameEngine {
             }
         });
         this.currentBid = { count: 0, face: 0 };
+        
+        // Ensure currentTurnIndex points to an active player
+        if (!this.players[this.currentTurnIndex]?.active) {
+            // Find the next active player
+            const activePlayers = this.players.filter(p => p.active);
+            if (activePlayers.length > 0) {
+                // Start from current index and find next active player
+                let attempts = 0;
+                while (!this.players[this.currentTurnIndex]?.active && attempts < this.players.length) {
+                    this.currentTurnIndex = (this.currentTurnIndex + 1) % this.players.length;
+                    attempts++;
+                }
+            }
+        }
+        
         this.gameState = GAME_STATES.BIDDING;
     }
 
@@ -233,6 +300,12 @@ class GameEngine {
     }
 
     nextTurn() {
+        const activePlayers = this.players.filter(p => p.active);
+        if (activePlayers.length === 0) {
+            console.error('No active players for next turn');
+            return;
+        }
+        
         do {
             this.currentTurnIndex = (this.currentTurnIndex + 1) % this.players.length;
         } while (!this.players[this.currentTurnIndex].active);
@@ -241,13 +314,15 @@ class GameEngine {
     challenge(challengerId) {
         this.gameState = GAME_STATES.REVEALING;
         
-        // Capture snapshot of all dice before resolving
-        this.currentRoundSnapshot = this.players.map(p => ({
-            id: p.id,
-            name: p.name,
-            dice: [...p.dice],
-            active: p.active
-        }));
+        // Capture snapshot of all dice before resolving (only active players)
+        this.currentRoundSnapshot = this.players
+            .filter(p => p.active)
+            .map(p => ({
+                id: p.id,
+                name: p.name,
+                dice: [...p.dice],
+                active: p.active
+            }));
         
         const allDice = this.players.flatMap(p => p.dice);
         const count = allDice.filter(d =>

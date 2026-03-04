@@ -42,6 +42,7 @@ const GameBoard = ({
     loadedDieActive = false,
     gameLog = [],
     gameOptions = {},
+    nextRoundVotes = new Set(),
     onUsePeek,
     onActivateLoadedDie,
     onRerollDie,
@@ -93,7 +94,18 @@ const GameBoard = ({
         : null;
 
     const me = players.find(p => p.id === peerId);
-    const myBaseDiceCount = me ? me.diceCount : 0;
+    
+    // Calculate base dice count (non-slipped dice)
+    // During REVEALING/ROUND_END, always use actual dice length to prevent
+    // dice from incorrectly showing as red when player loses a die
+    let myBaseDiceCount;
+    if (gameState === 'REVEALING' || gameState === 'ROUND_END') {
+        // Use actual dice on screen - they shouldn't change until next round
+        myBaseDiceCount = myDice.length;
+    } else {
+        // During normal play, use player's diceCount
+        myBaseDiceCount = me ? me.diceCount : 0;
+    }
 
     const isGameOver = gameState === 'GAME_OVER';
     const isRoundOver = gameState === 'ROUND_END' || gameState === 'REVEALING';
@@ -241,8 +253,8 @@ const GameBoard = ({
                         <h2>Game Over!</h2>
                         <p className="result-subtitle">
                             {winner
-                                ? `${winner.name} rules the seas!`
-                                : 'The seas have claimed all pirates!'}
+                                ? `${winner.name} wins!`
+                                : 'The seas have claimed the rest of ye!'}
                         </p>
                         {isHost && (
                             <button className="btn-nautical" style={{ marginTop: '1.5rem' }} onClick={onNextRound}>
@@ -276,14 +288,19 @@ const GameBoard = ({
                             Actual count on the table: <strong>{challengeResult.count}</strong>
                         </p>
                         
-                        {isHost && (
-                            <button className="btn-nautical" style={{ marginTop: '1.5rem' }} onClick={onNextRound}>
-                                Next Round
-                            </button>
-                        )}
+                        <button 
+                            className="btn-nautical" 
+                            style={{ marginTop: '1.5rem' }} 
+                            onClick={onNextRound}
+                            disabled={nextRoundVotes.has(peerId)}
+                        >
+                            {isHost ? 'Next Round' : nextRoundVotes.has(peerId) ? 'Vote Recorded' : 'Vote: Next Round'}
+                        </button>
+                        
                         {!isHost && (
-                            <p style={{ marginTop: '1rem', opacity: 0.7, fontStyle: 'italic' }}>
-                                Waiting for the host to start the next round...
+                            <p style={{ marginTop: '0.5rem', opacity: 0.7, fontSize: '0.85rem' }}>
+                                {nextRoundVotes.size} / {Math.floor(players.length / 2) + 1} votes needed
+                                {nextRoundVotes.has(peerId) && ' (you voted)'}
                             </p>
                         )}
                     </div>
@@ -396,13 +413,16 @@ const GameBoard = ({
                 )}
 
                 <div className={`my-dice ${loadedDieActive ? 'loaded-die-active' : ''}`}>
-                    {myDice.map((val, i) => (
+                    {me && me.active && myDice.map((val, i) => (
                         <div key={i} className={`die-wrapper ${loadedDieActive ? 'clickable' : ''}`} onClick={() => { if (loadedDieActive) onRerollDie(i); }}>
                             <Dice value={val} isSlipped={i >= myBaseDiceCount} />
                         </div>
                     ))}
                     {myDice.length === 0 && gameState === 'LOBBY' && (
                         <p style={{ opacity: 0.5, fontStyle: 'italic' }}>Your dice will appear here when the round starts.</p>
+                    )}
+                    {me && !me.active && (
+                        <p style={{ opacity: 0.7, fontStyle: 'italic', fontSize: '1.1rem' }}>You've been eliminated. Watch the remaining players battle it out!</p>
                     )}
                 </div>
 

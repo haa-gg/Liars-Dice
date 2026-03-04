@@ -45,6 +45,8 @@ export const validateMessage = (msg) => {
         
         case 'USE_PEEK':
         case 'USE_SLIP':
+        case 'USE_MAGIC_DICE':
+        case 'VOTE_NEXT_ROUND':
             return true;  // No data validation needed
         
         case 'REROLL_DIE':
@@ -57,7 +59,7 @@ export const validateMessage = (msg) => {
         case 'SELECT_CHEAT':
             return (
                 typeof msg.data.cheat === 'string' &&
-                ['peek', 'shield', 'loaded_die', 'slip'].includes(msg.data.cheat)
+                ['peek', 'shield', 'loaded_die', 'slip', 'magic_dice'].includes(msg.data.cheat)
             );
         
         case 'STATE_SYNC':

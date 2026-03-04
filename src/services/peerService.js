@@ -1,5 +1,14 @@
 import { Peer } from 'peerjs';
-import { v4 as uuidv4 } from 'uuid';
+
+// Generate a short, readable room code
+const generateRoomCode = (length = 6) => {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Removed confusing chars (0,O,1,I)
+  let code = '';
+  for (let i = 0; i < length; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+};
 
 class PeerService {
   constructor() {
@@ -15,9 +24,12 @@ class PeerService {
       console.log('Destroying existing peer instance...');
       this.peer.destroy();
     }
-    console.log('Initializing PeerJS with ID:', id || 'generated');
-    // If id is null, PeerJS will generate a random one
-    this.peer = id ? new Peer(id, { debug: 1 }) : new Peer({ debug: 1 });
+    
+    // Generate a short room code if no ID provided
+    const roomId = id || generateRoomCode(6); // Change 6 to desired length
+    
+    console.log('Initializing PeerJS with ID:', roomId);
+    this.peer = new Peer(roomId, { debug: 1 });
 
     this.peer.on('connection', (conn) => {
       console.log('Incoming connection from:', conn.peer);

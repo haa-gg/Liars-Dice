@@ -4,7 +4,7 @@ import { usePeer } from './usePeer';
 import { validateMessage, sanitizeName } from '../utils/validation';
 import { formatGameLogAsText, formatGameLogAsJSON, downloadGameLog } from '../utils/gameLogger';
 
-const DEFAULT_OPTIONS = { startingDice: 5, eliminationThreshold: 0, wildsEnabled: true };
+const DEFAULT_OPTIONS = { startingDice: 5, eliminationThreshold: 0, wildsEnabled: true, honorSystemCheats: false };
 
 export const useGame = () => {
     const { peerId, connections, lastMessage, broadcast, initialize, connectToPeer, sendDirect, error } = usePeer();
@@ -19,6 +19,7 @@ export const useGame = () => {
     const [peekInfo, setPeekInfo] = useState(null);       // { playerName, dieValue }
     const [loadedDieActive, setLoadedDieActive] = useState(false); // waiting for die selection
     const [gameLog, setGameLog] = useState([]);  // Full game log
+    const [nextRoundVotes, setNextRoundVotes] = useState(new Set()); // Track who voted for next round
 
     // Derived: this player's cheat info
     const myPlayer = players.find(p => p.id === peerId);
@@ -68,8 +69,10 @@ export const useGame = () => {
         if (isHost) {
             if (type === 'JOIN') {
                 const sanitizedName = sanitizeName(data.name);
-                engine.addPlayer(lastMessage.from, sanitizedName);
-                syncState();
+                const added = engine.addPlayer(lastMessage.from, sanitizedName);
+                if (added) {
+                    syncState();
+                }
             }
             if (type === 'PLACE_BID') {
                 if (engine.placeBid(lastMessage.from, data.count, data.face)) syncState();
@@ -107,6 +110,27 @@ export const useGame = () => {
                 engine.assignCheat(lastMessage.from, data.cheat);
                 syncState();
             }
+            if (type === 'VOTE_NEXT_ROUND') {
+                // Add voter to the set
+                setNextRoundVotes(prev => {
+                    const newVotes = new Set(prev);
+                    newVotes.add(lastMessage.from);
+                    
+                    // Check if majority reached (more than half of all players)
+                    const totalPlayers = engine.players.length;
+                    const votesNeeded = Math.floor(totalPlayers / 2) + 1;
+                    
+                    if (newVotes.size >= votesNeeded) {
+                        // Majority reached, start next round
+                        startRound();
+                        return new Set(); // Clear votes
+                    }
+                    
+                    // Broadcast updated vote count to all players
+                    syncState({ nextRoundVotes: Array.from(newVotes) });
+                    return newVotes;
+                });
+            }
         } else {
             if (type === 'STATE_SYNC') {
                 setGameState(data.gameState);
@@ -119,15 +143,62 @@ export const useGame = () => {
                 if (data.peekInfo) setPeekInfo(data.peekInfo);
                 if (data.loadedDieHandled) setLoadedDieActive(false);
                 if (data.gameLog) setGameLog(data.gameLog);
+                if (data.nextRoundVotes !== undefined) setNextRoundVotes(new Set(data.nextRoundVotes));
 
                 if (data.roundReset) {
                     setChallengeResult(null);
                     setPeekInfo(null);
                     setLoadedDieActive(false);
+                    setNextRoundVotes(new Set()); // Clear votes on round reset
                 }
             }
         }
     }, [lastMessage, isHost, syncState, sendDirect]);
+
+    // Handle player disconnections (host only)
+    useEffect(() => {
+        if (!isHost) return;
+        
+        // Check for disconnected players
+        const connectedIds = new Set([peerId, ...connections]);
+        const disconnectedPlayers = engine.players.filter(p => !connectedIds.has(p.id));
+        
+        if (disconnectedPlayers.length > 0) {
+            disconnectedPlayers.forEach(p => {
+                console.log(`Player ${p.name} disconnected`);
+                
+                // Log disconnection
+                engine.gameLog.push({
+                    timestamp: new Date().toISOString(),
+                    round: engine.currentRoundNumber,
+                    event: 'PLAYER_DISCONNECTED',
+                    playerId: p.id,
+                    playerName: p.name
+                });
+                
+                // Remove player (this handles turn advancement automatically)
+                engine.removePlayer(p.id);
+            });
+            
+            // Check if game should end due to disconnections
+            const activePlayers = engine.players.filter(p => p.active);
+            if (activePlayers.length <= 1) {
+                engine.gameState = GAME_STATES.GAME_OVER;
+                if (activePlayers.length === 1) {
+                    engine.gameLog.push({
+                        timestamp: new Date().toISOString(),
+                        round: engine.currentRoundNumber,
+                        event: 'GAME_END',
+                        winnerId: activePlayers[0].id,
+                        winnerName: activePlayers[0].name,
+                        reason: 'Other players disconnected'
+                    });
+                }
+            }
+            
+            syncState();
+        }
+    }, [connections, isHost, peerId, syncState]);
 
     const startRoom = async (name) => {
         try {
@@ -137,6 +208,13 @@ export const useGame = () => {
             setIsHost(true);
             const sanitizedName = sanitizeName(name);
             engine.addPlayer(id, sanitizedName);
+            
+            // Clear all game state
+            setChallengeResult(null);
+            setPeekInfo(null);
+            setLoadedDieActive(false);
+            setMyDice([]);
+            
             syncState();
             return true;
         } catch (err) {
@@ -264,6 +342,7 @@ export const useGame = () => {
         setChallengeResult(null);
         setPeekInfo(null);
         setLoadedDieActive(false);
+        setNextRoundVotes(new Set()); // Clear votes when round starts
 
         const hostPlayer = engine.players.find(p => p.id === peerId);
         if (hostPlayer) setMyDice(hostPlayer.dice);
@@ -277,14 +356,26 @@ export const useGame = () => {
         syncState({ roundReset: true, challengeResult: null }, personalMap);
     };
 
+    const voteNextRound = () => {
+        if (isHost) {
+            // Host can start immediately
+            startRound();
+        } else {
+            // Non-host votes
+            broadcast({ type: 'VOTE_NEXT_ROUND', data: {} });
+            // Add own vote locally
+            setNextRoundVotes(prev => new Set([...prev, peerId]));
+        }
+    };
+
     return {
         gameState, players, currentTurn, currentBid, myDice,
         isHost, error, peerId, connections,
         challengeResult, gameOptions, myCheat, myCheatUsed,
-        peekInfo, loadedDieActive, gameLog,
+        peekInfo, loadedDieActive, gameLog, nextRoundVotes,
         setGameOptions, assignCheat,
         startRoom, joinRoom, startRound, placeBid, challenge,
         usePeek, activateLoadedDie, rerollDie, dismissPeek, useSlip, useMagicDice, selectCheat,
-        downloadTextLog, downloadJSONLog,
+        downloadTextLog, downloadJSONLog, voteNextRound,
     };
 };
