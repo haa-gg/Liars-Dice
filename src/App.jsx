@@ -22,8 +22,9 @@ function App() {
     gameState, players, currentTurn, currentBid, myDice,
     isHost, error, peerId, connections, challengeResult,
     gameOptions, myCheat, myCheatUsed, peekInfo, loadedDieActive, gameLog, nextRoundVotes,
+    isReconnecting, reconnect,
     setGameOptions, assignCheat,
-    startRoom, joinRoom, startRound, placeBid, challenge,
+    startRoom, joinRoom, rejoinRoom, startRound, placeBid, challenge,
     usePeek, activateLoadedDie, rerollDie, dismissPeek, useSlip, useMagicDice, selectCheat,
     downloadTextLog, downloadJSONLog, voteNextRound,
   } = game;
@@ -33,6 +34,7 @@ function App() {
   const [inLobby, setInLobby] = useState(true);
   const [copied, setCopied] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
 
   // Prevent accidental refresh
   React.useEffect(() => {
@@ -47,15 +49,20 @@ function App() {
   }, [inLobby]);
 
   const copyRoomId = () => {
-    navigator.clipboard.writeText(peerId);
+    const codeToCopy = isHost ? peerId : roomId;
+    navigator.clipboard.writeText(codeToCopy);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleCreateRoom = async () => {
     if (!playerName) return alert('Enter a name!');
+    if (isConnecting) return;
+    setIsConnecting(true);
     const success = await startRoom(playerName);
+    setIsConnecting(false);
     if (success) {
+      localStorage.setItem('liarsDiceSession', JSON.stringify({ isHost: true, playerName, roomId: peerId }));
       setInLobby(false);
     } else {
       alert('Failed to connect to the signaling server. Try again, ya scallywag!');
@@ -66,8 +73,45 @@ function App() {
     if (!playerName || !roomId) return alert('Name and Room ID required!');
     const sanitizedRoomId = sanitizeRoomId(roomId);
     if (!sanitizedRoomId) return alert('Invalid Room ID!');
-    await joinRoom(sanitizedRoomId, playerName);
-    setInLobby(false);
+
+    if (isConnecting) return;
+    setIsConnecting(true);
+
+    try {
+      await joinRoom(sanitizedRoomId, playerName);
+      localStorage.setItem('liarsDiceSession', JSON.stringify({ isHost: false, playerName, roomId: sanitizedRoomId }));
+      setInLobby(false);
+    } catch (err) {
+      alert(`Failed to join room: ${err.message}`);
+    } finally {
+      setIsConnecting(false);
+    }
+  };
+
+  const handleReconnect = async () => {
+    const sessionStr = localStorage.getItem('liarsDiceSession');
+    if (!sessionStr) return alert('No previous session found!');
+    const session = JSON.parse(sessionStr);
+
+    if (isConnecting || isReconnecting) return;
+    setIsConnecting(true);
+
+    try {
+      const id = await reconnect();
+      if (id) {
+        // If we were a client, we need to rejoin the host
+        if (!session.isHost && session.roomId) {
+          await rejoinRoom(session.roomId, session.playerName);
+          setRoomId(session.roomId);
+        }
+        setPlayerName(session.playerName);
+        setInLobby(false);
+      }
+    } catch (err) {
+      alert(`Reconnection failed: ${err.message}`);
+    } finally {
+      setIsConnecting(false);
+    }
   };
 
   const handleRandomName = () => {
@@ -127,8 +171,8 @@ function App() {
             <div className="form-divider" style={{ borderTop: '1px solid rgba(0,0,0,0.1)', margin: '1.5rem 0' }}></div>
 
             <div className="lobby-actions" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <button className="btn-nautical" onClick={handleCreateRoom}>
-                New Table
+              <button className="btn-nautical" onClick={handleCreateRoom} disabled={isConnecting}>
+                {isConnecting ? 'Starting...' : 'New Table'}
               </button>
 
               <div style={{ textAlign: 'center', opacity: 0.6 }}>— OR —</div>
@@ -142,10 +186,21 @@ function App() {
                   onChange={(e) => setRoomId(e.target.value)}
                   style={{ width: '100%', marginBottom: '1rem' }}
                 />
-                <button className="btn-nautical" onClick={handleJoinRoom} style={{ width: '100%' }}>
-                  Join Table
+                <button className="btn-nautical" onClick={handleJoinRoom} disabled={isConnecting} style={{ width: '100%' }}>
+                  {isConnecting ? 'Joining...' : 'Join Table'}
                 </button>
               </div>
+
+              {localStorage.getItem('liarsDicePeerId') && (
+                <button
+                  className="btn-nautical"
+                  onClick={handleReconnect}
+                  disabled={isReconnecting}
+                  style={{ width: '100%', marginTop: '0.5rem', backgroundColor: 'var(--color-ink)' }}
+                >
+                  {isReconnecting ? 'Reconnecting...' : 'Reconnect to Last Game'}
+                </button>
+              )}
             </div>
 
             {error && <p style={{ color: 'var(--color-blood)', marginTop: '1rem' }}>{error}</p>}
@@ -161,7 +216,7 @@ function App() {
           <div className="room-info">
             <div className="room-id-badge" onClick={copyRoomId} title="Click to copy Room ID">
               <span className="room-id-label">Room ID</span>
-              <span className="room-id-value">{peerId}</span>
+              <span className="room-id-value">{isHost ? peerId : roomId}</span>
               <span className={`room-id-copy ${copied ? 'copied' : ''}`}>
                 {copied ? '✓ Copied!' : '⎘ Copy'}
               </span>

@@ -48,13 +48,34 @@ class GameEngine {
         this.options = { ...this.options, ...opts };
     }
 
-    addPlayer(id, name) {
-        // Check if player already exists
-        if (this.players.some(p => p.id === id)) {
-            console.warn(`Player with id ${id} already exists`);
-            return false;
+    markPlayerDisconnected(id) {
+        const playerIndex = this.players.findIndex(p => p.id === id);
+        if (playerIndex === -1) return;
+
+        const player = this.players[playerIndex];
+        player.connected = false;
+        // Optionally, if we still want them to lose their turn:
+        // if this was their turn, advance to next connected & active player
+        if (this.currentTurnIndex === playerIndex) {
+            this.nextTurn();
         }
-        
+    }
+
+    handlePlayerReconnect(id) {
+        const player = this.players.find(p => p.id === id);
+        if (player) {
+            player.connected = true;
+            return true;
+        }
+        return false;
+    }
+
+    addPlayer(id, name) {
+        // If reconnecting
+        if (this.handlePlayerReconnect(id)) {
+            return true;
+        }
+
         if (this.players.length < 10) {
             let uniqueName = name;
             let counter = 2;
@@ -64,7 +85,7 @@ class GameEngine {
             }
 
             this.players.push({
-                id, name: uniqueName, dice: [], active: true,
+                id, name: uniqueName, dice: [], active: true, connected: true,
                 diceCount: this.options.startingDice,
                 cheat: null, cheatUsed: false
             });
@@ -84,25 +105,25 @@ class GameEngine {
     removePlayer(id) {
         const removedIndex = this.players.findIndex(p => p.id === id);
         if (removedIndex === -1) return;
-        
+
         this.players = this.players.filter(p => p.id !== id);
-        
+
         // Adjust currentTurnIndex if needed
         if (this.players.length === 0) {
             this.currentTurnIndex = 0;
             return;
         }
-        
+
         // If we removed a player before current turn, shift index back
         if (removedIndex < this.currentTurnIndex) {
             this.currentTurnIndex--;
         }
-        
+
         // If current turn index is now out of bounds or pointing to inactive player
         if (this.currentTurnIndex >= this.players.length) {
             this.currentTurnIndex = 0;
         }
-        
+
         // Make sure we're pointing to an active player
         const activePlayers = this.players.filter(p => p.active);
         if (activePlayers.length > 0 && !this.players[this.currentTurnIndex]?.active) {
@@ -118,10 +139,10 @@ class GameEngine {
     startRound() {
         // Check if this is a new game (after GAME_OVER) BEFORE changing state
         const isNewGame = this.gameState === GAME_STATES.GAME_OVER;
-        
+
         this.gameState = GAME_STATES.ROLLING;
         this.currentRoundSnapshot = null;  // Clear previous round snapshot
-        
+
         if (isNewGame) {
             // Reset all players for new game
             this.players.forEach(p => {
@@ -133,13 +154,13 @@ class GameEngine {
             });
             this.currentRoundNumber = 0; // Reset round counter for new game
         }
-        
+
         this.currentRoundNumber++;
-        
+
         if (!this.gameStartTime || isNewGame) {
             this.gameStartTime = new Date().toISOString();
         }
-        
+
         // Reset cheat usage for new round (honor system allows re-selection)
         if (this.options.honorSystemCheats) {
             this.players.forEach(p => {
@@ -152,7 +173,7 @@ class GameEngine {
                 p.cheatUsed = false;
             });
         }
-        
+
         // Log round start
         this.gameLog.push({
             timestamp: new Date().toISOString(),
@@ -165,14 +186,14 @@ class GameEngine {
                 active: p.active
             }))
         });
-        
+
         this.players.forEach(p => {
             if (p.active) {
                 p.dice = Array.from({ length: p.diceCount }, () => Math.floor(Math.random() * 6) + 1);
             }
         });
         this.currentBid = { count: 0, face: 0 };
-        
+
         // Ensure currentTurnIndex points to an active player
         if (!this.players[this.currentTurnIndex]?.active) {
             // Find the next active player
@@ -186,7 +207,7 @@ class GameEngine {
                 }
             }
         }
-        
+
         this.gameState = GAME_STATES.BIDDING;
     }
 
@@ -196,7 +217,7 @@ class GameEngine {
         if (!player || player.cheat !== CHEATS.SLIP || player.cheatUsed || this.gameState !== GAME_STATES.BIDDING) return null;
         player.dice.push(Math.floor(Math.random() * 6) + 1);
         player.cheatUsed = true;
-        
+
         // Log slip use
         this.gameLog.push({
             timestamp: new Date().toISOString(),
@@ -207,7 +228,7 @@ class GameEngine {
             playerName: player.name,
             details: 'Added 1 extra die'
         });
-        
+
         return [...player.dice];
     }
 
@@ -218,7 +239,7 @@ class GameEngine {
         player.dice.push(Math.floor(Math.random() * 6) + 1);
         player.dice.push(Math.floor(Math.random() * 6) + 1);
         player.cheatUsed = true;
-        
+
         // Log magic dice use
         this.gameLog.push({
             timestamp: new Date().toISOString(),
@@ -229,7 +250,7 @@ class GameEngine {
             playerName: player.name,
             details: 'Added 2 extra dice'
         });
-        
+
         return [...player.dice];
     }
 
@@ -240,7 +261,7 @@ class GameEngine {
         const oldValue = player.dice[index];
         player.dice[index] = Math.floor(Math.random() * 6) + 1;
         player.cheatUsed = true;
-        
+
         // Log loaded die use
         this.gameLog.push({
             timestamp: new Date().toISOString(),
@@ -251,7 +272,7 @@ class GameEngine {
             playerName: player.name,
             details: `Re-rolled die from ${oldValue} to ${player.dice[index]}`
         });
-        
+
         return [...player.dice];
     }
 
@@ -262,7 +283,7 @@ class GameEngine {
         if (others.length === 0) return null;
         const rp = others[Math.floor(Math.random() * others.length)];
         const dieValue = rp.dice[Math.floor(Math.random() * rp.dice.length)];
-        
+
         // Log peek use
         this.gameLog.push({
             timestamp: new Date().toISOString(),
@@ -273,14 +294,14 @@ class GameEngine {
             playerName: player?.name || 'Unknown',
             details: `Peeked at ${rp.name}'s die: ${dieValue}`
         });
-        
+
         return { playerName: rp.name, dieValue };
     }
 
     placeBid(playerId, count, face) {
         if (count > this.currentBid.count || (count === this.currentBid.count && face > this.currentBid.face)) {
             const player = this.players.find(p => p.id === playerId);
-            
+
             // Log the bid
             this.gameLog.push({
                 timestamp: new Date().toISOString(),
@@ -290,7 +311,7 @@ class GameEngine {
                 playerName: player?.name || 'Unknown',
                 bid: { count, face }
             });
-            
+
             this.currentBid = { count, face };
             this.lastBidderId = playerId;
             this.nextTurn();
@@ -305,7 +326,7 @@ class GameEngine {
             console.error('No active players for next turn');
             return;
         }
-        
+
         do {
             this.currentTurnIndex = (this.currentTurnIndex + 1) % this.players.length;
         } while (!this.players[this.currentTurnIndex].active);
@@ -313,7 +334,7 @@ class GameEngine {
 
     challenge(challengerId) {
         this.gameState = GAME_STATES.REVEALING;
-        
+
         // Capture snapshot of all dice before resolving (only active players)
         this.currentRoundSnapshot = this.players
             .filter(p => p.active)
@@ -323,7 +344,7 @@ class GameEngine {
                 dice: [...p.dice],
                 active: p.active
             }));
-        
+
         const allDice = this.players.flatMap(p => p.dice);
         const count = allDice.filter(d =>
             d === this.currentBid.face || (this.options.wildsEnabled && d === 1)
@@ -333,7 +354,7 @@ class GameEngine {
         const challenger = this.players.find(p => p.id === challengerId);
         const bidder = this.players.find(p => p.id === this.lastBidderId);
         const loser = this.players.find(p => p.id === loserId);
-        
+
         // Log the challenge with full details
         this.gameLog.push({
             timestamp: new Date().toISOString(),
@@ -353,7 +374,7 @@ class GameEngine {
                 dice: p.dice
             }))
         });
-        
+
         const shieldUsed = this.resolveRound(loserId);
         return { loserId, count, actualCount: count, shieldUsed };
     }
@@ -364,7 +385,7 @@ class GameEngine {
         // Shield: absorb this hit
         if (loser.cheat === CHEATS.SHIELD && !loser.cheatUsed) {
             loser.cheatUsed = true;
-            
+
             // Log shield use
             this.gameLog.push({
                 timestamp: new Date().toISOString(),
@@ -373,14 +394,14 @@ class GameEngine {
                 playerId: loserId,
                 playerName: loser.name
             });
-            
+
             const activePlayers = this.players.filter(p => p.active);
             this.gameState = activePlayers.length <= 1 ? GAME_STATES.GAME_OVER : GAME_STATES.ROUND_END;
             return true; // shieldUsed
         }
 
         loser.diceCount--;
-        
+
         // Log dice loss
         this.gameLog.push({
             timestamp: new Date().toISOString(),
@@ -390,10 +411,10 @@ class GameEngine {
             playerName: loser.name,
             remainingDice: loser.diceCount
         });
-        
+
         if (loser.diceCount <= this.options.eliminationThreshold) {
             loser.active = false;
-            
+
             // Log elimination
             this.gameLog.push({
                 timestamp: new Date().toISOString(),
@@ -405,10 +426,10 @@ class GameEngine {
         }
 
         const activePlayers = this.players.filter(p => p.active);
-        
+
         if (activePlayers.length <= 1) {
             this.gameState = GAME_STATES.GAME_OVER;
-            
+
             // Log game end
             const winner = activePlayers[0];
             this.gameLog.push({
@@ -422,7 +443,7 @@ class GameEngine {
         } else {
             this.gameState = GAME_STATES.ROUND_END;
         }
-        
+
         return false;
     }
 }
