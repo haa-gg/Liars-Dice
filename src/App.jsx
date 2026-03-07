@@ -35,6 +35,7 @@ function App() {
   const [copied, setCopied] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [canReconnect, setCanReconnect] = useState(false);
 
   // Prevent accidental refresh
   React.useEffect(() => {
@@ -46,6 +47,45 @@ function App() {
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [inLobby]);
+
+  // Session expiration and renewal logic
+  React.useEffect(() => {
+    const checkOrRenewSession = () => {
+      const sessionStr = localStorage.getItem('liarsDiceSession');
+      const peerIdStr = localStorage.getItem('liarsDicePeerId');
+
+      if (!sessionStr || !peerIdStr) {
+        setCanReconnect(false);
+        return;
+      }
+
+      try {
+        const session = JSON.parse(sessionStr);
+
+        if (!inLobby) {
+          // If active in a game, keep renewing the timestamp to prevent expiration
+          session.timestamp = Date.now();
+          localStorage.setItem('liarsDiceSession', JSON.stringify(session));
+        }
+
+        // Expire session after 1 hour (3600000ms) of inactivity
+        if (session.timestamp && (Date.now() - session.timestamp > 3600000)) {
+          localStorage.removeItem('liarsDiceSession');
+          localStorage.removeItem('liarsDicePeerId');
+          setCanReconnect(false);
+        } else {
+          setCanReconnect(true);
+        }
+      } catch (e) {
+        setCanReconnect(false);
+      }
+    };
+
+    checkOrRenewSession();
+    // Check every 10 seconds
+    const interval = setInterval(checkOrRenewSession, 10000);
+    return () => clearInterval(interval);
   }, [inLobby]);
 
   const copyRoomId = () => {
@@ -62,7 +102,7 @@ function App() {
     const success = await startRoom(playerName);
     setIsConnecting(false);
     if (success) {
-      localStorage.setItem('liarsDiceSession', JSON.stringify({ isHost: true, playerName, roomId: peerId }));
+      localStorage.setItem('liarsDiceSession', JSON.stringify({ isHost: true, playerName, roomId: peerId, timestamp: Date.now() }));
       setInLobby(false);
     } else {
       alert('Failed to connect to the signaling server. Try again, ya scallywag!');
@@ -79,7 +119,7 @@ function App() {
 
     try {
       await joinRoom(sanitizedRoomId, playerName);
-      localStorage.setItem('liarsDiceSession', JSON.stringify({ isHost: false, playerName, roomId: sanitizedRoomId }));
+      localStorage.setItem('liarsDiceSession', JSON.stringify({ isHost: false, playerName, roomId: sanitizedRoomId, timestamp: Date.now() }));
       setInLobby(false);
     } catch (err) {
       alert(`Failed to join room: ${err.message}`);
@@ -191,7 +231,7 @@ function App() {
                 </button>
               </div>
 
-              {localStorage.getItem('liarsDicePeerId') && (
+              {canReconnect && (
                 <button
                   className="btn-nautical"
                   onClick={handleReconnect}
