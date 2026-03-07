@@ -69,8 +69,8 @@ function App() {
           localStorage.setItem('liarsDiceSession', JSON.stringify(session));
         }
 
-        // Expire session after 1 hour (3600000ms) of inactivity
-        if (session.timestamp && (Date.now() - session.timestamp > 3600000)) {
+        // Expire session after 1 hour (3600000ms) of inactivity, or if no timestamp exists (legacy session)
+        if (!session.timestamp || (Date.now() - session.timestamp > 3600000)) {
           localStorage.removeItem('liarsDiceSession');
           localStorage.removeItem('liarsDicePeerId');
           setCanReconnect(false);
@@ -148,7 +148,15 @@ function App() {
         setInLobby(false);
       }
     } catch (err) {
-      alert(`Reconnection failed: ${err.message}`);
+      if (err.message && err.message.includes('is taken')) {
+        // If the ID is taken on the server, this session is unrecoverable. Clear it.
+        localStorage.removeItem('liarsDiceSession');
+        localStorage.removeItem('liarsDicePeerId');
+        setCanReconnect(false);
+        alert(`Failed to reconnect: the session ID is currently active or captured by another player.`);
+      } else {
+        alert(`Reconnection failed: ${err.message}`);
+      }
     } finally {
       setIsConnecting(false);
     }
