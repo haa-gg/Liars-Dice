@@ -29,7 +29,7 @@ class PeerService {
     }
 
     // Generate a short room code if no ID provided
-    const roomId = id || generateRoomCode(6); // Change 6 to desired length
+    const roomId = id || generateRoomCode(6); // Can switch this around, 6 just felt reasonable
 
     console.log(`Initializing PeerJS with ID: ${roomId} (Retries left: ${retries})`);
     this.peer = new Peer(roomId, {
