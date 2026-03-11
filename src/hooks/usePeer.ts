@@ -1,29 +1,43 @@
 import { useState, useCallback } from 'react';
 import peerService from '../services/peerService';
+import { DataConnection } from 'peerjs';
 
-export const usePeer = () => {
-    const [peerId, setPeerId] = useState(null);
-    const [connections, setConnections] = useState([]);
-    const [lastMessage, setLastMessage] = useState(null);
-    const [error, setError] = useState(null);
-    const [isReconnecting, setIsReconnecting] = useState(false);
+export interface UsePeerReturn {
+    peerId: string | null;
+    connections: string[];
+    lastMessage: { from: string; data: any } | null;
+    error: string | null;
+    isReconnecting: boolean;
+    initialize: (customId?: string) => Promise<string>;
+    connectToPeer: (id: string, metadata: any, onConnected?: () => void) => DataConnection;
+    reconnect: () => Promise<string | null>;
+    broadcast: (data: any) => void;
+    sendDirect: (id: string, data: any) => void;
+}
 
-    const initialize = useCallback(async (customId) => {
+export const usePeer = (): UsePeerReturn => {
+    const [peerId, setPeerId] = useState<string | null>(null);
+    const [connections, setConnections] = useState<string[]>([]);
+    const [lastMessage, setLastMessage] = useState<{ from: string; data: any } | null>(null);
+    const [error, setError] = useState<string | null>(null);
+    const [isReconnecting, setIsReconnecting] = useState<boolean>(false);
+
+    const initialize = useCallback(async (customId?: string) => {
         try {
             const id = await peerService.init(customId);
             setPeerId(id);
             localStorage.setItem('liarsDicePeerId', id);
 
-            peerService.onConnectionCallback = (conn) => {
+            peerService.onConnectionCallback = (conn: DataConnection) => {
                 // Use a Set to prevent duplicate connections being recorded
                 setConnections(prev => Array.from(new Set([...prev, conn.peer])));
             };
 
-            peerService.onDisconnectedCallback = (disconnectedId) => {
+            peerService.onDisconnectedCallback = (disconnectedId: string) => {
                 setConnections(prev => prev.filter(id => id !== disconnectedId));
             };
 
-            peerService.onMessageCallback = (id, data) => {
+            peerService.onMessageCallback = (id: string, data: any) => {
                 setLastMessage({ from: id, data });
             };
 
@@ -33,13 +47,13 @@ export const usePeer = () => {
 
             return id;
 
-        } catch (err) {
+        } catch (err: any) {
             setError(err.message);
             throw err;
         }
     }, []);
 
-    const connectToPeer = useCallback((id, metadata, onConnected) => {
+    const connectToPeer = useCallback((id: string, metadata: any, onConnected?: () => void) => {
         const conn = peerService.connect(id, metadata);
         if (onConnected) {
             conn.on('open', onConnected);
@@ -60,18 +74,18 @@ export const usePeer = () => {
             const id = await initialize(savedId);
             setIsReconnecting(false);
             return id;
-        } catch (err) {
+        } catch (err: any) {
             setIsReconnecting(false);
             setError("Failed to reconnect: " + err.message);
             return null;
         }
     }, [initialize]);
 
-    const broadcast = useCallback((data) => {
+    const broadcast = useCallback((data: any) => {
         peerService.broadcast(data);
     }, []);
 
-    const sendDirect = useCallback((id, data) => {
+    const sendDirect = useCallback((id: string, data: any) => {
         peerService.send(id, data);
     }, []);
 

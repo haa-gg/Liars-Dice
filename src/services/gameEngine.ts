@@ -1,4 +1,6 @@
-export const GAME_STATES = {
+import { Player, Bid, GameOptions, GameLogEntry, GameState, CheatType, ChallengeResult } from '../types';
+
+export const GAME_STATES: Record<string, GameState> = {
     LOBBY: 'LOBBY',
     ROLLING: 'ROLLING',
     BIDDING: 'BIDDING',
@@ -7,7 +9,7 @@ export const GAME_STATES = {
     GAME_OVER: 'GAME_OVER'
 };
 
-export const CHEATS = {
+export const CHEATS: Record<string, CheatType> = {
     PEEK: 'peek',
     SHIELD: 'shield',
     LOADED_DIE: 'loaded_die',
@@ -15,7 +17,7 @@ export const CHEATS = {
     MAGIC_DICE: 'magic_dice',
 };
 
-export const CHEAT_LABELS = {
+export const CHEAT_LABELS: Record<CheatType, string> = {
     peek: 'Peek',
     shield: 'Shield',
     loaded_die: 'Loaded Die',
@@ -23,9 +25,21 @@ export const CHEAT_LABELS = {
     magic_dice: 'Magic Dice',
 };
 
-const DEFAULT_OPTIONS = { startingDice: 5, eliminationThreshold: 0, wildsEnabled: true, honorSystemCheats: false };
+const DEFAULT_OPTIONS: GameOptions = { startingDice: 5, eliminationThreshold: 0, wildsEnabled: true, honorSystemCheats: false };
 
 class GameEngine {
+    options: GameOptions = { ...DEFAULT_OPTIONS };
+    gameState: GameState = GAME_STATES.LOBBY;
+    players: Player[] = [];
+    currentTurnIndex: number = 0;
+    currentBid: Bid = { count: 0, face: 0 };
+    lastBidderId: string | null = null;
+    history: any[] = [];
+    currentRoundSnapshot: any[] | null = null;
+    gameLog: GameLogEntry[] = [];
+    currentRoundNumber: number = 0;
+    gameStartTime: string | null = null;
+
     constructor() {
         this.reset();
     }
@@ -44,11 +58,11 @@ class GameEngine {
         this.gameStartTime = null;
     }
 
-    setOptions(opts) {
+    setOptions(opts: Partial<GameOptions>) {
         this.options = { ...this.options, ...opts };
     }
 
-    markPlayerDisconnected(id) {
+    markPlayerDisconnected(id: string) {
         const playerIndex = this.players.findIndex(p => p.id === id);
         if (playerIndex === -1) return;
 
@@ -61,7 +75,7 @@ class GameEngine {
         }
     }
 
-    handlePlayerReconnect(id) {
+    handlePlayerReconnect(id: string): boolean {
         const player = this.players.find(p => p.id === id);
         if (player) {
             player.connected = true;
@@ -70,7 +84,7 @@ class GameEngine {
         return false;
     }
 
-    addPlayer(id, name) {
+    addPlayer(id: string, name: string): boolean {
         // If reconnecting
         if (this.handlePlayerReconnect(id)) {
             return true;
@@ -94,15 +108,15 @@ class GameEngine {
         return false;
     }
 
-    assignCheat(playerId, cheat) {
+    assignCheat(playerId: string, cheat: CheatType | null) {
         const player = this.players.find(p => p.id === playerId);
         if (player) {
-            player.cheat = cheat || null;
+            player.cheat = cheat;
             player.cheatUsed = false;
         }
     }
 
-    removePlayer(id) {
+    removePlayer(id: string) {
         const removedIndex = this.players.findIndex(p => p.id === id);
         if (removedIndex === -1) return;
 
@@ -212,7 +226,7 @@ class GameEngine {
     }
 
     // Slip: secretly add 1 extra die to hand mid-round
-    useSlip(playerId) {
+    useSlip(playerId: string): number[] | null {
         const player = this.players.find(p => p.id === playerId);
         if (!player || player.cheat !== CHEATS.SLIP || player.cheatUsed || this.gameState !== GAME_STATES.BIDDING) return null;
         player.dice.push(Math.floor(Math.random() * 6) + 1);
@@ -233,7 +247,7 @@ class GameEngine {
     }
 
     // Magic Dice: add 2 extra dice to hand mid-round
-    useMagicDice(playerId) {
+    useMagicDice(playerId: string): number[] | null {
         const player = this.players.find(p => p.id === playerId);
         if (!player || player.cheat !== CHEATS.MAGIC_DICE || player.cheatUsed || this.gameState !== GAME_STATES.BIDDING) return null;
         player.dice.push(Math.floor(Math.random() * 6) + 1);
@@ -255,9 +269,9 @@ class GameEngine {
     }
 
     // Loaded Die: re-roll one specific die for a player
-    rerollDie(playerId, index) {
+    rerollDie(playerId: string, index: number): number[] | null {
         const player = this.players.find(p => p.id === playerId);
-        if (!player || index < 0 || index >= player.dice.length) return null;
+        if (!player || player.cheat !== CHEATS.LOADED_DIE || player.cheatUsed || index < 0 || index >= player.dice.length) return null;
         const oldValue = player.dice[index];
         player.dice[index] = Math.floor(Math.random() * 6) + 1;
         player.cheatUsed = true;
@@ -277,7 +291,7 @@ class GameEngine {
     }
 
     // Peek: reveal one random die from an opponent
-    peekResult(peekingPlayerId) {
+    peekResult(peekingPlayerId: string): { playerName: string, dieValue: number } | null {
         const player = this.players.find(p => p.id === peekingPlayerId);
         const others = this.players.filter(p => p.id !== peekingPlayerId && p.active && p.dice.length > 0);
         if (others.length === 0) return null;
@@ -298,7 +312,7 @@ class GameEngine {
         return { playerName: rp.name, dieValue };
     }
 
-    placeBid(playerId, count, face) {
+    placeBid(playerId: string, count: number, face: number): boolean {
         if (count > this.currentBid.count || (count === this.currentBid.count && face > this.currentBid.face)) {
             const player = this.players.find(p => p.id === playerId);
 
@@ -332,7 +346,7 @@ class GameEngine {
         } while (!this.players[this.currentTurnIndex].active);
     }
 
-    challenge(challengerId) {
+    challenge(challengerId: string): ChallengeResult {
         this.gameState = GAME_STATES.REVEALING;
 
         // Capture snapshot of all dice before resolving (only active players)
@@ -350,7 +364,7 @@ class GameEngine {
             d === this.currentBid.face || (this.options.wildsEnabled && d === 1)
         ).length;
 
-        const loserId = count >= this.currentBid.count ? challengerId : this.lastBidderId;
+        const loserId = count >= this.currentBid.count ? challengerId : (this.lastBidderId as string);
         const challenger = this.players.find(p => p.id === challengerId);
         const bidder = this.players.find(p => p.id === this.lastBidderId);
         const loser = this.players.find(p => p.id === loserId);
@@ -379,8 +393,9 @@ class GameEngine {
         return { loserId, count, actualCount: count, shieldUsed };
     }
 
-    resolveRound(loserId) {
+    resolveRound(loserId: string): boolean {
         const loser = this.players.find(p => p.id === loserId);
+        if (!loser) return false;
 
         // Shield: absorb this hit
         if (loser.cheat === CHEATS.SHIELD && !loser.cheatUsed) {

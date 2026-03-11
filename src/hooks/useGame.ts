@@ -3,23 +3,64 @@ import engine, { GAME_STATES, CHEATS } from '../services/gameEngine';
 import { usePeer } from './usePeer';
 import { validateMessage, sanitizeName } from '../utils/validation';
 import { formatGameLogAsText, formatGameLogAsJSON, downloadGameLog } from '../utils/gameLogger';
+import { Player, Bid, GameState, GameOptions, ChallengeResult, GameLogEntry, CheatType } from '../types';
 
-const DEFAULT_OPTIONS = { startingDice: 5, eliminationThreshold: 0, wildsEnabled: true, honorSystemCheats: false };
+const DEFAULT_OPTIONS: GameOptions = { startingDice: 5, eliminationThreshold: 0, wildsEnabled: true, honorSystemCheats: false };
 
-export const useGame = () => {
+export interface UseGameReturn {
+    gameState: GameState;
+    players: Player[];
+    currentTurn: string | null;
+    currentBid: Bid;
+    myDice: number[];
+    isHost: boolean;
+    error: string | null;
+    peerId: string | null;
+    connections: string[];
+    challengeResult: ChallengeResult | null;
+    gameOptions: GameOptions;
+    myCheat: CheatType | null;
+    myCheatUsed: boolean;
+    peekInfo: { playerName: string; dieValue: number } | null;
+    loadedDieActive: boolean;
+    gameLog: GameLogEntry[];
+    nextRoundVotes: Set<string>;
+    isReconnecting: boolean;
+    reconnect: () => Promise<string | null>;
+    setGameOptions: (opts: Partial<GameOptions>) => void;
+    assignCheat: (playerId: string, cheat: CheatType | null) => void;
+    startRoom: (name: string) => Promise<boolean>;
+    joinRoom: (hostId: string, name: string) => Promise<boolean>;
+    rejoinRoom: (hostId: string, name: string) => Promise<boolean>;
+    startRound: () => void;
+    placeBid: (count: number, face: number) => void;
+    challenge: () => void;
+    usePeek: () => void;
+    activateLoadedDie: () => void;
+    rerollDie: (index: number) => void;
+    dismissPeek: () => void;
+    useSlip: () => void;
+    useMagicDice: () => void;
+    selectCheat: (cheatType: CheatType) => void;
+    downloadTextLog: () => void;
+    downloadJSONLog: () => void;
+    voteNextRound: () => void;
+}
+
+export const useGame = (): UseGameReturn => {
     const { peerId, connections, lastMessage, broadcast, initialize, connectToPeer, sendDirect, error, isReconnecting, reconnect } = usePeer();
-    const [gameState, setGameState] = useState(GAME_STATES.LOBBY);
-    const [players, setPlayers] = useState([]);
-    const [currentTurn, setCurrentTurn] = useState(null);
-    const [currentBid, setCurrentBid] = useState({ count: 0, face: 0 });
-    const [myDice, setMyDice] = useState([]);
-    const [isHost, setIsHost] = useState(false);
-    const [challengeResult, setChallengeResult] = useState(null);
-    const [gameOptions, setGameOptionsState] = useState({ ...DEFAULT_OPTIONS });
-    const [peekInfo, setPeekInfo] = useState(null);       // { playerName, dieValue }
-    const [loadedDieActive, setLoadedDieActive] = useState(false); // waiting for die selection
-    const [gameLog, setGameLog] = useState([]);  // Full game log
-    const [nextRoundVotes, setNextRoundVotes] = useState(new Set()); // Track who voted for next round
+    const [gameState, setGameState] = useState<GameState>(GAME_STATES.LOBBY);
+    const [players, setPlayers] = useState<Player[]>([]);
+    const [currentTurn, setCurrentTurn] = useState<string | null>(null);
+    const [currentBid, setCurrentBid] = useState<Bid>({ count: 0, face: 0 });
+    const [myDice, setMyDice] = useState<number[]>([]);
+    const [isHost, setIsHost] = useState<boolean>(false);
+    const [challengeResult, setChallengeResult] = useState<ChallengeResult | null>(null);
+    const [gameOptions, setGameOptionsState] = useState<GameOptions>({ ...DEFAULT_OPTIONS });
+    const [peekInfo, setPeekInfo] = useState<{ playerName: string; dieValue: number } | null>(null);
+    const [loadedDieActive, setLoadedDieActive] = useState<boolean>(false);
+    const [gameLog, setGameLog] = useState<GameLogEntry[]>([]);
+    const [nextRoundVotes, setNextRoundVotes] = useState<Set<string>>(new Set());
 
     // Derived: this player's cheat info
     const myPlayer = players.find(p => p.id === peerId);
@@ -27,12 +68,12 @@ export const useGame = () => {
     const myCheatUsed = myPlayer?.cheatUsed ?? false;
 
     // Sync engine state to React + broadcast to clients
-    const syncState = useCallback((extraData = {}, personalDataMap = {}) => {
+    const syncState = useCallback((extraData: any = {}, personalDataMap: Record<string, any> = {}) => {
         setGameState(engine.gameState);
         setPlayers([...engine.players]);
-        setCurrentTurn(engine.players[engine.currentTurnIndex]?.id);
+        setCurrentTurn(engine.players[engine.currentTurnIndex]?.id || null);
         setCurrentBid(engine.currentBid);
-        setGameLog([...engine.gameLog]);  // Sync game log
+        setGameLog([...engine.gameLog]);
 
         const baseState = {
             gameState: engine.gameState,
@@ -76,8 +117,6 @@ export const useGame = () => {
                     if (player && player.dice.length > 0) {
                         syncState({}, { [lastMessage.from]: { myDice: player.dice } });
                     } else {
-                        // We still want to use the map form to trigger the specific targeted send, 
-                        // ensuring the new connection receives the baseline state even if not in React state yet
                         syncState({}, { [lastMessage.from]: {} });
                     }
                 }
@@ -119,22 +158,18 @@ export const useGame = () => {
                 syncState();
             }
             if (type === 'VOTE_NEXT_ROUND') {
-                // Add voter to the set
                 setNextRoundVotes(prev => {
                     const newVotes = new Set(prev);
                     newVotes.add(lastMessage.from);
 
-                    // Check if majority reached (more than half of all players)
                     const totalPlayers = engine.players.length;
                     const votesNeeded = Math.floor(totalPlayers / 2) + 1;
 
                     if (newVotes.size >= votesNeeded) {
-                        // Majority reached, start next round
                         startRound();
-                        return new Set(); // Clear votes
+                        return new Set<string>();
                     }
 
-                    // Broadcast updated vote count to all players
                     syncState({ nextRoundVotes: Array.from(newVotes) });
                     return newVotes;
                 });
@@ -143,7 +178,7 @@ export const useGame = () => {
             if (type === 'STATE_SYNC') {
                 setGameState(data.gameState);
                 setPlayers(data.players);
-                setCurrentTurn(data.players[data.currentTurnIndex]?.id);
+                setCurrentTurn(data.players[data.currentTurnIndex]?.id || null);
                 setCurrentBid(data.currentBid);
                 if (data.myDice) setMyDice(data.myDice);
                 if (data.challengeResult !== undefined) setChallengeResult(data.challengeResult);
@@ -157,25 +192,21 @@ export const useGame = () => {
                     setChallengeResult(null);
                     setPeekInfo(null);
                     setLoadedDieActive(false);
-                    setNextRoundVotes(new Set()); // Clear votes on round reset
+                    setNextRoundVotes(new Set());
                 }
             }
         }
     }, [lastMessage, isHost, syncState, sendDirect]);
 
-    // Handle player disconnections (host only)
     useEffect(() => {
         if (!isHost) return;
 
-        // Check for disconnected players
-        const connectedIds = new Set([peerId, ...connections]);
+        const connectedIds = new Set([peerId as string, ...connections]);
         const disconnectedPlayers = engine.players.filter(p => !connectedIds.has(p.id));
 
         if (disconnectedPlayers.length > 0) {
             disconnectedPlayers.forEach(p => {
                 console.log(`Player ${p.name} disconnected`);
-
-                // Log disconnection
                 engine.gameLog.push({
                     timestamp: new Date().toISOString(),
                     round: engine.currentRoundNumber,
@@ -183,12 +214,9 @@ export const useGame = () => {
                     playerId: p.id,
                     playerName: p.name
                 });
-
-                // Remove player (this handles turn advancement automatically)
                 engine.removePlayer(p.id);
             });
 
-            // Check if game should end due to disconnections
             const activePlayers = engine.players.filter(p => p.active);
             if (activePlayers.length <= 1) {
                 engine.gameState = GAME_STATES.GAME_OVER;
@@ -203,12 +231,11 @@ export const useGame = () => {
                     });
                 }
             }
-
             syncState();
         }
     }, [connections, isHost, peerId, syncState]);
 
-    const startRoom = async (name) => {
+    const startRoom = async (name: string) => {
         try {
             engine.reset();
             const id = await initialize();
@@ -217,7 +244,6 @@ export const useGame = () => {
             const sanitizedName = sanitizeName(name);
             engine.addPlayer(id, sanitizedName);
 
-            // Clear all game state
             setChallengeResult(null);
             setPeekInfo(null);
             setLoadedDieActive(false);
@@ -230,7 +256,7 @@ export const useGame = () => {
         }
     };
 
-    const joinRoom = async (hostId, name) => {
+    const joinRoom = async (hostId: string, name: string): Promise<boolean> => {
         await initialize();
         const sanitizedName = sanitizeName(name);
 
@@ -246,7 +272,7 @@ export const useGame = () => {
 
             if (conn) {
                 conn.on('open', () => clearTimeout(timeout));
-                conn.on('error', (err) => {
+                conn.on('error', (err: any) => {
                     clearTimeout(timeout);
                     reject(err);
                 });
@@ -257,7 +283,7 @@ export const useGame = () => {
         });
     };
 
-    const rejoinRoom = (hostId, name) => {
+    const rejoinRoom = (hostId: string, name: string): Promise<boolean> => {
         const sanitizedName = sanitizeName(name);
         return new Promise((resolve, reject) => {
             const conn = connectToPeer(hostId, { name: sanitizedName }, () => {
@@ -271,7 +297,7 @@ export const useGame = () => {
 
             if (conn) {
                 conn.on('open', () => clearTimeout(timeout));
-                conn.on('error', (err) => {
+                conn.on('error', (err: any) => {
                     clearTimeout(timeout);
                     reject(err);
                 });
@@ -282,7 +308,7 @@ export const useGame = () => {
         });
     };
 
-    const setGameOptions = (opts) => {
+    const setGameOptions = (opts: Partial<GameOptions>) => {
         if (!isHost) return;
         const newOptions = { ...gameOptions, ...opts };
         setGameOptionsState(newOptions);
@@ -290,15 +316,15 @@ export const useGame = () => {
         syncState();
     };
 
-    const assignCheat = (playerId, cheat) => {
+    const assignCheat = (playerId: string, cheat: CheatType | null) => {
         if (!isHost) return;
         engine.assignCheat(playerId, cheat);
         syncState();
     };
 
-    const placeBid = (count, face) => {
+    const placeBid = (count: number, face: number) => {
         if (isHost) {
-            if (engine.placeBid(peerId, count, face)) syncState();
+            if (engine.placeBid(peerId as string, count, face)) syncState();
         } else {
             broadcast({ type: 'PLACE_BID', data: { count, face } });
         }
@@ -306,7 +332,7 @@ export const useGame = () => {
 
     const challenge = () => {
         if (isHost) {
-            const result = engine.challenge(peerId);
+            const result = engine.challenge(peerId as string);
             setChallengeResult(result);
             syncState({ challengeResult: result });
         } else {
@@ -317,7 +343,7 @@ export const useGame = () => {
     const usePeek = () => {
         if (myCheat !== CHEATS.PEEK || myCheatUsed) return;
         if (isHost) {
-            const result = engine.peekResult(peerId);
+            const result = engine.peekResult(peerId as string);
             const p = engine.players.find(pl => pl.id === peerId);
             if (p) p.cheatUsed = true;
             setPeekInfo(result);
@@ -330,7 +356,7 @@ export const useGame = () => {
     const useSlip = () => {
         if (myCheat !== CHEATS.SLIP || myCheatUsed) return;
         if (isHost) {
-            const newDice = engine.useSlip(peerId);
+            const newDice = engine.useSlip(peerId as string);
             if (newDice) { setMyDice([...newDice]); syncState(); }
         } else {
             broadcast({ type: 'USE_SLIP', data: {} });
@@ -340,7 +366,7 @@ export const useGame = () => {
     const useMagicDice = () => {
         if (myCheat !== CHEATS.MAGIC_DICE || myCheatUsed) return;
         if (isHost) {
-            const newDice = engine.useMagicDice(peerId);
+            const newDice = engine.useMagicDice(peerId as string);
             if (newDice) { setMyDice([...newDice]); syncState(); }
         } else {
             broadcast({ type: 'USE_MAGIC_DICE', data: {} });
@@ -352,11 +378,11 @@ export const useGame = () => {
         setLoadedDieActive(true);
     };
 
-    const rerollDie = (index) => {
+    const rerollDie = (index: number) => {
         if (!loadedDieActive) return;
         setLoadedDieActive(false);
         if (isHost) {
-            const newDice = engine.rerollDie(peerId, index);
+            const newDice = engine.rerollDie(peerId as string, index);
             if (newDice) { setMyDice([...newDice]); syncState(); }
         } else {
             broadcast({ type: 'REROLL_DIE', data: { index } });
@@ -365,10 +391,10 @@ export const useGame = () => {
 
     const dismissPeek = () => setPeekInfo(null);
 
-    const selectCheat = (cheatType) => {
+    const selectCheat = (cheatType: CheatType) => {
         if (!gameOptions.honorSystemCheats) return;
         if (isHost) {
-            engine.assignCheat(peerId, cheatType);
+            engine.assignCheat(peerId as string, cheatType);
             syncState();
         } else {
             broadcast({ type: 'SELECT_CHEAT', data: { cheat: cheatType } });
@@ -394,29 +420,25 @@ export const useGame = () => {
         setChallengeResult(null);
         setPeekInfo(null);
         setLoadedDieActive(false);
-        setNextRoundVotes(new Set()); // Clear votes when round starts
+        setNextRoundVotes(new Set<string>());
 
         const hostPlayer = engine.players.find(p => p.id === peerId);
-        if (hostPlayer) setMyDice(hostPlayer.dice);
+        if (hostPlayer) setMyDice([...hostPlayer.dice]);
 
-        const personalMap = {};
+        const personalMap: Record<string, any> = {};
         engine.players.forEach(p => {
-            if (p.id !== peerId) personalMap[p.id] = { myDice: p.dice };
+            if (p.id !== peerId) personalMap[p.id] = { myDice: [...p.dice] };
         });
 
-        // Trigger full sync with roundReset flag
         syncState({ roundReset: true, challengeResult: null }, personalMap);
     };
 
     const voteNextRound = () => {
         if (isHost) {
-            // Host can start immediately
             startRound();
         } else {
-            // Non-host votes
             broadcast({ type: 'VOTE_NEXT_ROUND', data: {} });
-            // Add own vote locally
-            setNextRoundVotes(prev => new Set([...prev, peerId]));
+            setNextRoundVotes(prev => new Set([...prev, peerId as string]));
         }
     };
 

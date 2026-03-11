@@ -1,9 +1,15 @@
 import React from 'react';
 import './Dice.css';
 
-const Dice = ({ value, rolling, isSlipped }) => {
-    const renderPips = (faceValue) => {
-        const pipMap = {
+interface DiceProps {
+    value: number;
+    rolling?: boolean;
+    isSlipped?: boolean;
+}
+
+const Dice: React.FC<DiceProps> = ({ value, rolling, isSlipped }) => {
+    const renderPips = (faceValue: number) => {
+        const pipMap: Record<number, number[]> = {
             1: [4],
             2: [0, 8],
             3: [0, 4, 8],

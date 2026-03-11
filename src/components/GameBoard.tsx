@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import Dice from './Dice';
 import { formatGameLogAsText } from '../utils/gameLogger';
+import { Player, Bid, GameState, ChallengeResult, GameOptions, GameLogEntry, CheatType } from '../types';
 import './GameBoard.css';
 
 const iconStyle = { width: '1.2em', height: '1.2em', verticalAlign: 'middle' };
+// @ts-ignore
 const BASE_URL = import.meta.env.BASE_URL;
-const RULES = [
+
+interface Rule {
+    icon: React.ReactNode;
+    text: string;
+}
+
+const RULES: Rule[] = [
     { icon: <img src={`${BASE_URL}images/dice.png`} alt="dice" style={iconStyle} />, text: 'Each player holds 5 dice, kept secret from others.' },
     { icon: <img src={`${BASE_URL}images/megaphone.png`} alt="megaphone" style={iconStyle} />, text: 'On your turn, bid how many dice of a face value exist across ALL hands (e.g. "three 4s").' },
     { icon: <img src={`${BASE_URL}images/ace-of-spades.png`} alt="ace" style={iconStyle} />, text: 'Each bid must raise the count — or same count with a higher face.' },
@@ -15,7 +23,7 @@ const RULES = [
     { icon: <img src={`${BASE_URL}images/skull.png`} alt="skull" style={iconStyle} />, text: 'Lose all your dice and you\'re out. Last crew standing wins!' },
 ];
 
-const CHEAT_LABELS = {
+const CHEAT_LABELS: Record<CheatType, string> = {
     peek: 'Peek',
     shield: 'Shield',
     loaded_die: 'Loaded Die',
@@ -23,7 +31,38 @@ const CHEAT_LABELS = {
     magic_dice: 'Magic Dice',
 };
 
-const GameBoard = ({
+interface GameBoardProps {
+    players: Player[];
+    myDice: number[];
+    currentTurn: string | null;
+    currentBid: Bid;
+    onBid: (count: number, face: number) => void;
+    onChallenge: () => void;
+    isMyTurn: boolean;
+    gameState: GameState;
+    challengeResult: ChallengeResult | null;
+    isHost: boolean;
+    onNextRound: () => void;
+    peerId: string | null;
+    myCheat?: CheatType | null;
+    myCheatUsed?: boolean;
+    peekInfo?: { playerName: string; dieValue: number } | null;
+    loadedDieActive?: boolean;
+    gameLog?: GameLogEntry[];
+    gameOptions?: GameOptions;
+    nextRoundVotes?: Set<string>;
+    onUsePeek: () => void;
+    onActivateLoadedDie: () => void;
+    onRerollDie: (index: number) => void;
+    onDismissPeek: () => void;
+    onUseSlip: () => void;
+    onUseMagicDice: () => void;
+    onSelectCheat: (cheatType: CheatType) => void;
+    onDownloadTextLog: () => void;
+    onDownloadJSONLog: () => void;
+}
+
+const GameBoard: React.FC<GameBoardProps> = ({
     players = [],
     myDice = [],
     currentTurn,
@@ -41,7 +80,7 @@ const GameBoard = ({
     peekInfo = null,
     loadedDieActive = false,
     gameLog = [],
-    gameOptions = {},
+    gameOptions = { startingDice: 5, eliminationThreshold: 0, wildsEnabled: true, honorSystemCheats: false },
     nextRoundVotes = new Set(),
     onUsePeek,
     onActivateLoadedDie,
@@ -53,13 +92,13 @@ const GameBoard = ({
     onDownloadTextLog,
     onDownloadJSONLog,
 }) => {
-    const [bidCount, setBidCount] = useState(currentBid?.count || 1);
-    const [bidFace, setBidFace] = useState(currentBid?.face || 2);
-    const [showRules, setShowRules] = useState(false);
-    const [showGameLog, setShowGameLog] = useState(false);
-    const [showCheatInfo, setShowCheatInfo] = useState(false);
-    const [bidError, setBidError] = useState('');
-    
+    const [bidCount, setBidCount] = useState<number>(currentBid?.count || 1);
+    const [bidFace, setBidFace] = useState<number>(currentBid?.face || 2);
+    const [showRules, setShowRules] = useState<boolean>(false);
+    const [showGameLog, setShowGameLog] = useState<boolean>(false);
+    const [showCheatInfo, setShowCheatInfo] = useState<boolean>(false);
+    const [bidError, setBidError] = useState<string>('');
+
     // Generate text preview of game log
     const gameLogText = formatGameLogAsText(gameLog, gameOptions);
 
@@ -74,12 +113,12 @@ const GameBoard = ({
     const handleRaiseBid = () => {
         // Check if bid is actually higher
         const isValidBid = bidCount > currentBid.count || (bidCount === currentBid.count && bidFace > currentBid.face);
-        
+
         if (!isValidBid) {
             setBidError('You must raise the bid! Increase the count or choose a higher face value.');
             return;
         }
-        
+
         setBidError('');
         onBid(bidCount, bidFace);
     };
@@ -94,11 +133,11 @@ const GameBoard = ({
         : null;
 
     const me = players.find(p => p.id === peerId);
-    
+
     // Calculate base dice count (non-slipped dice)
     // During REVEALING/ROUND_END, always use actual dice length to prevent
     // dice from incorrectly showing as red when player loses a die
-    let myBaseDiceCount;
+    let myBaseDiceCount: number;
     if (gameState === 'REVEALING' || gameState === 'ROUND_END') {
         // Use actual dice on screen - they shouldn't change until next round
         myBaseDiceCount = myDice.length;
@@ -161,7 +200,7 @@ const GameBoard = ({
                         <button className="rules-close" onClick={() => setShowGameLog(false)}>✕</button>
                         <h2>Game Log</h2>
                         <p className="history-subtitle">Complete game history</p>
-                        
+
                         <div className="log-actions" style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
                             <button className="btn-nautical" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }} onClick={onDownloadTextLog}>
                                 Download as Text
@@ -170,12 +209,12 @@ const GameBoard = ({
                                 Download as JSON
                             </button>
                         </div>
-                        
-                        <div className="game-log-content" style={{ 
-                            maxHeight: '400px', 
-                            overflowY: 'auto', 
-                            background: 'rgba(0,0,0,0.05)', 
-                            padding: '1rem', 
+
+                        <div className="game-log-content" style={{
+                            maxHeight: '400px',
+                            overflowY: 'auto',
+                            background: 'rgba(0,0,0,0.05)',
+                            padding: '1rem',
                             borderRadius: '4px',
                             fontFamily: 'monospace',
                             fontSize: '0.85rem',
@@ -204,7 +243,7 @@ const GameBoard = ({
                             <div>
                                 <h3 style={{ margin: '0 0 0.3rem 0', fontSize: '1rem', color: 'var(--color-ink)' }}>Shield</h3>
                                 <p style={{ margin: 0, fontSize: '0.9rem', opacity: 0.8 }}>
-                                    Absorb one hit when you lose a challenge. You won't lose a die this round. Use it to stay in the game longer. This move is more broken than most new LoL champs and mostly in for testing purposes.
+                                    Absorb one hit when you lose a challenge. You won't lose a die this round. Use it to stay in the game longer.
                                 </p>
                             </div>
                             <div>
@@ -216,7 +255,7 @@ const GameBoard = ({
                             <div>
                                 <h3 style={{ margin: '0 0 0.3rem 0', fontSize: '1rem', color: 'var(--color-ink)' }}>Slip</h3>
                                 <p style={{ margin: 0, fontSize: '0.9rem', opacity: 0.8 }}>
-                                    Secretly gain 1 extra die in your hand. Other players won't know you have more dice than expected. I mean it's in the game logs but meh!
+                                    Secretly gain 1 extra die in your hand. Other players won't know you have more dice than expected.
                                 </p>
                             </div>
                             <div>
@@ -270,10 +309,10 @@ const GameBoard = ({
                 <div className="result-overlay">
                     <div className="result-panel parchment-panel">
                         <div className="result-icon">
-                            <img 
-                                src={challengeResult.loserId === peerId ? `${BASE_URL}images/lose.png` : `${BASE_URL}images/win.png`} 
-                                alt={challengeResult.loserId === peerId ? "You Lost" : "Victory"} 
-                                style={{ width: '120px', height: '120px' }} 
+                            <img
+                                src={challengeResult.loserId === peerId ? `${BASE_URL}images/lose.png` : `${BASE_URL}images/win.png`}
+                                alt={challengeResult.loserId === peerId ? "You Lost" : "Victory"}
+                                style={{ width: '120px', height: '120px' }}
                             />
                         </div>
                         <h2>
@@ -287,20 +326,20 @@ const GameBoard = ({
                             <br />
                             Actual count on the table: <strong>{challengeResult.count}</strong>
                         </p>
-                        
-                        <button 
-                            className="btn-nautical" 
-                            style={{ marginTop: '1.5rem' }} 
+
+                        <button
+                            className="btn-nautical"
+                            style={{ marginTop: '1.5rem' }}
                             onClick={onNextRound}
-                            disabled={nextRoundVotes.has(peerId)}
+                            disabled={nextRoundVotes.has(peerId as string)}
                         >
-                            {isHost ? 'Next Round' : nextRoundVotes.has(peerId) ? 'Vote Recorded' : 'Vote: Next Round'}
+                            {isHost ? 'Next Round' : nextRoundVotes.has(peerId as string) ? 'Vote Recorded' : 'Vote: Next Round'}
                         </button>
-                        
+
                         {!isHost && (
                             <p style={{ marginTop: '0.5rem', opacity: 0.7, fontSize: '0.85rem' }}>
                                 {nextRoundVotes.size} / {Math.floor(players.length / 2) + 1} votes needed
-                                {nextRoundVotes.has(peerId) && ' (you voted)'}
+                                {nextRoundVotes.has(peerId as string) && ' (you voted)'}
                             </p>
                         )}
                     </div>
@@ -327,7 +366,7 @@ const GameBoard = ({
                 <div className="center-board">
                     <div className="current-bid-display parchment-panel">
                         <h3>Current Bid</h3>
-                        {currentBid.count > 0 ? (
+                        {currentBid && currentBid.count > 0 ? (
                             <div className="bid-info">
                                 <span className="bid-count">{currentBid.count}</span>
                                 <span className="bid-x">×</span>
@@ -373,12 +412,12 @@ const GameBoard = ({
                     <div className="cheat-selection parchment-panel" style={{ padding: '0.8rem 1rem', marginBottom: '1rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                             <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 'bold' }}>Choose Your Cheat:</p>
-                            <button 
+                            <button
                                 onClick={() => setShowCheatInfo(true)}
-                                style={{ 
-                                    background: 'none', 
-                                    border: 'none', 
-                                    fontSize: '1.2rem', 
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    fontSize: '1.2rem',
                                     cursor: 'pointer',
                                     padding: '0.2rem',
                                     color: 'var(--color-ink)',
@@ -392,11 +431,11 @@ const GameBoard = ({
                             </button>
                         </div>
                         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                            {['peek', 'shield', 'loaded_die', 'slip', 'magic_dice'].map(cheatType => (
-                                <button 
+                            {(['peek', 'shield', 'loaded_die', 'slip', 'magic_dice'] as CheatType[]).map(cheatType => (
+                                <button
                                     key={cheatType}
-                                    className="btn-nautical cheat-btn" 
-                                    style={{ fontSize: '0.75rem', padding: '0.4rem 0.7rem' }} 
+                                    className="btn-nautical cheat-btn"
+                                    style={{ fontSize: '0.75rem', padding: '0.4rem 0.7rem' }}
                                     onClick={() => onSelectCheat(cheatType)}
                                 >
                                     {cheatType === 'loaded_die' ? 'Loaded Die' : cheatType === 'magic_dice' ? 'Magic Dice' : cheatType.charAt(0).toUpperCase() + cheatType.slice(1)}
@@ -414,7 +453,16 @@ const GameBoard = ({
 
                 <div className={`my-dice ${loadedDieActive ? 'loaded-die-active' : ''}`}>
                     {me && me.active && myDice.map((val, i) => (
-                        <div key={i} className={`die-wrapper ${loadedDieActive ? 'clickable' : ''}`} onClick={() => { if (loadedDieActive) onRerollDie(i); }}>
+                        <div
+                            key={i}
+                            className={`die-wrapper ${loadedDieActive ? 'clickable' : ''}`}
+                            onClick={() => {
+                                if (loadedDieActive) {
+                                    console.log('Rerolling die at index:', i);
+                                    onRerollDie(i);
+                                }
+                            }}
+                        >
                             <Dice value={val} isSlipped={i >= myBaseDiceCount} />
                         </div>
                     ))}
