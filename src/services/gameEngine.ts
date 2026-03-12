@@ -202,6 +202,7 @@ class GameEngine {
         });
 
         this.players.forEach(p => {
+            p.dice = []; // Clear previous dice
             if (p.active) {
                 p.dice = Array.from({ length: p.diceCount }, () => Math.floor(Math.random() * 6) + 1);
             }
@@ -359,7 +360,7 @@ class GameEngine {
                 active: p.active
             }));
 
-        const allDice = this.players.flatMap(p => p.dice);
+        const allDice = this.players.filter(p => p.active).flatMap(p => p.dice);
         const count = allDice.filter(d =>
             d === this.currentBid.face || (this.options.wildsEnabled && d === 1)
         ).length;

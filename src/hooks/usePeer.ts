@@ -13,6 +13,7 @@ export interface UsePeerReturn {
     reconnect: () => Promise<string | null>;
     broadcast: (data: any) => void;
     sendDirect: (id: string, data: any) => void;
+    closeConnection: (id: string) => void;
 }
 
 export const usePeer = (): UsePeerReturn => {
@@ -89,6 +90,11 @@ export const usePeer = (): UsePeerReturn => {
         peerService.send(id, data);
     }, []);
 
+    const closeConnection = useCallback((id: string) => {
+        peerService.closeConnection(id);
+        setConnections(prev => prev.filter(connId => connId !== id));
+    }, []);
+
     return {
         peerId,
         connections,
@@ -99,6 +105,7 @@ export const usePeer = (): UsePeerReturn => {
         connectToPeer,
         reconnect,
         broadcast,
-        sendDirect
+        sendDirect,
+        closeConnection
     };
 };

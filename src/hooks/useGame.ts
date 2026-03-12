@@ -45,10 +45,11 @@ export interface UseGameReturn {
     downloadTextLog: () => void;
     downloadJSONLog: () => void;
     voteNextRound: () => void;
+    kickPlayer: (playerId: string) => void;
 }
 
 export const useGame = (): UseGameReturn => {
-    const { peerId, connections, lastMessage, broadcast, initialize, connectToPeer, sendDirect, error, isReconnecting, reconnect } = usePeer();
+    const { peerId, connections, lastMessage, broadcast, initialize, connectToPeer, sendDirect, closeConnection, error, isReconnecting, reconnect } = usePeer();
     const [gameState, setGameState] = useState<GameState>(GAME_STATES.LOBBY);
     const [players, setPlayers] = useState<Player[]>([]);
     const [currentTurn, setCurrentTurn] = useState<string | null>(null);
@@ -194,6 +195,11 @@ export const useGame = (): UseGameReturn => {
                     setLoadedDieActive(false);
                     setNextRoundVotes(new Set());
                 }
+            }
+
+            if (type === 'KICKED') {
+                alert("You have been kicked from the table by the host.");
+                window.location.reload();
             }
         }
     }, [lastMessage, isHost, syncState, sendDirect]);
@@ -442,6 +448,33 @@ export const useGame = (): UseGameReturn => {
         }
     };
 
+    const kickPlayer = (playerId: string) => {
+        if (!isHost || playerId === peerId) return;
+
+        // 1. Notify the player they are being kicked
+        sendDirect(playerId, { type: 'KICKED', data: {} });
+
+        // 2. Short delay to ensure message is sent before closing connection
+        setTimeout(() => {
+            // 3. Log the kick
+            const player = engine.players.find(p => p.id === playerId);
+            engine.gameLog.push({
+                timestamp: new Date().toISOString(),
+                round: engine.currentRoundNumber,
+                event: 'PLAYER_KICKED' as any,
+                playerId: playerId,
+                playerName: player?.name || 'Unknown'
+            });
+
+            // 4. Remove from engine and peer connections
+            engine.removePlayer(playerId);
+            closeConnection(playerId);
+
+            // 5. Sync to remaining
+            syncState();
+        }, 500);
+    };
+
     return {
         gameState, players, currentTurn, currentBid, myDice,
         isHost, error, peerId, connections,
@@ -451,6 +484,6 @@ export const useGame = (): UseGameReturn => {
         setGameOptions, assignCheat,
         startRoom, joinRoom, rejoinRoom, startRound, placeBid, challenge,
         usePeek, activateLoadedDie, rerollDie, dismissPeek, useSlip, useMagicDice, selectCheat,
-        downloadTextLog, downloadJSONLog, voteNextRound,
+        downloadTextLog, downloadJSONLog, voteNextRound, kickPlayer,
     };
 };

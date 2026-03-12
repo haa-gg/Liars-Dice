@@ -40,7 +40,7 @@ function App() {
         setGameOptions, assignCheat,
         startRoom, joinRoom, rejoinRoom, placeBid, challenge,
         usePeek, activateLoadedDie, rerollDie, dismissPeek, useSlip, useMagicDice, selectCheat,
-        downloadTextLog, downloadJSONLog, voteNextRound,
+        downloadTextLog, downloadJSONLog, voteNextRound, kickPlayer,
     } = game;
 
     const [playerName, setPlayerName] = useState<string>('');
@@ -444,6 +444,7 @@ function App() {
                         onSelectCheat={selectCheat}
                         onDownloadTextLog={downloadTextLog}
                         onDownloadJSONLog={downloadJSONLog}
+                        onKickPlayer={kickPlayer}
                     />
                 </div>
             )}

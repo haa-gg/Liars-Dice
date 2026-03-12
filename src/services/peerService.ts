@@ -138,6 +138,14 @@ class PeerService {
         }
     }
 
+    closeConnection(peerId: string) {
+        if (this.connections[peerId]) {
+            console.log(`Closing connection to peer: ${peerId}`);
+            this.connections[peerId].close();
+            delete this.connections[peerId];
+        }
+    }
+
     disconnect() {
         if (this.peer) {
             this.peer.destroy();

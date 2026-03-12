@@ -60,6 +60,7 @@ interface GameBoardProps {
     onSelectCheat: (cheatType: CheatType) => void;
     onDownloadTextLog: () => void;
     onDownloadJSONLog: () => void;
+    onKickPlayer: (playerId: string) => void;
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({
@@ -91,6 +92,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
     onSelectCheat,
     onDownloadTextLog,
     onDownloadJSONLog,
+    onKickPlayer,
 }) => {
     const [bidCount, setBidCount] = useState<number>(currentBid?.count || 1);
     const [bidFace, setBidFace] = useState<number>(currentBid?.face || 2);
@@ -358,6 +360,20 @@ const GameBoard: React.FC<GameBoardProps> = ({
                                 <div className="player-dice-count">
                                     {p.active ? `Dice: ${p.diceCount || 0}` : 'Eliminated'}
                                 </div>
+                                {isHost && p.id !== peerId && (
+                                    <button 
+                                        className="kick-player-btn" 
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (window.confirm(`Kick ${p.name} from the table?`)) {
+                                                onKickPlayer(p.id);
+                                            }
+                                        }}
+                                        title={`Kick ${p.name}`}
+                                    >
+                                        🥾
+                                    </button>
+                                )}
                             </div>
                         );
                     })}

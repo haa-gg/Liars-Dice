@@ -1,0 +1,912 @@
+{
+  "gameId": "GT8FAB",
+  "startTime": "2026-03-12T01:50:57.362Z",
+  "endTime": "2026-03-12T01:58:49.969Z",
+  "settings": {
+    "startingDice": 5,
+    "eliminationThreshold": 4,
+    "wildsEnabled": true,
+    "honorSystemCheats": true
+  },
+  "events": [
+    {
+      "timestamp": "2026-03-12T01:50:57.362Z",
+      "round": 1,
+      "event": "ROUND_START",
+      "players": [
+        {
+          "id": "GT8FAB",
+          "name": "Todger",
+          "diceCount": 5,
+          "active": true
+        },
+        {
+          "id": "5EPYLQ",
+          "name": "Phobos",
+          "diceCount": 5,
+          "active": true
+        },
+        {
+          "id": "2CYGNG",
+          "name": "The Revenge of Eidel",
+          "diceCount": 5,
+          "active": true
+        },
+        {
+          "id": "Q4D4J6",
+          "name": "Levena",
+          "diceCount": 5,
+          "active": true
+        },
+        {
+          "id": "3QSPTW",
+          "name": "Gree",
+          "diceCount": 5,
+          "active": true
+        },
+        {
+          "id": "XQVYAY",
+          "name": "CHOGATH - DESTROYER OF WORLDS -",
+          "diceCount": 5,
+          "active": true
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-12T01:51:28.216Z",
+      "round": 1,
+      "event": "BID",
+      "playerId": "GT8FAB",
+      "playerName": "Todger",
+      "bid": {
+        "count": 5,
+        "face": 4
+      }
+    },
+    {
+      "timestamp": "2026-03-12T01:51:40.367Z",
+      "round": 1,
+      "event": "BID",
+      "playerId": "5EPYLQ",
+      "playerName": "Phobos",
+      "bid": {
+        "count": 6,
+        "face": 4
+      }
+    },
+    {
+      "timestamp": "2026-03-12T01:52:04.241Z",
+      "round": 1,
+      "event": "BID",
+      "playerId": "2CYGNG",
+      "playerName": "The Revenge of Eidel",
+      "bid": {
+        "count": 6,
+        "face": 5
+      }
+    },
+    {
+      "timestamp": "2026-03-12T01:52:11.749Z",
+      "round": 1,
+      "event": "BID",
+      "playerId": "Q4D4J6",
+      "playerName": "Levena",
+      "bid": {
+        "count": 7,
+        "face": 4
+      }
+    },
+    {
+      "timestamp": "2026-03-12T01:52:43.664Z",
+      "round": 1,
+      "event": "BID",
+      "playerId": "3QSPTW",
+      "playerName": "Gree",
+      "bid": {
+        "count": 8,
+        "face": 4
+      }
+    },
+    {
+      "timestamp": "2026-03-12T01:52:59.615Z",
+      "round": 1,
+      "event": "BID",
+      "playerId": "XQVYAY",
+      "playerName": "CHOGATH - DESTROYER OF WORLDS -",
+      "bid": {
+        "count": 9,
+        "face": 4
+      }
+    },
+    {
+      "timestamp": "2026-03-12T01:53:07.792Z",
+      "round": 1,
+      "event": "BID",
+      "playerId": "GT8FAB",
+      "playerName": "Todger",
+      "bid": {
+        "count": 10,
+        "face": 4
+      }
+    },
+    {
+      "timestamp": "2026-03-12T01:53:33.828Z",
+      "round": 1,
+      "event": "BID",
+      "playerId": "5EPYLQ",
+      "playerName": "Phobos",
+      "bid": {
+        "count": 10,
+        "face": 5
+      }
+    },
+    {
+      "timestamp": "2026-03-12T01:53:56.261Z",
+      "round": 1,
+      "event": "BID",
+      "playerId": "2CYGNG",
+      "playerName": "The Revenge of Eidel",
+      "bid": {
+        "count": 11,
+        "face": 5
+      }
+    },
+    {
+      "timestamp": "2026-03-12T01:54:11.589Z",
+      "round": 1,
+      "event": "BID",
+      "playerId": "Q4D4J6",
+      "playerName": "Levena",
+      "bid": {
+        "count": 12,
+        "face": 4
+      }
+    },
+    {
+      "timestamp": "2026-03-12T01:54:35.724Z",
+      "round": 1,
+      "event": "BID",
+      "playerId": "3QSPTW",
+      "playerName": "Gree",
+      "bid": {
+        "count": 13,
+        "face": 4
+      }
+    },
+    {
+      "timestamp": "2026-03-12T01:55:11.131Z",
+      "round": 1,
+      "event": "CHALLENGE",
+      "challengerId": "XQVYAY",
+      "challengerName": "CHOGATH - DESTROYER OF WORLDS -",
+      "bidderId": "3QSPTW",
+      "bidderName": "Gree",
+      "bid": {
+        "count": 13,
+        "face": 4
+      },
+      "actualCount": 13,
+      "loserId": "XQVYAY",
+      "loserName": "CHOGATH - DESTROYER OF WORLDS -",
+      "allDice": [
+        {
+          "playerId": "GT8FAB",
+          "playerName": "Todger",
+          "dice": [
+            1,
+            4,
+            1,
+            1,
+            6
+          ]
+        },
+        {
+          "playerId": "5EPYLQ",
+          "playerName": "Phobos",
+          "dice": [
+            5,
+            4,
+            2,
+            1,
+            1
+          ]
+        },
+        {
+          "playerId": "2CYGNG",
+          "playerName": "The Revenge of Eidel",
+          "dice": [
+            5,
+            2,
+            6,
+            2,
+            1
+          ]
+        },
+        {
+          "playerId": "Q4D4J6",
+          "playerName": "Levena",
+          "dice": [
+            3,
+            4,
+            2,
+            4,
+            5
+          ]
+        },
+        {
+          "playerId": "3QSPTW",
+          "playerName": "Gree",
+          "dice": [
+            6,
+            2,
+            1,
+            4,
+            5
+          ]
+        },
+        {
+          "playerId": "XQVYAY",
+          "playerName": "CHOGATH - DESTROYER OF WORLDS -",
+          "dice": [
+            5,
+            6,
+            1,
+            5,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-12T01:55:11.131Z",
+      "round": 1,
+      "event": "DICE_LOST",
+      "playerId": "XQVYAY",
+      "playerName": "CHOGATH - DESTROYER OF WORLDS -",
+      "remainingDice": 4
+    },
+    {
+      "timestamp": "2026-03-12T01:55:11.131Z",
+      "round": 1,
+      "event": "PLAYER_ELIMINATED",
+      "playerId": "XQVYAY",
+      "playerName": "CHOGATH - DESTROYER OF WORLDS -"
+    },
+    {
+      "timestamp": "2026-03-12T01:55:16.587Z",
+      "round": 2,
+      "event": "ROUND_START",
+      "players": [
+        {
+          "id": "GT8FAB",
+          "name": "Todger",
+          "diceCount": 5,
+          "active": true
+        },
+        {
+          "id": "5EPYLQ",
+          "name": "Phobos",
+          "diceCount": 5,
+          "active": true
+        },
+        {
+          "id": "2CYGNG",
+          "name": "The Revenge of Eidel",
+          "diceCount": 5,
+          "active": true
+        },
+        {
+          "id": "Q4D4J6",
+          "name": "Levena",
+          "diceCount": 5,
+          "active": true
+        },
+        {
+          "id": "3QSPTW",
+          "name": "Gree",
+          "diceCount": 5,
+          "active": true
+        },
+        {
+          "id": "XQVYAY",
+          "name": "CHOGATH - DESTROYER OF WORLDS -",
+          "diceCount": 4,
+          "active": false
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-12T01:55:31.767Z",
+      "round": 2,
+      "event": "BID",
+      "playerId": "GT8FAB",
+      "playerName": "Todger",
+      "bid": {
+        "count": 6,
+        "face": 2
+      }
+    },
+    {
+      "timestamp": "2026-03-12T01:56:00.129Z",
+      "round": 2,
+      "event": "BID",
+      "playerId": "5EPYLQ",
+      "playerName": "Phobos",
+      "bid": {
+        "count": 7,
+        "face": 2
+      }
+    },
+    {
+      "timestamp": "2026-03-12T01:56:07.054Z",
+      "round": 2,
+      "event": "BID",
+      "playerId": "2CYGNG",
+      "playerName": "The Revenge of Eidel",
+      "bid": {
+        "count": 7,
+        "face": 5
+      }
+    },
+    {
+      "timestamp": "2026-03-12T01:56:09.765Z",
+      "round": 2,
+      "event": "BID",
+      "playerId": "Q4D4J6",
+      "playerName": "Levena",
+      "bid": {
+        "count": 8,
+        "face": 5
+      }
+    },
+    {
+      "timestamp": "2026-03-12T01:56:15.402Z",
+      "round": 2,
+      "event": "BID",
+      "playerId": "3QSPTW",
+      "playerName": "Gree",
+      "bid": {
+        "count": 9,
+        "face": 3
+      }
+    },
+    {
+      "timestamp": "2026-03-12T01:56:48.228Z",
+      "round": 2,
+      "event": "BID",
+      "playerId": "GT8FAB",
+      "playerName": "Todger",
+      "bid": {
+        "count": 10,
+        "face": 2
+      }
+    },
+    {
+      "timestamp": "2026-03-12T01:57:08.549Z",
+      "round": 2,
+      "event": "CHALLENGE",
+      "challengerId": "5EPYLQ",
+      "challengerName": "Phobos",
+      "bidderId": "GT8FAB",
+      "bidderName": "Todger",
+      "bid": {
+        "count": 10,
+        "face": 2
+      },
+      "actualCount": 9,
+      "loserId": "GT8FAB",
+      "loserName": "Todger",
+      "allDice": [
+        {
+          "playerId": "GT8FAB",
+          "playerName": "Todger",
+          "dice": [
+            3,
+            1,
+            2,
+            5,
+            1
+          ]
+        },
+        {
+          "playerId": "5EPYLQ",
+          "playerName": "Phobos",
+          "dice": [
+            2,
+            2,
+            5,
+            4,
+            6
+          ]
+        },
+        {
+          "playerId": "2CYGNG",
+          "playerName": "The Revenge of Eidel",
+          "dice": [
+            3,
+            5,
+            5,
+            1,
+            6
+          ]
+        },
+        {
+          "playerId": "Q4D4J6",
+          "playerName": "Levena",
+          "dice": [
+            2,
+            5,
+            5,
+            4,
+            3
+          ]
+        },
+        {
+          "playerId": "3QSPTW",
+          "playerName": "Gree",
+          "dice": [
+            2,
+            3,
+            3,
+            6,
+            3
+          ]
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-12T01:57:08.549Z",
+      "round": 2,
+      "event": "DICE_LOST",
+      "playerId": "GT8FAB",
+      "playerName": "Todger",
+      "remainingDice": 4
+    },
+    {
+      "timestamp": "2026-03-12T01:57:08.549Z",
+      "round": 2,
+      "event": "PLAYER_ELIMINATED",
+      "playerId": "GT8FAB",
+      "playerName": "Todger"
+    },
+    {
+      "timestamp": "2026-03-12T01:57:11.276Z",
+      "round": 3,
+      "event": "ROUND_START",
+      "players": [
+        {
+          "id": "GT8FAB",
+          "name": "Todger",
+          "diceCount": 4,
+          "active": false
+        },
+        {
+          "id": "5EPYLQ",
+          "name": "Phobos",
+          "diceCount": 5,
+          "active": true
+        },
+        {
+          "id": "2CYGNG",
+          "name": "The Revenge of Eidel",
+          "diceCount": 5,
+          "active": true
+        },
+        {
+          "id": "Q4D4J6",
+          "name": "Levena",
+          "diceCount": 5,
+          "active": true
+        },
+        {
+          "id": "3QSPTW",
+          "name": "Gree",
+          "diceCount": 5,
+          "active": true
+        },
+        {
+          "id": "XQVYAY",
+          "name": "CHOGATH - DESTROYER OF WORLDS -",
+          "diceCount": 4,
+          "active": false
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-12T01:57:35.589Z",
+      "round": 3,
+      "event": "BID",
+      "playerId": "5EPYLQ",
+      "playerName": "Phobos",
+      "bid": {
+        "count": 25,
+        "face": 6
+      }
+    },
+    {
+      "timestamp": "2026-03-12T01:57:51.682Z",
+      "round": 3,
+      "event": "CHALLENGE",
+      "challengerId": "2CYGNG",
+      "challengerName": "The Revenge of Eidel",
+      "bidderId": "5EPYLQ",
+      "bidderName": "Phobos",
+      "bid": {
+        "count": 25,
+        "face": 6
+      },
+      "actualCount": 7,
+      "loserId": "5EPYLQ",
+      "loserName": "Phobos",
+      "allDice": [
+        {
+          "playerId": "5EPYLQ",
+          "playerName": "Phobos",
+          "dice": [
+            5,
+            3,
+            5,
+            2,
+            1
+          ]
+        },
+        {
+          "playerId": "2CYGNG",
+          "playerName": "The Revenge of Eidel",
+          "dice": [
+            2,
+            5,
+            3,
+            2,
+            1
+          ]
+        },
+        {
+          "playerId": "Q4D4J6",
+          "playerName": "Levena",
+          "dice": [
+            3,
+            2,
+            2,
+            5,
+            2
+          ]
+        },
+        {
+          "playerId": "3QSPTW",
+          "playerName": "Gree",
+          "dice": [
+            2,
+            3,
+            6,
+            5,
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-12T01:57:51.682Z",
+      "round": 3,
+      "event": "DICE_LOST",
+      "playerId": "5EPYLQ",
+      "playerName": "Phobos",
+      "remainingDice": 4
+    },
+    {
+      "timestamp": "2026-03-12T01:57:51.682Z",
+      "round": 3,
+      "event": "PLAYER_ELIMINATED",
+      "playerId": "5EPYLQ",
+      "playerName": "Phobos"
+    },
+    {
+      "timestamp": "2026-03-12T01:57:54.832Z",
+      "round": 4,
+      "event": "ROUND_START",
+      "players": [
+        {
+          "id": "GT8FAB",
+          "name": "Todger",
+          "diceCount": 4,
+          "active": false
+        },
+        {
+          "id": "5EPYLQ",
+          "name": "Phobos",
+          "diceCount": 4,
+          "active": false
+        },
+        {
+          "id": "2CYGNG",
+          "name": "The Revenge of Eidel",
+          "diceCount": 5,
+          "active": true
+        },
+        {
+          "id": "Q4D4J6",
+          "name": "Levena",
+          "diceCount": 5,
+          "active": true
+        },
+        {
+          "id": "3QSPTW",
+          "name": "Gree",
+          "diceCount": 5,
+          "active": true
+        },
+        {
+          "id": "XQVYAY",
+          "name": "CHOGATH - DESTROYER OF WORLDS -",
+          "diceCount": 4,
+          "active": false
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-12T01:58:06.194Z",
+      "round": 4,
+      "event": "BID",
+      "playerId": "2CYGNG",
+      "playerName": "The Revenge of Eidel",
+      "bid": {
+        "count": 22,
+        "face": 6
+      }
+    },
+    {
+      "timestamp": "2026-03-12T01:58:09.953Z",
+      "round": 4,
+      "event": "CHALLENGE",
+      "challengerId": "Q4D4J6",
+      "challengerName": "Levena",
+      "bidderId": "2CYGNG",
+      "bidderName": "The Revenge of Eidel",
+      "bid": {
+        "count": 22,
+        "face": 6
+      },
+      "actualCount": 8,
+      "loserId": "2CYGNG",
+      "loserName": "The Revenge of Eidel",
+      "allDice": [
+        {
+          "playerId": "2CYGNG",
+          "playerName": "The Revenge of Eidel",
+          "dice": [
+            2,
+            4,
+            6,
+            5,
+            4
+          ]
+        },
+        {
+          "playerId": "Q4D4J6",
+          "playerName": "Levena",
+          "dice": [
+            3,
+            3,
+            5,
+            4,
+            4
+          ]
+        },
+        {
+          "playerId": "3QSPTW",
+          "playerName": "Gree",
+          "dice": [
+            1,
+            1,
+            2,
+            2,
+            2
+          ]
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-12T01:58:09.953Z",
+      "round": 4,
+      "event": "DICE_LOST",
+      "playerId": "2CYGNG",
+      "playerName": "The Revenge of Eidel",
+      "remainingDice": 4
+    },
+    {
+      "timestamp": "2026-03-12T01:58:09.953Z",
+      "round": 4,
+      "event": "PLAYER_ELIMINATED",
+      "playerId": "2CYGNG",
+      "playerName": "The Revenge of Eidel"
+    },
+    {
+      "timestamp": "2026-03-12T01:58:12.362Z",
+      "round": 5,
+      "event": "ROUND_START",
+      "players": [
+        {
+          "id": "GT8FAB",
+          "name": "Todger",
+          "diceCount": 4,
+          "active": false
+        },
+        {
+          "id": "5EPYLQ",
+          "name": "Phobos",
+          "diceCount": 4,
+          "active": false
+        },
+        {
+          "id": "2CYGNG",
+          "name": "The Revenge of Eidel",
+          "diceCount": 4,
+          "active": false
+        },
+        {
+          "id": "Q4D4J6",
+          "name": "Levena",
+          "diceCount": 5,
+          "active": true
+        },
+        {
+          "id": "3QSPTW",
+          "name": "Gree",
+          "diceCount": 5,
+          "active": true
+        },
+        {
+          "id": "XQVYAY",
+          "name": "CHOGATH - DESTROYER OF WORLDS -",
+          "diceCount": 4,
+          "active": false
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-12T01:58:20.297Z",
+      "round": 5,
+      "event": "BID",
+      "playerId": "Q4D4J6",
+      "playerName": "Levena",
+      "bid": {
+        "count": 1,
+        "face": 2
+      }
+    },
+    {
+      "timestamp": "2026-03-12T01:58:35.285Z",
+      "round": 5,
+      "event": "BID",
+      "playerId": "3QSPTW",
+      "playerName": "Gree",
+      "bid": {
+        "count": 4,
+        "face": 4
+      }
+    },
+    {
+      "timestamp": "2026-03-12T01:58:47.184Z",
+      "round": 5,
+      "event": "BID",
+      "playerId": "Q4D4J6",
+      "playerName": "Levena",
+      "bid": {
+        "count": 5,
+        "face": 5
+      }
+    },
+    {
+      "timestamp": "2026-03-12T01:58:49.969Z",
+      "round": 5,
+      "event": "CHALLENGE",
+      "challengerId": "3QSPTW",
+      "challengerName": "Gree",
+      "bidderId": "Q4D4J6",
+      "bidderName": "Levena",
+      "bid": {
+        "count": 5,
+        "face": 5
+      },
+      "actualCount": 12,
+      "loserId": "3QSPTW",
+      "loserName": "Gree",
+      "allDice": [
+        {
+          "playerId": "Q4D4J6",
+          "playerName": "Levena",
+          "dice": [
+            4,
+            5,
+            2,
+            5,
+            2
+          ]
+        },
+        {
+          "playerId": "3QSPTW",
+          "playerName": "Gree",
+          "dice": [
+            4,
+            4,
+            2,
+            2,
+            6
+          ]
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-03-12T01:58:49.969Z",
+      "round": 5,
+      "event": "DICE_LOST",
+      "playerId": "3QSPTW",
+      "playerName": "Gree",
+      "remainingDice": 4
+    },
+    {
+      "timestamp": "2026-03-12T01:58:49.969Z",
+      "round": 5,
+      "event": "PLAYER_ELIMINATED",
+      "playerId": "3QSPTW",
+      "playerName": "Gree"
+    },
+    {
+      "timestamp": "2026-03-12T01:58:49.969Z",
+      "round": 5,
+      "event": "GAME_END",
+      "winnerId": "Q4D4J6",
+      "winnerName": "Levena",
+      "totalRounds": 5
+    },
+    {
+      "timestamp": "2026-03-12T01:58:55.367Z",
+      "round": 1,
+      "event": "ROUND_START",
+      "players": [
+        {
+          "id": "GT8FAB",
+          "name": "Todger",
+          "diceCount": 5,
+          "active": true
+        },
+        {
+          "id": "5EPYLQ",
+          "name": "Phobos",
+          "diceCount": 5,
+          "active": true
+        },
+        {
+          "id": "2CYGNG",
+          "name": "The Revenge of Eidel",
+          "diceCount": 5,
+          "active": true
+        },
+        {
+          "id": "Q4D4J6",
+          "name": "Levena",
+          "diceCount": 5,
+          "active": true
+        },
+        {
+          "id": "3QSPTW",
+          "name": "Gree",
+          "diceCount": 5,
+          "active": true
+        },
+        {
+          "id": "XQVYAY",
+          "name": "CHOGATH - DESTROYER OF WORLDS -",
+          "diceCount": 5,
+          "active": true
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "totalRounds": 6,
+    "totalBids": 22,
+    "totalChallenges": 5,
+    "winner": "Levena"
+  }
+}
