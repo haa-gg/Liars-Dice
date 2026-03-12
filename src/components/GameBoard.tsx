@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Dice from './Dice';
 import { formatGameLogAsText } from '../utils/gameLogger';
 import { Player, Bid, GameState, ChallengeResult, GameOptions, GameLogEntry, CheatType } from '../types';
+import { IconScroll, IconCross, IconUserMinus, IconInfo, IconFlag, IconSkull } from './Icons';
 import './GameBoard.css';
 
 const iconStyle = { width: '1.2em', height: '1.2em', verticalAlign: 'middle' };
@@ -176,7 +177,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
                     title="View Game Log"
                     aria-label="Toggle game log"
                 >
-                    📜
+                    <IconScroll />
                 </button>
             )}
 
@@ -184,7 +185,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
             {showRules && (
                 <div className="rules-overlay" onClick={() => setShowRules(false)}>
                     <div className="rules-panel parchment-panel" onClick={e => e.stopPropagation()}>
-                        <button className="rules-close" onClick={() => setShowRules(false)}>✕</button>
+                        <button className="rules-close" onClick={() => setShowRules(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCross size="0.8em" /></button>
                         <h2>How to Play</h2>
                         <ul className="rules-list">
                             {RULES.map((r, i) => (
@@ -199,7 +200,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
             {showGameLog && (
                 <div className="rules-overlay" onClick={() => setShowGameLog(false)}>
                     <div className="history-panel parchment-panel" onClick={e => e.stopPropagation()}>
-                        <button className="rules-close" onClick={() => setShowGameLog(false)}>✕</button>
+                        <button className="rules-close" onClick={() => setShowGameLog(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCross size="0.8em" /></button>
                         <h2>Game Log</h2>
                         <p className="history-subtitle">Complete game history</p>
 
@@ -233,7 +234,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
             {showCheatInfo && (
                 <div className="rules-overlay" onClick={() => setShowCheatInfo(false)}>
                     <div className="rules-panel parchment-panel" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px' }}>
-                        <button className="rules-close" onClick={() => setShowCheatInfo(false)}>✕</button>
+                        <button className="rules-close" onClick={() => setShowCheatInfo(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCross size="0.8em" /></button>
                         <h2>Cheat Abilities</h2>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
                             <div>
@@ -355,7 +356,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
                         if (!p || !p.id) return null;
                         return (
                             <div key={p.id} className={`player-node ${currentTurn === p.id ? 'active-turn' : ''} ${!p.active ? 'eliminated' : ''}`}>
-                                <div className="player-avatar">{p.active ? '🏴‍☠️' : '💀'}</div>
+                                <div className="player-avatar">{p.active ? <IconFlag size="1.5em" /> : <IconSkull size="1.5em" />}</div>
                                 <div className="player-name">{p.name || 'Unknown Pirate'}</div>
                                 <div className="player-dice-count">
                                     {p.active ? `Dice: ${p.diceCount || 0}` : 'Eliminated'}
@@ -371,7 +372,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
                                         }}
                                         title={`Kick ${p.name}`}
                                     >
-                                        🥾
+                                        <IconUserMinus />
                                     </button>
                                 )}
                             </div>
@@ -438,12 +439,14 @@ const GameBoard: React.FC<GameBoardProps> = ({
                                     padding: '0.2rem',
                                     color: 'var(--color-ink)',
                                     opacity: 0.7,
-                                    lineHeight: 1
+                                    lineHeight: 1,
+                                    display: 'flex',
+                                    alignItems: 'center'
                                 }}
                                 title="Cheat descriptions"
                                 aria-label="Show cheat information"
                             >
-                                🛈
+                                <IconInfo />
                             </button>
                         </div>
                         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>

@@ -1,0 +1,125 @@
+import React from 'react';
+
+export interface IconProps extends React.SVGProps<SVGSVGElement> {
+    size?: number | string;
+}
+
+const defaultProps = {
+    size: '1em',
+    fill: 'none',
+    stroke: 'currentColor',
+    strokeWidth: '2',
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+};
+
+export const IconScroll: React.FC<IconProps> = ({ size = defaultProps.size, ...props }) => (
+    <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        viewBox="0 0 32 32"
+        width={size} 
+        height={size} 
+        fill="none"
+        {...props}
+    >
+        <path fill="#FFDEA7" d="M23.51 2.01H8.6V2H4.45v3h2.5v22.07c0 1.62 1.32 2.94 2.94 2.94h15.67c.77 0 1.39-.62 1.39-1.39V5.45c0-1.9-1.54-3.44-3.44-3.44" />
+        <path fill="#E19747" d="M10.86 29.99s2.24-.33 2.73-2.5c.07-.3.41-.52.81-.52h14.73c.52 0 .91.36.82.74-.23.89-.6 2.29-4.37 2.29-5.57 0-14.72-.01-14.72-.01" />
+        <path fill="#D3883E" d="M6.95 5c0-1.66-1.12-3-2.5-3-1.19 0-2.18 1-2.44 2.33-.06.34.15.67.44.67zM10.42 11.87a.5.5 0 1 0 0 1H23.5a.5.5 0 0 0 0-1zm-.44 3.46a.5.5 0 0 1 .5-.5H23.5a.5.5 0 0 1 0 1H10.48a.5.5 0 0 1-.5-.5m.5 2.52a.5.5 0 1 0 0 1H23.5a.5.5 0 0 0 0-1zm.03 2.98a.5.5 0 1 0 0 1h7.96a.5.5 0 1 0 0-1z" />
+    </svg>
+);
+
+export const IconGear: React.FC<IconProps> = ({ size = defaultProps.size, ...props }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...defaultProps} {...props}>
+        <circle cx="12" cy="12" r="3" />
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    </svg>
+);
+
+export const IconUsers: React.FC<IconProps> = ({ size = defaultProps.size, ...props }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...defaultProps} {...props}>
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+);
+
+export const IconCheck: React.FC<IconProps> = ({ size = defaultProps.size, ...props }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...defaultProps} {...props}>
+        <polyline points="20 6 9 17 4 12" />
+    </svg>
+);
+
+export const IconCross: React.FC<IconProps> = ({ size = defaultProps.size, ...props }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...defaultProps} {...props}>
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+);
+
+export const IconCopy: React.FC<IconProps> = ({ size = defaultProps.size, ...props }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...defaultProps} {...props}>
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </svg>
+);
+
+export const IconInfo: React.FC<IconProps> = ({ size = defaultProps.size, ...props }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...defaultProps} {...props}>
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="16" x2="12" y2="12" />
+        <line x1="12" y1="8" x2="12.01" y2="8" />
+    </svg>
+);
+
+export const IconFlag: React.FC<IconProps> = ({ size = defaultProps.size, ...props }) => (
+    <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        xmlSpace="preserve" 
+        viewBox="0 0 128 128"
+        width={size}
+        height={size}
+        {...props}
+    >
+        <path d="M124 107.2c-41.55 17.8-78.49-17.79-120 0V20.8c41.51-17.79 78.45 17.8 120 0z" fill="#424242" />
+        <linearGradient id="a" x1="5.371" x2="122.371" y1="105.342" y2="22.841" gradientTransform="matrix(1 0 0 -1 0 128)" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stopColor="#fff" stopOpacity="0" />
+            <stop offset=".801" stopColor="#090909" stopOpacity=".9151" />
+            <stop offset="1" stopColor="#000" />
+        </linearGradient>
+        <path d="M124 107.2c-41.55 17.8-78.49-17.79-120 0V20.8c41.51-17.79 78.45 17.8 120 0z" opacity=".3" fill="url(#a)" />
+        <linearGradient id="b" x1="4.821" x2="120.172" y1="64.002" y2="64.002" gradientUnits="userSpaceOnUse">
+            <stop offset=".001" stopColor="#bfbebe" />
+            <stop offset=".234" stopColor="#212121" stopOpacity="0" />
+            <stop offset=".803" stopColor="#212121" stopOpacity="0" />
+            <stop offset="1" stopColor="#bfbebe" />
+        </linearGradient>
+        <path d="M124 107.2c-41.55 17.8-78.49-17.79-120 0V20.8c41.51-17.79 78.45 17.8 120 0z" opacity=".2" fill="url(#b)" />
+        <linearGradient id="c" x1="66.837" x2="61.035" y1="16.011" y2="114.159" gradientUnits="userSpaceOnUse">
+            <stop offset=".001" stopColor="#bfbebe" />
+            <stop offset=".197" stopColor="#212121" stopOpacity="0" />
+            <stop offset=".75" stopColor="#212121" stopOpacity="0" />
+            <stop offset="1" stopColor="#bfbebe" />
+        </linearGradient>
+        <path d="M124 107.2c-41.55 17.8-78.49-17.79-120 0V20.8c41.51-17.79 78.45 17.8 120 0z" opacity=".2" fill="url(#c)" />
+        <path d="M37.44 68.83c1.68.78 3.51.18 4.08-1.41 4.45 2.28 6.67 3.58 11.12 6.28 3.1-.21 4.64-.27 7.74-.38-6.91-4.4-10.37-6.62-17.29-10.28.57-1.58-.34-3.59-2.02-4.44s-3.51-.18-4.08 1.43c-.32.9-.17 1.9.31 2.75-.86.23-1.57.85-1.88 1.76-.57 1.62.34 3.51 2.02 4.29M88.56 86.68c-1.68-.82-3.51-.26-4.08 1.31-4.45-2.37-6.67-3.71-11.12-6.45-3.1.17-4.64.23-7.74.33 6.91 4.41 10.37 6.68 17.29 10.48-.57 1.56.34 3.59 2.02 4.48s3.51.27 4.08-1.33c.32-.89.17-1.9-.31-2.75a2.61 2.61 0 0 0 1.88-1.71c.57-1.62-.34-3.54-2.02-4.36" fill="#fff" />
+        <path d="M84.48 78.74c.57 1.8 2.39 3.05 4.08 2.73 1.68-.31 2.59-2.04 2.02-3.8a3.93 3.93 0 0 0-1.88-2.23c.48-.71.62-1.68.31-2.66-.57-1.77-2.39-2.96-4.08-2.71s-2.59 1.86-2.02 3.67c-13.78 1.45-27.65.98-41.39 2.94-.57-1.78-2.39-2.99-4.08-2.64-1.68.36-2.59 2.11-2.02 3.85a3.8 3.8 0 0 0 1.88 2.18c-.48.73-.62 1.69-.31 2.67.57 1.75 2.39 2.89 4.08 2.61s2.59-1.92 2.02-3.71c13.76-1.72 27.63-1.24 41.39-2.9M71.64 38.99c-5.39-4.43-11.89-6.49-17.29-5.11-5.41 1.38-10.46 6.12-5.34 19.27 0 0-2.74 8.24 5.95 8.65 0 0 1.39.16 1.3 2.23v.99c0 .64.52 1.3 1.15 1.48.01 0 .02.01.03.01.64.19 1.15-.18 1.15-.81v-.96c.56.16.83.25 1.39.41v.96c0 .64.52 1.3 1.15 1.5h.01c.64.19 1.15-.17 1.15-.8v-.96l1.39.42v.96c0 .64.52 1.31 1.15 1.5.64.19 1.15-.17 1.15-.8v-.96l1.39.42v.96c0 .64.52 1.31 1.15 1.49.01 0 .02.01.03.01.64.19 1.15-.18 1.15-.81v-.99c-.09-2.12 1.3-1.48 1.3-1.48 8.7 4.57 5.95-5.42 5.95-5.42 5.15-10.58.1-17.72-5.31-22.16m-14.67 16.7c-2.4-.7-4.35-3.17-4.35-5.58s1.95-3.83 4.35-3.13c2.41.7 4.35 3.24 4.35 5.64.01 2.41-1.94 3.77-4.35 3.07m7.48 6.9c-.89-.71-1.92-1.02-2.81-.85-.35.07-.57-.11-.57-1.1 0-.64.02-1.19.06-1.66.1-1.1.93-1.7 1.91-1.41.99.3 1.81 1.4 1.91 2.56.04.49.06 1.06.06 1.7 0 .98-.21 1.04-.56.76m4.71-3.26c-2.4-.71-4.35-3.25-4.35-5.66s1.95-3.76 4.35-3.05 4.35 3.21 4.35 5.61c0 2.41-1.95 3.82-4.35 3.1" fill="#fff" />
+    </svg>
+);
+
+export const IconSkull: React.FC<IconProps> = ({ size = defaultProps.size, ...props }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...defaultProps} {...props}>
+        <circle cx="9" cy="12" r="1.5" />
+        <circle cx="15" cy="12" r="1.5" />
+        <path d="M8 20v2h8v-2" />
+        <path d="M12 2C6.5 2 2 6.5 2 12c0 2.5 1 4.5 2.5 6h15c1.5-1.5 2.5-3.5 2.5-6 0-5.5-4.5-10-10-10z" />
+    </svg>
+);
+
+export const IconUserMinus: React.FC<IconProps> = ({ size = defaultProps.size, ...props }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...defaultProps} {...props}>
+        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+        <circle cx="8.5" cy="7" r="4" />
+        <line x1="23" y1="11" x2="17" y2="11" />
+    </svg>
+);

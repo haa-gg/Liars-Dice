@@ -7,6 +7,7 @@ import { CheatType } from './types';
 import './index.css';
 import './components/GameBoard.css';
 import './components/LobbySettings.css';
+import { IconScroll, IconGear, IconUsers, IconCheck, IconCross, IconCopy } from './components/Icons';
 
 interface CheatOption {
     value: CheatType | '';
@@ -280,10 +281,12 @@ function App() {
                             <span className="room-id-label">Room ID</span>
                             <span className="room-id-value">{isHost ? peerId : roomId}</span>
                             <span className={`room-id-copy ${copied ? 'copied' : ''}`}>
-                                {copied ? '✓ Copied!' : '⎘ Copy'}
+                                {copied ? <><IconCheck style={{ marginRight: '0.2rem' }} /> Copied!</> : <><IconCopy style={{ marginRight: '0.2rem' }} /> Copy</>}
                             </span>
                         </div>
-                        <span className="room-player-count">👥 {players.length} player{players.length !== 1 ? 's' : ''}</span>
+                        <span className="room-player-count">
+                            <IconUsers style={{ marginRight: '0.3rem' }} /> {players.length} player{players.length !== 1 ? 's' : ''}
+                        </span>
 
                         {isHost && (
                             <button
@@ -291,11 +294,13 @@ function App() {
                                 onClick={() => setShowSettings(v => !v)}
                                 title="Game Settings"
                             >
-                                ⚙ Settings
+                                <IconGear style={{ marginRight: '0.3rem' }} /> Settings
                             </button>
                         )}
                         {!isHost && (
-                            <span className="rules-badge">📜 {rulesSummary}</span>
+                            <span className="rules-badge">
+                                <IconScroll style={{ marginRight: '0.3rem' }} /> {rulesSummary}
+                            </span>
                         )}
                     </div>
 
@@ -315,12 +320,14 @@ function App() {
                                         color: 'var(--color-ink)',
                                         opacity: 0.7,
                                         lineHeight: 1,
-                                        fontWeight: 'bold'
+                                        fontWeight: 'bold',
+                                        display: 'flex',
+                                        alignItems: 'center'
                                     }}
                                     title="Close settings"
                                     aria-label="Close settings"
                                 >
-                                    ×
+                                    <IconCross />
                                 </button>
                             </div>
 
@@ -365,9 +372,9 @@ function App() {
                                         className={`toggle-btn ${gameOptions.wildsEnabled ? 'on' : 'off'}`}
                                         onClick={() => setGameOptions({ wildsEnabled: !gameOptions.wildsEnabled })}
                                         disabled={gameState !== 'LOBBY'}
-                                        style={{ opacity: gameState !== 'LOBBY' ? 0.5 : 1, cursor: gameState !== 'LOBBY' ? 'not-allowed' : 'pointer' }}
+                                        style={{ opacity: gameState !== 'LOBBY' ? 0.5 : 1, cursor: gameState !== 'LOBBY' ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
                                     >
-                                        {gameOptions.wildsEnabled ? '✓ On' : '✗ Off'}
+                                        {gameOptions.wildsEnabled ? <><IconCheck /> On</> : <><IconCross /> Off</>}
                                     </button>
                                 </div>
 
@@ -377,9 +384,9 @@ function App() {
                                         className={`toggle-btn ${gameOptions.honorSystemCheats ? 'on' : 'off'}`}
                                         onClick={() => setGameOptions({ honorSystemCheats: !gameOptions.honorSystemCheats })}
                                         disabled={gameState !== 'LOBBY'}
-                                        style={{ opacity: gameState !== 'LOBBY' ? 0.5 : 1, cursor: gameState !== 'LOBBY' ? 'not-allowed' : 'pointer' }}
+                                        style={{ opacity: gameState !== 'LOBBY' ? 0.5 : 1, cursor: gameState !== 'LOBBY' ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
                                     >
-                                        {gameOptions.honorSystemCheats ? '✓ On' : '✗ Off'}
+                                        {gameOptions.honorSystemCheats ? <><IconCheck /> On</> : <><IconCross /> Off</>}
                                     </button>
                                 </div>
                                 {gameOptions.honorSystemCheats && (
