@@ -68,7 +68,10 @@ function App() {
     const [playerName, setPlayerName] = useState<string>(() => {
         return localStorage.getItem('liarsDicePlayerName') || '';
     });
-    const [roomId, setRoomId] = useState<string>('');
+    const [roomId, setRoomId] = useState<string>(() => {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('join') ?? '';
+    });
     const [inLobby, setInLobby] = useState<boolean>(true);
     const [copied, setCopied] = useState<boolean>(false);
     const [showSettings, setShowSettings] = useState<boolean>(false);
@@ -202,6 +205,14 @@ function App() {
     const copyRoomId = () => {
         const codeToCopy = (isHost ? peerId : roomId) || '';
         navigator.clipboard.writeText(codeToCopy);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    const copyInviteLink = () => {
+        const code = (isHost ? peerId : roomId) || '';
+        const url = `${window.location.origin}${window.location.pathname}?join=${code}`;
+        navigator.clipboard.writeText(url);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
@@ -381,6 +392,9 @@ function App() {
                                 {copied ? <><IconCheck style={{ marginRight: '0.2rem' }} /> Copied!</> : <><IconCopy style={{ marginRight: '0.2rem' }} /> Copy</>}
                             </span>
                         </div>
+                        <button className="room-id-badge" onClick={copyInviteLink} style={{ color: 'var(--color-parchment)', opacity: '0.6' }} title="Copy invite link">
+                            {copied ? <><IconCheck /> Copied!</> : <>🔗 Invite Link</>}
+                        </button>
                         <span className="room-player-count">
                             <IconUsers style={{ marginRight: '0.3rem' }} /> {players.length} player{players.length !== 1 ? 's' : ''}
                         </span>
