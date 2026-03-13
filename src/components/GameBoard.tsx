@@ -5,24 +5,8 @@ import { Player, Bid, GameState, ChallengeResult, GameOptions, GameLogEntry, Che
 import { IconScroll, IconCross, IconUserMinus, IconInfo, IconFlag, IconSkull } from './Icons';
 import './GameBoard.css';
 
-const iconStyle = { width: '1.2em', height: '1.2em', verticalAlign: 'middle' };
 // @ts-ignore
 const BASE_URL = import.meta.env.BASE_URL;
-
-interface Rule {
-    icon: React.ReactNode;
-    text: string;
-}
-
-const RULES: Rule[] = [
-    { icon: <img src={`${BASE_URL}images/dice.png`} alt="dice" style={iconStyle} />, text: 'Each player holds 5 dice, kept secret from others.' },
-    { icon: <img src={`${BASE_URL}images/megaphone.png`} alt="megaphone" style={iconStyle} />, text: 'On your turn, bid how many dice of a face value exist across ALL hands (e.g. "three 4s").' },
-    { icon: <img src={`${BASE_URL}images/ace-of-spades.png`} alt="ace" style={iconStyle} />, text: 'Each bid must raise the count — or same count with a higher face.' },
-    { icon: <img src={`${BASE_URL}images/cards.png`} alt="cards" style={iconStyle} />, text: '1s are wild — they count as any face.' },
-    { icon: <img src={`${BASE_URL}images/bell.png`} alt="bell" style={iconStyle} />, text: 'Call "Liar!" to challenge the last bid.' },
-    { icon: <img src={`${BASE_URL}images/scales.png`} alt="scales" style={iconStyle} />, text: 'If the actual count ≥ the bid → challenger loses a die. Otherwise the bidder loses.' },
-    { icon: <img src={`${BASE_URL}images/skull.png`} alt="skull" style={iconStyle} />, text: 'Lose all your dice and you\'re out. Last crew standing wins!' },
-];
 
 const CHEAT_LABELS: Record<CheatType, string> = {
     peek: 'Peek',
@@ -97,7 +81,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
 }) => {
     const [bidCount, setBidCount] = useState<number>(currentBid?.count || 1);
     const [bidFace, setBidFace] = useState<number>(currentBid?.face || 2);
-    const [showRules, setShowRules] = useState<boolean>(false);
     const [showGameLog, setShowGameLog] = useState<boolean>(false);
     const [showCheatInfo, setShowCheatInfo] = useState<boolean>(false);
     const [bidError, setBidError] = useState<string>('');
@@ -159,16 +142,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
     return (
         <div className="game-board-layout">
-            {/* ── RULES BUTTON ── */}
-            <button
-                className="rules-btn"
-                onClick={() => setShowRules(v => !v)}
-                title="Rules"
-                aria-label="Toggle rules"
-            >
-                ?
-            </button>
-
             {/* ── GAME LOG BUTTON ── */}
             {gameLog && gameLog.length > 0 && (
                 <button
@@ -179,21 +152,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
                 >
                     <IconScroll />
                 </button>
-            )}
-
-            {/* ── RULES POPOVER ── */}
-            {showRules && (
-                <div className="rules-overlay" onClick={() => setShowRules(false)}>
-                    <div className="rules-panel parchment-panel" onClick={e => e.stopPropagation()}>
-                        <button className="rules-close" onClick={() => setShowRules(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCross size="0.8em" /></button>
-                        <h2>How to Play</h2>
-                        <ul className="rules-list">
-                            {RULES.map((r, i) => (
-                                <li key={i}><span className="rules-icon">{r.icon}</span>{r.text}</li>
-                            ))}
-                        </ul>
-                    </div>
-                </div>
             )}
 
             {/* ── GAME LOG PANEL ── */}

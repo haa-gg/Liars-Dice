@@ -41,7 +41,7 @@ npm run build
 ```
 
 ## Tech Stack
-- React + Vite
+- React/ TypeScript + Vite
 - PeerJS for WebRTC connections
 
 ## License

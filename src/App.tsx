@@ -25,6 +25,26 @@ const CHEAT_OPTIONS: CheatOption[] = [
     { value: 'magic_dice', label: 'Magic Dice', description: 'Gain 2 extra dice' },
 ];
 
+// @ts-ignore
+const BASE_URL = import.meta.env.BASE_URL;
+
+interface Rule {
+    icon: React.ReactNode;
+    text: string;
+}
+
+const iconStyle = { width: '1.2em', height: '1.2em', verticalAlign: 'middle' };
+
+const RULES: Rule[] = [
+    { icon: <img src={`${BASE_URL}images/dice.png`} alt="dice" style={iconStyle} />, text: 'Each player holds 5 dice, kept secret from others.' },
+    { icon: <img src={`${BASE_URL}images/megaphone.png`} alt="megaphone" style={iconStyle} />, text: 'On your turn, bid how many dice of a face value exist across ALL hands (e.g. "three 4s").' },
+    { icon: <img src={`${BASE_URL}images/ace-of-spades.png`} alt="ace" style={iconStyle} />, text: 'Each bid must raise the count — or same count with a higher face.' },
+    { icon: <img src={`${BASE_URL}images/cards.png`} alt="cards" style={iconStyle} />, text: '1s are wild — they count as any face.' },
+    { icon: <img src={`${BASE_URL}images/bell.png`} alt="bell" style={iconStyle} />, text: 'Call "Liar!" to challenge the last bid.' },
+    { icon: <img src={`${BASE_URL}images/scales.png`} alt="scales" style={iconStyle} />, text: 'If the actual count ≥ the bid → challenger loses a die. Otherwise the bidder loses.' },
+    { icon: <img src={`${BASE_URL}images/skull.png`} alt="skull" style={iconStyle} />, text: 'Lose all your dice and you\'re out. Last crew standing wins!' },
+];
+
 interface SessionData {
     isHost: boolean;
     playerName: string;
@@ -52,6 +72,7 @@ function App() {
     const [inLobby, setInLobby] = useState<boolean>(true);
     const [copied, setCopied] = useState<boolean>(false);
     const [showSettings, setShowSettings] = useState<boolean>(false);
+    const [showRules, setShowRules] = useState<boolean>(false);
     const [isConnecting, setIsConnecting] = useState<boolean>(false);
     const [canReconnect, setCanReconnect] = useState(false);
     const [reconnectPingActive, setReconnectPingActive] = useState(false);
@@ -127,14 +148,14 @@ function App() {
                 if (isFirstPing) {
                     setReconnectPingActive(true);
                 }
-                
+
                 pingAttemptsRef.current += 1;
 
                 const pingTimer = setTimeout(() => {
                     // If ping times out, hide reconnect
                     setCanReconnect(false);
                     setReconnectPingActive(false);
-                    
+
                     if (pingAttemptsRef.current >= 12 && pingIntervalRef.current) {
                         clearInterval(pingIntervalRef.current);
                     }
@@ -149,12 +170,12 @@ function App() {
                     // Disconnect after ping success to avoid phantom player spots
                     setTimeout(() => conn.close(), 500);
                 });
-                
+
                 conn.on('error', () => {
                     clearTimeout(pingTimer);
                     setCanReconnect(false);
                     setReconnectPingActive(false);
-                    
+
                     if (pingAttemptsRef.current >= 12 && pingIntervalRef.current) {
                         clearInterval(pingIntervalRef.current);
                     }
@@ -278,7 +299,7 @@ function App() {
                                     A multiplayer pirate-themed bluffing game<br />
                                     <span style={{ fontSize: '0.8rem', color: 'var(--color-ink)' }}>
                                         "But I have no idea how to play this :("<br />
-                                        Fear not! Tap the (?) button in the bottom right once you're in a lobby for rules.
+                                        Fear not! Tap the (?) button in the bottom right for rules.
                                     </span>
                                 </div>
                             </div>
@@ -324,20 +345,20 @@ function App() {
                                     onChange={(e) => setRoomId(e.target.value)}
                                     style={{ width: '100%', marginBottom: '1rem' }}
                                 />                            <button className="btn-nautical join-btn" onClick={handleJoinRoom} disabled={isConnecting || !roomId || reconnectPingActive} style={{ width: '100%' }}>
-                                {isConnecting ? 'Joining...' : reconnectPingActive ? 'Searching...' : 'Join Table'}
-                            </button>
-                        </div>
+                                    {isConnecting ? 'Joining...' : reconnectPingActive ? 'Searching...' : 'Join Table'}
+                                </button>
+                            </div>
 
-                        {(canReconnect || reconnectPingActive) && (
-                            <button
-                                className="btn-nautical"
-                                onClick={handleReconnect}
-                                disabled={isConnecting || reconnectPingActive}
-                                style={{ width: '100%', marginTop: '0.5rem', backgroundColor: 'var(--color-ink)', opacity: reconnectPingActive ? 0.7 : 1 }}
-                            >
-                                {reconnectPingActive ? 'Checking connection...' : 'Reconnect to Last Game'}
-                            </button>
-                        )}
+                            {(canReconnect || reconnectPingActive) && (
+                                <button
+                                    className="btn-nautical"
+                                    onClick={handleReconnect}
+                                    disabled={isConnecting || reconnectPingActive}
+                                    style={{ width: '100%', marginTop: '0.5rem', backgroundColor: 'var(--color-ink)', opacity: reconnectPingActive ? 0.7 : 1 }}
+                                >
+                                    {reconnectPingActive ? 'Checking connection...' : 'Reconnect to Last Game'}
+                                </button>
+                            )}
                         </div>
 
                         {error && <p style={{ color: 'var(--color-blood)', marginTop: '1rem' }}>{error}</p>}
@@ -527,6 +548,31 @@ function App() {
                         onDownloadJSONLog={downloadJSONLog}
                         onKickPlayer={kickPlayer}
                     />
+                </div>
+            )}
+
+            {/* ── GLOBAL RULES BUTTON ── */}
+            <button
+                className="rules-btn"
+                onClick={() => setShowRules(v => !v)}
+                title="Rules"
+                aria-label="Toggle rules"
+            >
+                ?
+            </button>
+
+            {/* ── RULES POPOVER ── */}
+            {showRules && (
+                <div className="rules-overlay" onClick={() => setShowRules(false)}>
+                    <div className="rules-panel parchment-panel" onClick={e => e.stopPropagation()}>
+                        <button className="rules-close" onClick={() => setShowRules(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCross size="0.8em" /></button>
+                        <h2>How to Play</h2>
+                        <ul className="rules-list">
+                            {RULES.map((r, i) => (
+                                <li key={i}><span className="rules-icon">{r.icon}</span>{r.text}</li>
+                            ))}
+                        </ul>
+                    </div>
                 </div>
             )}
         </div>
