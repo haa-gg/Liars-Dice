@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useGame, UseGameReturn } from './hooks/useGame';
+import peerService from './services/peerService';
 import GameBoard from './components/GameBoard';
 import { sanitizeRoomId } from './utils/validation';
 import { generateRandomName } from './utils/nameGenerator';
@@ -50,7 +51,9 @@ function App() {
     const [copied, setCopied] = useState<boolean>(false);
     const [showSettings, setShowSettings] = useState<boolean>(false);
     const [isConnecting, setIsConnecting] = useState<boolean>(false);
-    const [canReconnect, setCanReconnect] = useState<boolean>(false);
+    const [canReconnect, setCanReconnect] = useState(false);
+    const [reconnectPingActive, setReconnectPingActive] = useState(false);
+    const pingIntervalRef = useRef<number | null>(null);
 
     // Prevent accidental refresh
     useEffect(() => {
@@ -66,12 +69,13 @@ function App() {
 
     // Session expiration and renewal logic
     useEffect(() => {
-        const checkOrRenewSession = () => {
+        const checkOrRenewSession = async () => {
             const sessionStr = localStorage.getItem('liarsDiceSession');
             const peerIdStr = localStorage.getItem('liarsDicePeerId');
 
             if (!sessionStr || !peerIdStr) {
                 setCanReconnect(false);
+                setReconnectPingActive(false);
                 return;
             }
 
@@ -82,6 +86,9 @@ function App() {
                     // If active in a game, keep renewing the timestamp to prevent expiration
                     session.timestamp = Date.now();
                     localStorage.setItem('liarsDiceSession', JSON.stringify(session));
+                    setCanReconnect(false);
+                    setReconnectPingActive(false);
+                    return;
                 }
 
                 // Expire session after 1 hour (3600000ms) of inactivity, or if no timestamp exists (legacy session)
@@ -89,18 +96,59 @@ function App() {
                     localStorage.removeItem('liarsDiceSession');
                     localStorage.removeItem('liarsDicePeerId');
                     setCanReconnect(false);
-                } else {
-                    setCanReconnect(true);
+                    setReconnectPingActive(false);
+                    return;
                 }
+
+                // If we get here, valid session exists in lobby
+                if (session.isHost) {
+                    // Hosts can always potentially revive their room
+                    setCanReconnect(true);
+                    setReconnectPingActive(false);
+                    return;
+                }
+
+                // If client, temporarily connect to host just to verify they exist
+                if (!peerService.peer || peerService.peer.destroyed) {
+                    await peerService.init(peerIdStr);
+                }
+
+                setReconnectPingActive(true);
+                const pingTimer = setTimeout(() => {
+                    // If ping times out, hide reconnect
+                    setCanReconnect(false);
+                    setReconnectPingActive(false);
+                }, 3000);
+
+                const conn = peerService.connect(session.roomId, { name: session.playerName });
+                conn.on('open', () => {
+                    clearTimeout(pingTimer);
+                    setCanReconnect(true);
+                    setReconnectPingActive(false);
+                    // Disconnect after ping success to avoid phantom player spots
+                    setTimeout(() => conn.close(), 500);
+                });
+                
+                conn.on('error', () => {
+                    clearTimeout(pingTimer);
+                    setCanReconnect(false);
+                    setReconnectPingActive(false);
+                });
+
             } catch (e) {
                 setCanReconnect(false);
+                setReconnectPingActive(false);
             }
         };
 
         checkOrRenewSession();
-        // Check every 10 seconds
-        const interval = setInterval(checkOrRenewSession, 10000);
-        return () => clearInterval(interval);
+        // Check every 5 seconds
+        if (pingIntervalRef.current) clearInterval(pingIntervalRef.current);
+        pingIntervalRef.current = window.setInterval(checkOrRenewSession, 5000);
+
+        return () => {
+            if (pingIntervalRef.current) clearInterval(pingIntervalRef.current);
+        };
     }, [inLobby]);
 
     const copyRoomId = () => {
@@ -248,22 +296,21 @@ function App() {
                                     value={roomId}
                                     onChange={(e) => setRoomId(e.target.value)}
                                     style={{ width: '100%', marginBottom: '1rem' }}
-                                />
-                                <button className="btn-nautical" onClick={handleJoinRoom} disabled={isConnecting} style={{ width: '100%' }}>
-                                    {isConnecting ? 'Joining...' : 'Join Table'}
-                                </button>
-                            </div>
+                                />                            <button className="btn-nautical join-btn" onClick={handleJoinRoom} disabled={isConnecting || !roomId || reconnectPingActive} style={{ width: '100%' }}>
+                                {isConnecting ? 'Joining...' : reconnectPingActive ? 'Searching...' : 'Join Table'}
+                            </button>
+                        </div>
 
-                            {canReconnect && (
-                                <button
-                                    className="btn-nautical"
-                                    onClick={handleReconnect}
-                                    disabled={isReconnecting}
-                                    style={{ width: '100%', marginTop: '0.5rem', backgroundColor: 'var(--color-ink)' }}
-                                >
-                                    {isReconnecting ? 'Reconnecting...' : 'Reconnect to Last Game'}
-                                </button>
-                            )}
+                        {(canReconnect || reconnectPingActive) && (
+                            <button
+                                className="btn-nautical"
+                                onClick={handleReconnect}
+                                disabled={isConnecting || reconnectPingActive}
+                                style={{ width: '100%', marginTop: '0.5rem', backgroundColor: 'var(--color-ink)', opacity: reconnectPingActive ? 0.7 : 1 }}
+                            >
+                                {reconnectPingActive ? 'Checking connection...' : 'Reconnect to Last Game'}
+                            </button>
+                        )}
                         </div>
 
                         {error && <p style={{ color: 'var(--color-blood)', marginTop: '1rem' }}>{error}</p>}

@@ -133,17 +133,17 @@ class GameEngine {
             this.currentTurnIndex--;
         }
 
-        // If current turn index is now out of bounds or pointing to inactive player
+        // If current turn index is now out of bounds or pointing to inactive/disconnected player
         if (this.currentTurnIndex >= this.players.length) {
             this.currentTurnIndex = 0;
         }
 
-        // Make sure we're pointing to an active player
-        const activePlayers = this.players.filter(p => p.active);
-        if (activePlayers.length > 0 && !this.players[this.currentTurnIndex]?.active) {
-            // Find next active player
+        // Make sure we're pointing to an active and connected player
+        const activePlayers = this.players.filter(p => p.active && p.connected);
+        if (activePlayers.length > 0 && !(this.players[this.currentTurnIndex]?.active && this.players[this.currentTurnIndex]?.connected)) {
+            // Find next active and connected player
             let attempts = 0;
-            while (!this.players[this.currentTurnIndex]?.active && attempts < this.players.length) {
+            while (!(this.players[this.currentTurnIndex]?.active && this.players[this.currentTurnIndex]?.connected) && attempts < this.players.length) {
                 this.currentTurnIndex = (this.currentTurnIndex + 1) % this.players.length;
                 attempts++;
             }
@@ -209,14 +209,14 @@ class GameEngine {
         });
         this.currentBid = { count: 0, face: 0 };
 
-        // Ensure currentTurnIndex points to an active player
-        if (!this.players[this.currentTurnIndex]?.active) {
-            // Find the next active player
-            const activePlayers = this.players.filter(p => p.active);
+        // Ensure currentTurnIndex points to an active and connected player
+        if (!(this.players[this.currentTurnIndex]?.active && this.players[this.currentTurnIndex]?.connected)) {
+            // Find the next active and connected player
+            const activePlayers = this.players.filter(p => p.active && p.connected);
             if (activePlayers.length > 0) {
-                // Start from current index and find next active player
+                // Start from current index and find next active and connected player
                 let attempts = 0;
-                while (!this.players[this.currentTurnIndex]?.active && attempts < this.players.length) {
+                while (!(this.players[this.currentTurnIndex]?.active && this.players[this.currentTurnIndex]?.connected) && attempts < this.players.length) {
                     this.currentTurnIndex = (this.currentTurnIndex + 1) % this.players.length;
                     attempts++;
                 }
@@ -336,23 +336,23 @@ class GameEngine {
     }
 
     nextTurn() {
-        const activePlayers = this.players.filter(p => p.active);
+        const activePlayers = this.players.filter(p => p.active && p.connected);
         if (activePlayers.length === 0) {
-            console.error('No active players for next turn');
+            console.error('No active and connected players for next turn');
             return;
         }
 
         do {
             this.currentTurnIndex = (this.currentTurnIndex + 1) % this.players.length;
-        } while (!this.players[this.currentTurnIndex].active);
+        } while (!(this.players[this.currentTurnIndex].active && this.players[this.currentTurnIndex].connected));
     }
 
     challenge(challengerId: string): ChallengeResult {
         this.gameState = GAME_STATES.REVEALING;
 
-        // Capture snapshot of all dice before resolving (only active players)
+        // Capture snapshot of all dice before resolving (only active and connected players count towards the bid)
         this.currentRoundSnapshot = this.players
-            .filter(p => p.active)
+            .filter(p => p.active && p.connected)
             .map(p => ({
                 id: p.id,
                 name: p.name,
@@ -360,7 +360,7 @@ class GameEngine {
                 active: p.active
             }));
 
-        const allDice = this.players.filter(p => p.active).flatMap(p => p.dice);
+        const allDice = this.players.filter(p => p.active && p.connected).flatMap(p => p.dice);
         const count = allDice.filter(d =>
             d === this.currentBid.face || (this.options.wildsEnabled && d === 1)
         ).length;
@@ -411,7 +411,7 @@ class GameEngine {
                 playerName: loser.name
             });
 
-            const activePlayers = this.players.filter(p => p.active);
+            const activePlayers = this.players.filter(p => p.active && p.connected);
             this.gameState = activePlayers.length <= 1 ? GAME_STATES.GAME_OVER : GAME_STATES.ROUND_END;
             return true; // shieldUsed
         }
@@ -441,7 +441,7 @@ class GameEngine {
             });
         }
 
-        const activePlayers = this.players.filter(p => p.active);
+        const activePlayers = this.players.filter(p => p.active && p.connected);
 
         if (activePlayers.length <= 1) {
             this.gameState = GAME_STATES.GAME_OVER;

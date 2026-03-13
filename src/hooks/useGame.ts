@@ -142,6 +142,9 @@ export const useGame = (): UseGameReturn => {
                     syncState({}, { [lastMessage.from]: { myDice: newDice } });
                 }
             }
+            if (type === 'PING') {
+                sendDirect(lastMessage.from, { type: 'PONG', data: {} });
+            }
             if (type === 'USE_MAGIC_DICE') {
                 const newDice = engine.useMagicDice(lastMessage.from);
                 if (newDice) {
@@ -220,10 +223,10 @@ export const useGame = (): UseGameReturn => {
                     playerId: p.id,
                     playerName: p.name
                 });
-                engine.removePlayer(p.id);
+                engine.markPlayerDisconnected(p.id);
             });
 
-            const activePlayers = engine.players.filter(p => p.active);
+            const activePlayers = engine.players.filter(p => p.active && p.connected);
             if (activePlayers.length <= 1) {
                 engine.gameState = GAME_STATES.GAME_OVER;
                 if (activePlayers.length === 1) {
