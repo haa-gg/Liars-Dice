@@ -99,14 +99,14 @@ h1 {
 }
 
 .lobby-footer {
-  position: absolute;
-  bottom: 1rem;
+  position: relative;
   left: 0;
   width: 100%;
   text-align: center;
   opacity: 0.7;
   font-size: 0.85rem;
   color: var(--color-parchment);
+  padding-top: 30px;
 }
 
 /* ════════════════════════════════════════
@@ -145,7 +145,7 @@ h1 {
   }
 
   /* Form group with button - prevent overflow */
-  .form-group > div {
+  .form-group>div {
     flex-wrap: wrap;
   }
 

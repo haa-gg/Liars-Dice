@@ -290,21 +290,23 @@ function App() {
         <div className="game-container">
             {inLobby ? (
                 <div className="lobby-overlay">
-                    <div className="parchment-panel">
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'left', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                            <div style={{ textAlign: 'left' }}>
-                                <img src={`${import.meta.env.BASE_URL}images/logo-v2-clean-01.png`} alt="Liar's Dice Logo" style={{ width: '100%', height: 'auto', flexShrink: 0 }} />
-                                <h1 className="sr-only" style={{ margin: 0, paddingBottom: '0.2rem', borderBottom: 'none' }}>Liar&apos;s Dice</h1>
-                                <div style={{ margin: 0, fontStyle: 'italic', opacity: 0.8 }}>
-                                    A multiplayer pirate-themed bluffing game<br />
-                                    <span style={{ fontSize: '0.8rem', color: 'var(--color-ink)' }}>
-                                        "But I have no idea how to play this :("<br />
-                                        Fear not! Tap the (?) button in the bottom right for rules.
-                                    </span>
-                                </div>
+                    <div className="logo-container">
+                        <div className="scanlines">
+                            <img src={`${import.meta.env.BASE_URL}images/logo-clear.png`} alt="Liar's Dice Logo" style={{ display: 'block', width: '450px', height: 'auto', margin: '40px auto 0px auto', flexShrink: 0 }} />
+                        </div>
+                        <div style={{ textAlign: 'center' }}>
+
+                            <h1 className="sr-only" style={{ margin: 0, paddingBottom: '0.2rem', borderBottom: 'none' }}>Liar&apos;s Dice</h1>
+                            <div style={{ margin: 0, fontStyle: 'italic', opacity: 0.8 }}>
+                                A multiplayer pirate-themed bluffing game<br />
+                                <span style={{ fontSize: '0.8rem' }}>
+                                    "But I have no idea how to play this :("<br />
+                                    Fear not! Tap the (?) button in the bottom right for rules.
+                                </span>
                             </div>
                         </div>
-
+                    </div>
+                    <div className="parchment-panel">
                         <div className="form-group" style={{ marginBottom: '1rem' }}>
                             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Player Name</label>
                             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'stretch' }}>
