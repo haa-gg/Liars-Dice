@@ -292,7 +292,7 @@ function App() {
                 <div className="lobby-overlay">
                     <div className="logo-container">
                         <div className="scanlines">
-                            <img src={`${import.meta.env.BASE_URL}images/logo-clear.png`} alt="Liar's Dice Logo" style={{ display: 'block', width: '450px', height: 'auto', margin: '40px auto 0px auto', flexShrink: 0 }} />
+                            <img src={`${import.meta.env.BASE_URL}images/logo-clear.png`} alt="Liar's Dice Logo" style={{ display: 'block', width: '90%', height: 'auto', margin: '40px auto 0px auto', flexShrink: 0 }} />
                         </div>
                         <div style={{ textAlign: 'center' }}>
 
