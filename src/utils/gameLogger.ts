@@ -102,6 +102,18 @@ export const formatGameLogAsText = (gameLog: GameLogEntry[], gameOptions: Partia
             output.push(`[${time}] ${event.playerName} has been ELIMINATED!`);
         }
 
+        // Player disconnection
+        if (event.event === 'PLAYER_DISCONNECTED') {
+            const time = new Date(event.timestamp).toLocaleTimeString();
+            output.push(`[${time}] ${event.playerName} lost connection!`);
+        }
+
+        // Player reconnection
+        if (event.event === 'PLAYER_RECONNECTED') {
+            const time = new Date(event.timestamp).toLocaleTimeString();
+            output.push(`[${time}] ${event.playerName} reconnected to the table.`);
+        }
+
         // Game end
         if (event.event === 'GAME_END') {
             output.push('');

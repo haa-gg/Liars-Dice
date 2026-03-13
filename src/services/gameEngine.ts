@@ -85,8 +85,30 @@ class GameEngine {
     }
 
     addPlayer(id: string, name: string): boolean {
-        // If reconnecting
+        // If reconnecting with exact same peerId
         if (this.handlePlayerReconnect(id)) {
+            this.gameLog.push({
+                timestamp: new Date().toISOString(),
+                round: this.currentRoundNumber,
+                event: 'PLAYER_RECONNECTED',
+                playerId: id,
+                playerName: name
+            });
+            return true;
+        }
+
+        // If reconnecting by exact name (hijacking a disconnected player's slot)
+        const existingDisconnectedPlayer = this.players.find(p => p.name === name && !p.connected);
+        if (existingDisconnectedPlayer) {
+            existingDisconnectedPlayer.id = id;
+            existingDisconnectedPlayer.connected = true;
+            this.gameLog.push({
+                timestamp: new Date().toISOString(),
+                round: this.currentRoundNumber,
+                event: 'PLAYER_RECONNECTED',
+                playerId: id,
+                playerName: existingDisconnectedPlayer.name
+            });
             return true;
         }
 

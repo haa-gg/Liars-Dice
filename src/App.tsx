@@ -45,7 +45,9 @@ function App() {
         downloadTextLog, downloadJSONLog, voteNextRound, kickPlayer,
     } = game;
 
-    const [playerName, setPlayerName] = useState<string>('');
+    const [playerName, setPlayerName] = useState<string>(() => {
+        return localStorage.getItem('liarsDicePlayerName') || '';
+    });
     const [roomId, setRoomId] = useState<string>('');
     const [inLobby, setInLobby] = useState<boolean>(true);
     const [copied, setCopied] = useState<boolean>(false);
@@ -67,6 +69,13 @@ function App() {
         window.addEventListener('beforeunload', handleBeforeUnload);
         return () => window.removeEventListener('beforeunload', handleBeforeUnload);
     }, [inLobby]);
+
+    // Persist player name
+    useEffect(() => {
+        if (playerName) {
+            localStorage.setItem('liarsDicePlayerName', playerName);
+        }
+    }, [playerName]);
 
     // Session expiration and renewal logic
     useEffect(() => {
@@ -157,7 +166,9 @@ function App() {
             }
         };
 
+        // Fire immediately on mount
         checkOrRenewSession();
+
         // Check every 5 seconds
         if (pingIntervalRef.current) clearInterval(pingIntervalRef.current);
         pingIntervalRef.current = window.setInterval(checkOrRenewSession, 5000);
