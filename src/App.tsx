@@ -54,6 +54,7 @@ function App() {
     const [canReconnect, setCanReconnect] = useState(false);
     const [reconnectPingActive, setReconnectPingActive] = useState(false);
     const pingIntervalRef = useRef<number | null>(null);
+    const pingAttemptsRef = useRef<number>(0);
 
     // Prevent accidental refresh
     useEffect(() => {
@@ -113,11 +114,21 @@ function App() {
                     await peerService.init(peerIdStr);
                 }
 
-                setReconnectPingActive(true);
+                const isFirstPing = pingAttemptsRef.current === 0;
+                if (isFirstPing) {
+                    setReconnectPingActive(true);
+                }
+                
+                pingAttemptsRef.current += 1;
+
                 const pingTimer = setTimeout(() => {
                     // If ping times out, hide reconnect
                     setCanReconnect(false);
                     setReconnectPingActive(false);
+                    
+                    if (pingAttemptsRef.current >= 12 && pingIntervalRef.current) {
+                        clearInterval(pingIntervalRef.current);
+                    }
                 }, 3000);
 
                 const conn = peerService.connect(session.roomId, { name: session.playerName });
@@ -125,6 +136,7 @@ function App() {
                     clearTimeout(pingTimer);
                     setCanReconnect(true);
                     setReconnectPingActive(false);
+                    pingAttemptsRef.current = 0; // Reset consecutive failures
                     // Disconnect after ping success to avoid phantom player spots
                     setTimeout(() => conn.close(), 500);
                 });
@@ -133,6 +145,10 @@ function App() {
                     clearTimeout(pingTimer);
                     setCanReconnect(false);
                     setReconnectPingActive(false);
+                    
+                    if (pingAttemptsRef.current >= 12 && pingIntervalRef.current) {
+                        clearInterval(pingIntervalRef.current);
+                    }
                 });
 
             } catch (e) {
