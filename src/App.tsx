@@ -292,9 +292,9 @@ function App() {
                 <div className="lobby-overlay">
                     <div className="parchment-panel">
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'left', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                            <img src={`${import.meta.env.BASE_URL}images/dice-hero-v2.png`} alt="Hero Dice" style={{ width: '120px', height: 'auto', flexShrink: 0 }} />
                             <div style={{ textAlign: 'left' }}>
-                                <h1 style={{ margin: 0, paddingBottom: '0.2rem', borderBottom: 'none' }}>Liar&apos;s Dice</h1>
+                                <img src={`${import.meta.env.BASE_URL}images/logo-v2-clean-01.png`} alt="Liar's Dice Logo" style={{ width: '100%', height: 'auto', flexShrink: 0 }} />
+                                <h1 className="sr-only" style={{ margin: 0, paddingBottom: '0.2rem', borderBottom: 'none' }}>Liar&apos;s Dice</h1>
                                 <div style={{ margin: 0, fontStyle: 'italic', opacity: 0.8 }}>
                                     A multiplayer pirate-themed bluffing game<br />
                                     <span style={{ fontSize: '0.8rem', color: 'var(--color-ink)' }}>
