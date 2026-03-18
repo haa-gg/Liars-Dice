@@ -380,6 +380,8 @@ function App() {
                     <div className="lobby-footer">
                         &copy; {new Date().getFullYear()} Liar&apos;s Dice. Licensed under GPLv3.<br />
                         Check out the <a style={{ color: 'var(--color-gold)', marginTop: '1rem' }} href="https://github.com/haa-gg/liars-dice" target="_blank">github repo</a>
+                        <br />
+                        <a style={{ color: 'var(--color-gold)', marginTop: '1rem' }} href="https://buy.stripe.com/bJe3cu35NaEt8LO5Hq9bO00" target="_blank">Buy me an ale!</a>
                     </div>
                 </div>
             ) : (
