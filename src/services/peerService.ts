@@ -40,12 +40,24 @@ class PeerService {
 
         console.log(`Initializing PeerJS with ID: ${roomId} (Retries left: ${retries})`);
         this.peer = new Peer(roomId, {
-            debug: 1,
+            debug: 2, // Increased for better troubleshooting
             config: {
                 iceServers: [
                     { urls: 'stun:stun.l.google.com:19302' },
-                    { urls: 'turn:turn.anyfirewall.com:3478?transport=udp', username: 'webrtc', credential: 'webrtc' }
-                ]
+                    { urls: 'stun:stun1.l.google.com:19302' },
+                    { urls: 'stun:stun2.l.google.com:19302' },
+                    { urls: 'stun:stun3.l.google.com:19302' },
+                    { urls: 'stun:stun4.l.google.com:19302' },
+                    { 
+                        urls: [
+                            'turn:turn.anyfirewall.com:3478?transport=udp',
+                            'turn:turn.anyfirewall.com:3478?transport=tcp'
+                        ], 
+                        username: 'webrtc', 
+                        credential: 'webrtc' 
+                    }
+                ],
+                iceCandidatePoolSize: 10
             }
         });
 

@@ -276,8 +276,8 @@ export const useGame = (): UseGameReturn => {
             });
 
             const timeout = setTimeout(() => {
-                reject(new Error("Connection to host timed out. Check the Room ID or your VPN settings."));
-            }, 8000);
+                reject(new Error("Connection to host timed out. If you're using a VPN, it might be taking longer to establish a secure link."));
+            }, 15000);
 
             if (conn) {
                 conn.on('open', () => clearTimeout(timeout));
@@ -301,8 +301,8 @@ export const useGame = (): UseGameReturn => {
             });
 
             const timeout = setTimeout(() => {
-                reject(new Error("Connection to host timed out during reconnect."));
-            }, 8000);
+                reject(new Error("Connection to host timed out during reconnect. Still trying to find a path..."));
+            }, 15000);
 
             if (conn) {
                 conn.on('open', () => clearTimeout(timeout));
