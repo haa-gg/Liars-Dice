@@ -116,10 +116,14 @@ export const useGame = (): UseGameReturn => {
                 if (added) {
                     const player = engine.players.find(p => p.id === lastMessage.from);
                     if (player && player.dice.length > 0) {
+                        // For rejoining players during a round, send their dice specifically
                         syncState({}, { [lastMessage.from]: { myDice: player.dice } });
                     } else {
-                        syncState({}, { [lastMessage.from]: {} });
+                        // For new players or those without dice, send a clean state
+                        syncState({ roundReset: true }, { [lastMessage.from]: {} });
                     }
+                    // Broadcast to everyone that the player status (connected) has changed
+                    syncState();
                 }
             }
             if (type === 'PLACE_BID') {

@@ -85,6 +85,7 @@ export const sanitizeRoomId = (roomId: string): string => {
 
     return roomId
         .trim()
+        .toUpperCase()
         .slice(0, 100)  // Reasonable max length for peer IDs
         .replace(/[<>'"]/g, '');  // Remove potentially dangerous characters
 };

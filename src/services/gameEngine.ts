@@ -68,11 +68,8 @@ class GameEngine {
 
         const player = this.players[playerIndex];
         player.connected = false;
-        // Optionally, if we still want them to lose their turn:
-        // if this was their turn, advance to next connected & active player
-        if (this.currentTurnIndex === playerIndex) {
-            this.nextTurn();
-        }
+        // Turn advancement is now handled more deliberately to avoid skipping 
+        // players who might be briefly reconnecting.
     }
 
     handlePlayerReconnect(id: string): boolean {

@@ -355,8 +355,8 @@ function App() {
                                     type="text"
                                     placeholder="Room ID"
                                     value={roomId}
-                                    onChange={(e) => setRoomId(e.target.value)}
-                                    style={{ width: '100%', marginBottom: '1rem' }}
+                                    onChange={(e) => setRoomId(e.target.value.toUpperCase())}
+                                    style={{ width: '100%', marginBottom: '1rem', textTransform: 'uppercase' }}
                                 />                            <button className="btn-nautical join-btn" onClick={handleJoinRoom} disabled={isConnecting || !roomId || reconnectPingActive} style={{ width: '100%' }}>
                                     {isConnecting ? 'Joining...' : reconnectPingActive ? 'Searching...' : 'Join Table'}
                                 </button>
