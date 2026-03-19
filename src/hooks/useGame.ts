@@ -112,17 +112,17 @@ export const useGame = (): UseGameReturn => {
         if (isHost) {
             if (type === 'JOIN') {
                 const sanitizedName = sanitizeName(data.name);
+                console.log(`[Host] Player ${sanitizedName} attempting to join with ID: ${lastMessage.from}`);
                 const added = engine.addPlayer(lastMessage.from, sanitizedName);
                 if (added) {
                     const player = engine.players.find(p => p.id === lastMessage.from);
                     if (player && player.dice.length > 0) {
-                        // For rejoining players during a round, send their dice specifically
+                        console.log(`[Host] Restoring ${player.dice.length} dice to rejoining player: ${player.name}`);
                         syncState({}, { [lastMessage.from]: { myDice: player.dice } });
                     } else {
-                        // For new players or those without dice, send a clean state
+                        console.log(`[Host] Joining player ${sanitizedName} starts with no dice.`);
                         syncState({ roundReset: true }, { [lastMessage.from]: {} });
                     }
-                    // Broadcast to everyone that the player status (connected) has changed
                     syncState();
                 }
             }
@@ -188,7 +188,10 @@ export const useGame = (): UseGameReturn => {
                 setPlayers(data.players);
                 setCurrentTurn(data.players[data.currentTurnIndex]?.id || null);
                 setCurrentBid(data.currentBid);
-                if (data.myDice) setMyDice(data.myDice);
+                if (data.myDice) {
+                    console.log(`[Client] Received dice sync: ${data.myDice.length} dice`);
+                    setMyDice(data.myDice);
+                }
                 if (data.challengeResult !== undefined) setChallengeResult(data.challengeResult);
                 if (data.gameOptions) setGameOptionsState(data.gameOptions);
                 if (data.peekInfo) setPeekInfo(data.peekInfo);

@@ -94,17 +94,17 @@ class GameEngine {
             return true;
         }
 
-        // If reconnecting by exact name (hijacking a disconnected player's slot)
-        const existingDisconnectedPlayer = this.players.find(p => p.name === name && !p.connected);
-        if (existingDisconnectedPlayer) {
-            existingDisconnectedPlayer.id = id;
-            existingDisconnectedPlayer.connected = true;
+        // If reconnecting by exact name (hijacking a player slot - useful if disconnect hasn't been detected yet)
+        const existingPlayer = this.players.find(p => p.name === name);
+        if (existingPlayer) {
+            existingPlayer.id = id;
+            existingPlayer.connected = true;
             this.gameLog.push({
                 timestamp: new Date().toISOString(),
                 round: this.currentRoundNumber,
                 event: 'PLAYER_RECONNECTED',
                 playerId: id,
-                playerName: existingDisconnectedPlayer.name
+                playerName: existingPlayer.name
             });
             return true;
         }
