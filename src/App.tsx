@@ -309,11 +309,7 @@ function App() {
 
                             <h1 className="sr-only" style={{ margin: 0, paddingBottom: '0.2rem', borderBottom: 'none' }}>Liar&apos;s Dice</h1>
                             <div style={{ margin: 0, fontStyle: 'italic', opacity: 0.8 }}>
-                                A multiplayer pirate-themed bluffing game<br />
-                                <span style={{ fontSize: '0.8rem' }}>
-                                    "But I have no idea how to play this :("<br />
-                                    Fear not! Tap the (?) button in the bottom right for rules.
-                                </span>
+                                A multiplayer pirate-themed bluffing game
                             </div>
                         </div>
                     </div>
