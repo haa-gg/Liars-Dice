@@ -81,7 +81,7 @@ class GameEngine {
         return false;
     }
 
-    addPlayer(id: string, name: string): boolean {
+    addPlayer(id: string, name: string, forceSpectator = false): boolean {
         // If reconnecting with exact same peerId
         if (this.handlePlayerReconnect(id)) {
             this.gameLog.push({
@@ -117,10 +117,15 @@ class GameEngine {
                 counter++;
             }
 
+            const isMidGame = this.gameState !== GAME_STATES.LOBBY;
+            const spectator = forceSpectator || isMidGame;
+
             this.players.push({
-                id, name: uniqueName, dice: [], active: true, connected: true,
-                diceCount: this.options.startingDice,
-                cheat: null, cheatUsed: false
+                id, name: uniqueName, dice: [], active: !spectator, connected: true,
+                diceCount: spectator ? 0 : this.options.startingDice,
+                cheat: null, cheatUsed: false,
+                isSpectator: spectator,
+                permanentSpectator: forceSpectator
             });
             return true;
         }
@@ -177,15 +182,26 @@ class GameEngine {
         this.currentRoundSnapshot = null;  // Clear previous round snapshot
 
         if (isNewGame) {
-            // Reset all players for new game
+            // Reset all players for new game; permanent spectators stay inactive
             this.players.forEach(p => {
+                if (p.permanentSpectator) return; // stays on the sidelines
                 p.active = true;
                 p.diceCount = this.options.startingDice;
                 p.dice = [];
-                p.cheat = this.options.honorSystemCheats ? null : p.cheat; // Keep assigned cheats unless honor system
+                p.cheat = this.options.honorSystemCheats ? null : p.cheat;
                 p.cheatUsed = false;
+                p.isSpectator = false;
             });
             this.currentRoundNumber = 0; // Reset round counter for new game
+        } else {
+            // Activate mid-game joiners who are waiting as spectators (not permanent spectators)
+            this.players.forEach(p => {
+                if (!p.active && p.connected && p.diceCount === 0 && p.isSpectator && !p.permanentSpectator) {
+                    p.active = true;
+                    p.diceCount = this.options.startingDice;
+                    p.isSpectator = false;
+                }
+            });
         }
 
         this.currentRoundNumber++;

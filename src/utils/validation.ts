@@ -50,6 +50,9 @@ export const validateMessage = (msg: any): msg is PeerMessage => {
         case 'KICKED':
             return true;  // No data validation needed
 
+        case 'SPECTATE':
+            return typeof msg.data.targetId === 'string';
+
         case 'REROLL_DIE':
             return (
                 typeof msg.data.index === 'number' &&

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import engine, { GAME_STATES, CHEATS } from '../services/gameEngine';
 import { usePeer } from './usePeer';
 import { validateMessage, sanitizeName } from '../utils/validation';
@@ -26,12 +26,15 @@ export interface UseGameReturn {
     loadedDieActive: boolean;
     gameLog: GameLogEntry[];
     nextRoundVotes: Set<string>;
+    spectatingId: string | null;
+    spectatingDice: number[];
+    spectatingName: string | null;
     isReconnecting: boolean;
     reconnect: () => Promise<string | null>;
     setGameOptions: (opts: Partial<GameOptions>) => void;
     assignCheat: (playerId: string, cheat: CheatType | null) => void;
     startRoom: (name: string) => Promise<boolean>;
-    joinRoom: (hostId: string, name: string) => Promise<boolean>;
+    joinRoom: (hostId: string, name: string, asSpectator?: boolean) => Promise<boolean>;
     rejoinRoom: (hostId: string, name: string) => Promise<boolean>;
     startRound: () => void;
     placeBid: (count: number, face: number) => void;
@@ -48,6 +51,7 @@ export interface UseGameReturn {
     voteNextRound: () => void;
     kickPlayer: (playerId: string) => void;
     setPeekTargetId: (id: string | null) => void;
+    setSpectateTarget: (targetId: string) => void;
 }
 
 export const useGame = (): UseGameReturn => {
@@ -65,6 +69,12 @@ export const useGame = (): UseGameReturn => {
     const [loadedDieActive, setLoadedDieActive] = useState<boolean>(false);
     const [gameLog, setGameLog] = useState<GameLogEntry[]>([]);
     const [nextRoundVotes, setNextRoundVotes] = useState<Set<string>>(new Set());
+    const [spectatingId, setSpectatingId] = useState<string | null>(null);
+    const [spectatingDice, setSpectatingDice] = useState<number[]>([]);
+    const [spectatingName, setSpectatingName] = useState<string | null>(null);
+
+    // Host-side: track which eliminated players are spectating whom
+    const spectatorMapRef = useRef<Record<string, string>>({});
 
     // Derived: this player's cheat info
     const myPlayer = players.find(p => p.id === peerId);
@@ -88,6 +98,24 @@ export const useGame = (): UseGameReturn => {
             gameLog: engine.gameLog,
             ...extraData
         };
+
+        // Inject spectated dice into personalDataMap for each spectator
+        const specMap = spectatorMapRef.current;
+        for (const [spectatorId, targetId] of Object.entries(specMap)) {
+            const target = engine.players.find(p => p.id === targetId);
+            if (target && target.active) {
+                console.log(`[Host] Syncing spectated dice for ${spectatorId}: target=${target.name}, dice=${target.dice.length}`);
+                // If it's for the host (local state), update host state directly
+                if (spectatorId === peerId) {
+                    setSpectatingDice([...target.dice]);
+                    setSpectatingName(target.name);
+                } else {
+                    if (!personalDataMap[spectatorId]) personalDataMap[spectatorId] = {};
+                    personalDataMap[spectatorId].spectatingDice = [...target.dice];
+                    personalDataMap[spectatorId].spectatingName = target.name;
+                }
+            }
+        }
 
         if (Object.keys(personalDataMap).length === 0) {
             broadcast({ type: 'STATE_SYNC', data: baseState });
@@ -115,7 +143,7 @@ export const useGame = (): UseGameReturn => {
         if (isHost) {
             if (type === 'JOIN') {
                 const sanitizedName = sanitizeName(data.name);
-                const added = engine.addPlayer(lastMessage.from, sanitizedName);
+                const added = engine.addPlayer(lastMessage.from, sanitizedName, data.asSpectator === true);
                 if (added) {
                     const player = engine.players.find(p => p.id === lastMessage.from);
                     if (player && player.dice.length > 0) {
@@ -184,6 +212,31 @@ export const useGame = (): UseGameReturn => {
                     return newVotes;
                 });
             }
+            if (type === 'SPECTATE') {
+                const sPlayer = engine.players.find(p => p.id === lastMessage.from);
+                const tPlayer = engine.players.find(p => p.id === data.targetId);
+                console.log(`[Host] SPECTATE msg from ${lastMessage.from}: target=${data.targetId}, foundS=${!!sPlayer}, foundT=${!!tPlayer}`);
+                if (sPlayer && !sPlayer.active && tPlayer && tPlayer.active) {
+                    console.log(`[Host] spectated target dice length: ${tPlayer.dice.length}`);
+                    spectatorMapRef.current[lastMessage.from] = data.targetId;
+                    // Send spectated dice immediately
+                    sendDirect(lastMessage.from, {
+                        type: 'STATE_SYNC',
+                        data: {
+                            ...{
+                                gameState: engine.gameState,
+                                players: engine.players.map(p => ({ ...p, dice: [] })),
+                                currentTurnIndex: engine.currentTurnIndex,
+                                currentBid: engine.currentBid,
+                                gameOptions: engine.options,
+                                gameLog: engine.gameLog,
+                            },
+                            spectatingDice: [...tPlayer.dice],
+                            spectatingName: tPlayer.name,
+                        }
+                    });
+                }
+            }
         } else {
             if (type === 'STATE_SYNC') {
                 setGameState(data.gameState);
@@ -197,12 +250,28 @@ export const useGame = (): UseGameReturn => {
                 if (data.loadedDieHandled) setLoadedDieActive(false);
                 if (data.gameLog) setGameLog(data.gameLog);
                 if (data.nextRoundVotes !== undefined) setNextRoundVotes(new Set(data.nextRoundVotes));
+                if (data.spectatingDice) {
+                    console.log(`[Client] Received spectatingDice: ${data.spectatingDice.length}`);
+                    setSpectatingDice(data.spectatingDice);
+                }
+                if (data.spectatingName) {
+                    console.log(`[Client] Received spectatingName: ${data.spectatingName}`);
+                    setSpectatingName(data.spectatingName);
+                }
 
                 if (data.roundReset) {
                     setChallengeResult(null);
                     setPeekInfo(null);
                     setLoadedDieActive(false);
                     setNextRoundVotes(new Set());
+                    // Keep spectatingId — spectated dice will refresh via syncState
+                }
+
+                // Clear spectating on new game
+                if (data.gameState === 'LOBBY') {
+                    setSpectatingId(null);
+                    setSpectatingDice([]);
+                    setSpectatingName(null);
                 }
             }
 
@@ -217,7 +286,7 @@ export const useGame = (): UseGameReturn => {
         if (!isHost) return;
 
         const connectedIds = new Set([peerId as string, ...connections]);
-        const disconnectedPlayers = engine.players.filter(p => !connectedIds.has(p.id));
+        const disconnectedPlayers = engine.players.filter(p => p.connected && !connectedIds.has(p.id));
 
         if (disconnectedPlayers.length > 0) {
             disconnectedPlayers.forEach(p => {
@@ -271,13 +340,13 @@ export const useGame = (): UseGameReturn => {
         }
     };
 
-    const joinRoom = async (hostId: string, name: string): Promise<boolean> => {
+    const joinRoom = async (hostId: string, name: string, asSpectator = false): Promise<boolean> => {
         await initialize();
         const sanitizedName = sanitizeName(name);
 
         return new Promise((resolve, reject) => {
             const conn = connectToPeer(hostId, { name: sanitizedName }, () => {
-                sendDirect(hostId, { type: 'JOIN', data: { name: sanitizedName } });
+                sendDirect(hostId, { type: 'JOIN', data: { name: sanitizedName, asSpectator } });
                 resolve(true);
             });
 
@@ -428,9 +497,40 @@ export const useGame = (): UseGameReturn => {
         downloadGameLog(jsonLog, `liars-dice-log-${timestamp}.json`, 'application/json');
     };
 
+    const setSpectateTarget = (targetId: string) => {
+        // Only eliminated players can spectate, and only once (locked in)
+        if (!myPlayer || myPlayer.active || spectatingId) return;
+        
+        const target = players.find(p => p.id === targetId);
+        if (!target) return;
+
+        setSpectatingId(targetId);
+        setSpectatingName(target.name); // Set name immediately for UI
+
+        if (isHost) {
+            // Host is eliminated and spectating — set locally
+            spectatorMapRef.current[peerId as string] = targetId;
+            const engineTarget = engine.players.find(p => p.id === targetId);
+            if (engineTarget) {
+                setSpectatingDice([...engineTarget.dice]);
+            }
+        } else {
+            broadcast({ type: 'SPECTATE', data: { targetId } });
+        }
+    };
+
     const startRound = () => {
         if (!isHost) return;
         engine.setOptions(gameOptions);
+
+        // Clear spectating on new game
+        if (engine.gameState === GAME_STATES.GAME_OVER) {
+            spectatorMapRef.current = {};
+            setSpectatingId(null);
+            setSpectatingDice([]);
+            setSpectatingName(null);
+        }
+
         engine.startRound();
         setChallengeResult(null);
         setPeekInfo(null);
@@ -489,11 +589,12 @@ export const useGame = (): UseGameReturn => {
         isHost, error, peerId, connections,
         challengeResult, gameOptions, myCheat, myCheatUsed,
         peekInfo, peekTargetId, loadedDieActive, gameLog, nextRoundVotes,
+        spectatingId, spectatingDice, spectatingName,
         isReconnecting, reconnect,
         setGameOptions, assignCheat,
         startRoom, joinRoom, rejoinRoom, startRound, placeBid, challenge,
         usePeek, activateLoadedDie, rerollDie, dismissPeek, useSlip, useMagicDice, selectCheat,
         downloadTextLog, downloadJSONLog, voteNextRound, kickPlayer,
-        setPeekTargetId,
+        setPeekTargetId, setSpectateTarget,
     };
 };

@@ -11,6 +11,8 @@ export interface Player {
     diceCount: number;
     cheat: CheatType | null;
     cheatUsed: boolean;
+    isSpectator?: boolean;
+    permanentSpectator?: boolean;
 }
 
 export interface Bid {

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Dice from './Dice';
 import { formatGameLogAsText } from '../utils/gameLogger';
 import { Player, Bid, GameState, ChallengeResult, GameOptions, GameLogEntry, CheatType } from '../types';
-import { IconScroll, IconCross, IconUserMinus, IconInfo, IconFlag, IconSkull } from './Icons';
+import { IconScroll, IconCross, IconUserMinus, IconInfo, IconFlag, IconSkull, IconSpectator } from './Icons';
 import './GameBoard.css';
 
 // @ts-ignore
@@ -48,6 +48,10 @@ interface GameBoardProps {
     onKickPlayer: (playerId: string) => void;
     peekTargetId?: string | null;
     onSetPeekTargetId?: (id: string | null) => void;
+    spectatingId?: string | null;
+    spectatingDice?: number[];
+    spectatingName?: string | null;
+    onSetSpectateTarget?: (targetId: string) => void;
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({
@@ -82,11 +86,16 @@ const GameBoard: React.FC<GameBoardProps> = ({
     onKickPlayer,
     peekTargetId = null,
     onSetPeekTargetId,
+    spectatingId = null,
+    spectatingDice = [],
+    spectatingName = null,
+    onSetSpectateTarget,
 }) => {
     const [bidCount, setBidCount] = useState<number>(currentBid?.count || 1);
     const [bidFace, setBidFace] = useState<number>(currentBid?.face || 2);
     const [showGameLog, setShowGameLog] = useState<boolean>(false);
     const [showCheatInfo, setShowCheatInfo] = useState<boolean>(false);
+    const [showStartConfirmation, setShowStartConfirmation] = useState<boolean>(false);
     const [bidError, setBidError] = useState<string>('');
 
     // Generate text preview of game log
@@ -248,6 +257,42 @@ const GameBoard: React.FC<GameBoardProps> = ({
                 </div>
             )}
 
+            {/* ── START ROUND CONFIRMATION ── */}
+            {showStartConfirmation && (
+                <div className="result-overlay">
+                    <div className="result-panel parchment-panel">
+                        <div className="result-icon">
+                            <IconInfo size="3rem" />
+                        </div>
+                        <h3
+                            style={{ fontSize: '1.6rem' }}
+                        >Ready for Battle?</h3>
+                        <p className="result-subtitle" style={{ fontSize: '1.0rem', margin: '1rem 0' }}>
+                            Do you have all your players at the table and checked the game settings?
+                        </p>
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1.5rem' }}>
+                            <button
+                                className="btn-nautical"
+                                style={{ fontSize: '1.0rem' }}
+                                onClick={() => {
+                                    setShowStartConfirmation(false);
+                                    onNextRound();
+                                }}
+                            >
+                                Aye, Let's Begin!
+                            </button>
+                            <button
+                                className="btn-nautical"
+                                style={{ fontSize: '1.0rem' }}
+                                onClick={() => setShowStartConfirmation(false)}
+                            >
+                                Wait, Not Yet
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {isGameOver && (
                 <div className="result-overlay">
                     <div className="result-panel parchment-panel">
@@ -318,14 +363,22 @@ const GameBoard: React.FC<GameBoardProps> = ({
                         if (!p || !p.id) return null;
                         return (
                             <div key={p.id} className={`player-node ${currentTurn === p.id ? 'active-turn' : ''} ${!p.active ? 'eliminated' : ''}`}>
-                                <div className="player-avatar">{p.active ? <IconFlag size="1.5em" /> : <IconSkull size="1.5em" />}</div>
+                                <div className="player-avatar">
+                                    {p.active ? (
+                                        <IconFlag size="1.5em" />
+                                    ) : p.isSpectator ? (
+                                        <IconSpectator size="1.5em" />
+                                    ) : (
+                                        <IconSkull size="1.5em" />
+                                    )}
+                                </div>
                                 <div className="player-name">{p.name || 'Unknown Pirate'}</div>
                                 <div className="player-dice-count">
-                                    {p.active ? `Dice: ${p.diceCount || 0}` : 'Eliminated'}
+                                    {p.active ? `Dice: ${p.diceCount || 0}` : p.isSpectator ? 'Spectating' : 'Eliminated'}
                                 </div>
                                 {isHost && p.id !== peerId && (
-                                    <button 
-                                        className="kick-player-btn" 
+                                    <button
+                                        className="kick-player-btn"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             if (window.confirm(`Kick ${p.name} from the table?`)) {
@@ -474,7 +527,64 @@ const GameBoard: React.FC<GameBoardProps> = ({
                         <p style={{ opacity: 0.5, fontStyle: 'italic' }}>Your dice will appear here when the round starts.</p>
                     )}
                     {me && !me.active && (
-                        <p style={{ opacity: 0.7, fontStyle: 'italic', fontSize: '1.1rem' }}>You've been eliminated. Watch the remaining players battle it out!</p>
+                        <div style={{ textAlign: 'center' }}>
+                            {gameState === 'LOBBY' ? (
+                                // Game hasn't started yet — no active players to pick from
+                                <div className="parchment-panel" style={{ padding: '1rem', marginTop: '0.5rem' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                                        <IconSpectator size="1.5rem" />
+                                        <p style={{ opacity: 0.85, fontStyle: 'italic', fontSize: '1rem', margin: 0 }}>
+                                            {spectatingId
+                                                ? <>You'll see <strong>{spectatingName}</strong>'s dice here when the game starts.</>
+                                                : <>You're spectating. Pick a player to watch once the game begins.</>
+                                            }
+                                        </p>
+                                    </div>
+                                </div>
+                            ) : !spectatingId ? (
+                                // Spectate picker — mid-game
+                                <div className="parchment-panel" style={{ padding: '1rem', marginTop: '0.5rem' }}>
+                                    <p style={{ opacity: 0.8, fontStyle: 'italic', fontSize: '1rem', marginBottom: '0.8rem' }}>
+                                        You've been eliminated!<br />Well... That or you joined a game that's already in progress.<br />Pick a player to spectate:
+                                    </p>
+                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                                        {players
+                                            .filter(p => p.id !== peerId && p.active)
+                                            .map(p => (
+                                                <button
+                                                    key={p.id}
+                                                    className="btn-nautical"
+                                                    style={{ fontSize: '0.85rem', padding: '0.4rem 0.8rem' }}
+                                                    onClick={() => onSetSpectateTarget?.(p.id)}
+                                                >
+                                                    {p.name}
+                                                </button>
+                                            ))
+                                        }
+                                    </div>
+                                </div>
+                            ) : (
+                                // Spectating display — mid-game with dice
+                                <div style={{ marginTop: '0.5rem' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.8rem' }}>
+                                        <IconSpectator size="2rem" />
+                                        <p style={{ opacity: 0.9, fontStyle: 'italic', fontSize: '1.1rem', margin: 0 }}>
+                                            Watching <strong>{spectatingName}</strong>'s hand
+                                        </p>
+                                    </div>
+                                    <div className="my-dice">
+                                        {spectatingDice.map((val, i) => (
+                                            <div key={i} className="die-wrapper">
+                                                <Dice value={val} />
+                                            </div>
+                                        ))}
+                                        {spectatingDice.length === 0 && (
+                                            <p style={{ opacity: 0.5, fontStyle: 'italic' }}>Waiting for the next round...</p>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     )}
                 </div>
 
@@ -524,7 +634,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
                 {isHost && gameState === 'LOBBY' && players.length > 0 && (
                     <div className="bidding-controls parchment-panel" style={{ textAlign: 'center', marginTop: '1rem' }}>
                         <h3 style={{ marginBottom: '1rem' }}>Ready to bet the farm?</h3>
-                        <button className="btn-nautical" style={{ fontSize: '1.2rem', padding: '0.8rem 2rem' }} onClick={onNextRound}>
+                        <button className="btn-nautical" style={{ fontSize: '1.2rem', padding: '0.8rem 2rem' }} onClick={() => setShowStartConfirmation(true)}>
                             Start Round
                         </button>
                     </div>

@@ -58,11 +58,12 @@ function App() {
         gameState, players, currentTurn, currentBid, myDice,
         isHost, error, peerId, challengeResult,
         gameOptions, myCheat, myCheatUsed, peekInfo, peekTargetId, loadedDieActive, gameLog, nextRoundVotes,
+        spectatingId, spectatingDice, spectatingName,
         isReconnecting, reconnect,
         setGameOptions, assignCheat,
         startRoom, joinRoom, rejoinRoom, placeBid, challenge,
         usePeek, activateLoadedDie, rerollDie, dismissPeek, useSlip, useMagicDice, selectCheat,
-        downloadTextLog, downloadJSONLog, voteNextRound, kickPlayer, setPeekTargetId,
+        downloadTextLog, downloadJSONLog, voteNextRound, kickPlayer, setPeekTargetId, setSpectateTarget,
     } = game;
 
     const [playerName, setPlayerName] = useState<string>(() => {
@@ -79,6 +80,7 @@ function App() {
     const [isConnecting, setIsConnecting] = useState<boolean>(false);
     const [canReconnect, setCanReconnect] = useState(false);
     const [reconnectPingActive, setReconnectPingActive] = useState(false);
+    const [joinAsSpectator, setJoinAsSpectator] = useState(false);
     const pingIntervalRef = useRef<number | null>(null);
     const pingAttemptsRef = useRef<number>(0);
 
@@ -235,12 +237,10 @@ function App() {
         if (!playerName || !roomId) return alert('Name and Room ID required!');
         const sanitizedRoomId = sanitizeRoomId(roomId);
         if (!sanitizedRoomId) return alert('Invalid Room ID!');
-
         if (isConnecting) return;
         setIsConnecting(true);
-
         try {
-            await joinRoom(sanitizedRoomId, playerName);
+            await joinRoom(sanitizedRoomId, playerName, joinAsSpectator);
             localStorage.setItem('liarsDiceSession', JSON.stringify({ isHost: false, playerName, roomId: sanitizedRoomId, timestamp: Date.now() }));
             setInLobby(false);
         } catch (err: any) {
@@ -356,6 +356,15 @@ function App() {
                                 />                            <button className="btn-nautical join-btn" onClick={handleJoinRoom} disabled={isConnecting || !roomId || reconnectPingActive} style={{ width: '100%' }}>
                                     {isConnecting ? 'Joining...' : reconnectPingActive ? 'Searching...' : 'Join Table'}
                                 </button>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem', fontSize: '0.85rem', opacity: 0.75, cursor: 'pointer', userSelect: 'none' }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={joinAsSpectator}
+                                        onChange={e => setJoinAsSpectator(e.target.checked)}
+                                        style={{ accentColor: 'var(--color-gold)', width: '1rem', height: '1rem', cursor: 'pointer' }}
+                                    />
+                                    Join as spectator
+                                </label>
                             </div>
 
                             {(canReconnect || reconnectPingActive) && (
@@ -563,6 +572,10 @@ function App() {
                         onDownloadTextLog={downloadTextLog}
                         onDownloadJSONLog={downloadJSONLog}
                         onKickPlayer={kickPlayer}
+                        spectatingId={spectatingId}
+                        spectatingDice={spectatingDice}
+                        spectatingName={spectatingName}
+                        onSetSpectateTarget={setSpectateTarget}
                     />
                 </div>
             )}
