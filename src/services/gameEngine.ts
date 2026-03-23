@@ -310,12 +310,14 @@ class GameEngine {
         return [...player.dice];
     }
 
-    // Peek: reveal one random die from an opponent
-    peekResult(peekingPlayerId: string): { playerName: string, dieValue: number } | null {
+    // Peek: reveal one random die from an opponent (or a chosen opponent)
+    peekResult(peekingPlayerId: string, targetPlayerId?: string): { playerName: string, dieValue: number } | null {
         const player = this.players.find(p => p.id === peekingPlayerId);
         const others = this.players.filter(p => p.id !== peekingPlayerId && p.active && p.dice.length > 0);
         if (others.length === 0) return null;
-        const rp = others[Math.floor(Math.random() * others.length)];
+        const rp = targetPlayerId
+            ? (others.find(p => p.id === targetPlayerId) ?? others[Math.floor(Math.random() * others.length)])
+            : others[Math.floor(Math.random() * others.length)];
         const dieValue = rp.dice[Math.floor(Math.random() * rp.dice.length)];
 
         // Log peek use

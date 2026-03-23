@@ -22,6 +22,7 @@ export interface UseGameReturn {
     myCheat: CheatType | null;
     myCheatUsed: boolean;
     peekInfo: { playerName: string; dieValue: number } | null;
+    peekTargetId: string | null;
     loadedDieActive: boolean;
     gameLog: GameLogEntry[];
     nextRoundVotes: Set<string>;
@@ -35,7 +36,7 @@ export interface UseGameReturn {
     startRound: () => void;
     placeBid: (count: number, face: number) => void;
     challenge: () => void;
-    usePeek: () => void;
+    usePeek: (targetPlayerId: string) => void;
     activateLoadedDie: () => void;
     rerollDie: (index: number) => void;
     dismissPeek: () => void;
@@ -46,6 +47,7 @@ export interface UseGameReturn {
     downloadJSONLog: () => void;
     voteNextRound: () => void;
     kickPlayer: (playerId: string) => void;
+    setPeekTargetId: (id: string | null) => void;
 }
 
 export const useGame = (): UseGameReturn => {
@@ -59,6 +61,7 @@ export const useGame = (): UseGameReturn => {
     const [challengeResult, setChallengeResult] = useState<ChallengeResult | null>(null);
     const [gameOptions, setGameOptionsState] = useState<GameOptions>({ ...DEFAULT_OPTIONS });
     const [peekInfo, setPeekInfo] = useState<{ playerName: string; dieValue: number } | null>(null);
+    const [peekTargetId, setPeekTargetId] = useState<string | null>(null);
     const [loadedDieActive, setLoadedDieActive] = useState<boolean>(false);
     const [gameLog, setGameLog] = useState<GameLogEntry[]>([]);
     const [nextRoundVotes, setNextRoundVotes] = useState<Set<string>>(new Set());
@@ -134,7 +137,7 @@ export const useGame = (): UseGameReturn => {
                 syncState({ challengeResult: result });
             }
             if (type === 'USE_PEEK') {
-                const result = engine.peekResult(lastMessage.from);
+                const result = engine.peekResult(lastMessage.from, data.targetPlayerId);
                 const p = engine.players.find(pl => pl.id === lastMessage.from);
                 if (p) p.cheatUsed = true;
                 syncState({}, { [lastMessage.from]: { peekInfo: result } });
@@ -352,16 +355,16 @@ export const useGame = (): UseGameReturn => {
         }
     };
 
-    const usePeek = () => {
+    const usePeek = (targetPlayerId: string) => {
         if (myCheat !== CHEATS.PEEK || myCheatUsed) return;
         if (isHost) {
-            const result = engine.peekResult(peerId as string);
+            const result = engine.peekResult(peerId as string, targetPlayerId);
             const p = engine.players.find(pl => pl.id === peerId);
             if (p) p.cheatUsed = true;
             setPeekInfo(result);
             syncState();
         } else {
-            broadcast({ type: 'USE_PEEK', data: {} });
+            broadcast({ type: 'USE_PEEK', data: { targetPlayerId } });
         }
     };
 
@@ -485,11 +488,12 @@ export const useGame = (): UseGameReturn => {
         gameState, players, currentTurn, currentBid, myDice,
         isHost, error, peerId, connections,
         challengeResult, gameOptions, myCheat, myCheatUsed,
-        peekInfo, loadedDieActive, gameLog, nextRoundVotes,
+        peekInfo, peekTargetId, loadedDieActive, gameLog, nextRoundVotes,
         isReconnecting, reconnect,
         setGameOptions, assignCheat,
         startRoom, joinRoom, rejoinRoom, startRound, placeBid, challenge,
         usePeek, activateLoadedDie, rerollDie, dismissPeek, useSlip, useMagicDice, selectCheat,
         downloadTextLog, downloadJSONLog, voteNextRound, kickPlayer,
+        setPeekTargetId,
     };
 };

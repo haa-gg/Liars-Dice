@@ -36,7 +36,7 @@ interface GameBoardProps {
     gameLog?: GameLogEntry[];
     gameOptions?: GameOptions;
     nextRoundVotes?: Set<string>;
-    onUsePeek: () => void;
+    onUsePeek: (targetPlayerId: string) => void;
     onActivateLoadedDie: () => void;
     onRerollDie: (index: number) => void;
     onDismissPeek: () => void;
@@ -46,6 +46,8 @@ interface GameBoardProps {
     onDownloadTextLog: () => void;
     onDownloadJSONLog: () => void;
     onKickPlayer: (playerId: string) => void;
+    peekTargetId?: string | null;
+    onSetPeekTargetId?: (id: string | null) => void;
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({
@@ -78,6 +80,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
     onDownloadTextLog,
     onDownloadJSONLog,
     onKickPlayer,
+    peekTargetId = null,
+    onSetPeekTargetId,
 }) => {
     const [bidCount, setBidCount] = useState<number>(currentBid?.count || 1);
     const [bidFace, setBidFace] = useState<number>(currentBid?.face || 2);
@@ -366,7 +370,30 @@ const GameBoard: React.FC<GameBoardProps> = ({
                         {isMyTurn && gameState === 'BIDDING' && !myCheatUsed && (
                             <div className="cheat-actions">
                                 {myCheat === 'peek' && (
-                                    <button className="btn-nautical" style={{ fontSize: '0.7rem', padding: '0.3rem 0.6rem' }} onClick={onUsePeek}>Use Peek</button>
+                                    peekTargetId === undefined || peekTargetId === null ? (
+                                        // Step 1: show target picker
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                                            <span style={{ fontSize: '0.7rem', opacity: 0.8 }}>Peek at whom?</span>
+                                            <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                                                {players
+                                                    .filter(p => p.id !== peerId && p.active)
+                                                    .map(p => (
+                                                        <button
+                                                            key={p.id}
+                                                            className="btn-nautical"
+                                                            style={{ fontSize: '0.65rem', padding: '0.25rem 0.5rem' }}
+                                                            onClick={() => {
+                                                                onUsePeek(p.id);
+                                                                onSetPeekTargetId?.(null);
+                                                            }}
+                                                        >
+                                                            {p.name}
+                                                        </button>
+                                                    ))
+                                                }
+                                            </div>
+                                        </div>
+                                    ) : null
                                 )}
                                 {myCheat === 'loaded_die' && !loadedDieActive && (
                                     <button className="btn-nautical" style={{ fontSize: '0.7rem', padding: '0.3rem 0.6rem' }} onClick={onActivateLoadedDie}>Use Loaded Die</button>

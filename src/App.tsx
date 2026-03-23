@@ -57,12 +57,12 @@ function App() {
     const {
         gameState, players, currentTurn, currentBid, myDice,
         isHost, error, peerId, challengeResult,
-        gameOptions, myCheat, myCheatUsed, peekInfo, loadedDieActive, gameLog, nextRoundVotes,
+        gameOptions, myCheat, myCheatUsed, peekInfo, peekTargetId, loadedDieActive, gameLog, nextRoundVotes,
         isReconnecting, reconnect,
         setGameOptions, assignCheat,
         startRoom, joinRoom, rejoinRoom, placeBid, challenge,
         usePeek, activateLoadedDie, rerollDie, dismissPeek, useSlip, useMagicDice, selectCheat,
-        downloadTextLog, downloadJSONLog, voteNextRound, kickPlayer,
+        downloadTextLog, downloadJSONLog, voteNextRound, kickPlayer, setPeekTargetId,
     } = game;
 
     const [playerName, setPlayerName] = useState<string>(() => {
@@ -547,11 +547,13 @@ function App() {
                         myCheat={myCheat}
                         myCheatUsed={myCheatUsed}
                         peekInfo={peekInfo}
+                        peekTargetId={peekTargetId}
                         loadedDieActive={loadedDieActive}
                         gameLog={gameLog}
                         gameOptions={gameOptions}
                         nextRoundVotes={nextRoundVotes}
                         onUsePeek={usePeek}
+                        onSetPeekTargetId={setPeekTargetId}
                         onActivateLoadedDie={activateLoadedDie}
                         onRerollDie={rerollDie}
                         onDismissPeek={dismissPeek}
