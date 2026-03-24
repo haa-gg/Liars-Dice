@@ -3,7 +3,7 @@ import engine, { GAME_STATES, CHEATS } from '../services/gameEngine';
 import { usePeer } from './usePeer';
 import { validateMessage, sanitizeName } from '../utils/validation';
 import { formatGameLogAsText, formatGameLogAsJSON, downloadGameLog } from '../utils/gameLogger';
-import { Player, Bid, GameState, GameOptions, ChallengeResult, GameLogEntry, CheatType } from '../types';
+import { Player, Bid, GameState, GameOptions, ChallengeResult, GameLogEntry, CheatType, ClientMessage, StateSyncPayload } from '../types';
 
 const DEFAULT_OPTIONS: GameOptions = { startingDice: 5, eliminationThreshold: 0, wildsEnabled: true, honorSystemCheats: false };
 
@@ -89,7 +89,7 @@ export const useGame = (): UseGameReturn => {
         setCurrentBid(engine.currentBid);
         setGameLog([...engine.gameLog]);
 
-        const baseState = {
+        const baseState: StateSyncPayload = {
             gameState: engine.gameState,
             players: engine.players.map(p => ({ ...p, dice: [] })),
             currentTurnIndex: engine.currentTurnIndex,
@@ -127,6 +127,9 @@ export const useGame = (): UseGameReturn => {
             });
         }
     }, [broadcast, connections, sendDirect]);
+
+    /** Type-safe helper for client → host messages. */
+    const sendToHost = (msg: ClientMessage) => broadcast(msg);
 
     // Handle incoming messages
     useEffect(() => {
@@ -410,7 +413,7 @@ export const useGame = (): UseGameReturn => {
         if (isHost) {
             if (engine.placeBid(peerId as string, count, face)) syncState();
         } else {
-            broadcast({ type: 'PLACE_BID', data: { count, face } });
+            sendToHost({ type: 'PLACE_BID', data: { count, face } });
         }
     };
 
@@ -420,7 +423,7 @@ export const useGame = (): UseGameReturn => {
             setChallengeResult(result);
             syncState({ challengeResult: result });
         } else {
-            broadcast({ type: 'CHALLENGE', data: {} });
+            sendToHost({ type: 'CHALLENGE', data: {} as Record<string, never> });
         }
     };
 
@@ -433,7 +436,7 @@ export const useGame = (): UseGameReturn => {
             setPeekInfo(result);
             syncState();
         } else {
-            broadcast({ type: 'USE_PEEK', data: { targetPlayerId } });
+            sendToHost({ type: 'USE_PEEK', data: { targetPlayerId } });
         }
     };
 
@@ -443,7 +446,7 @@ export const useGame = (): UseGameReturn => {
             const newDice = engine.useSlip(peerId as string);
             if (newDice) { setMyDice([...newDice]); syncState(); }
         } else {
-            broadcast({ type: 'USE_SLIP', data: {} });
+            sendToHost({ type: 'USE_SLIP', data: {} as Record<string, never> });
         }
     };
 
@@ -453,7 +456,7 @@ export const useGame = (): UseGameReturn => {
             const newDice = engine.useMagicDice(peerId as string);
             if (newDice) { setMyDice([...newDice]); syncState(); }
         } else {
-            broadcast({ type: 'USE_MAGIC_DICE', data: {} });
+            sendToHost({ type: 'USE_MAGIC_DICE', data: {} as Record<string, never> });
         }
     };
 
@@ -469,7 +472,7 @@ export const useGame = (): UseGameReturn => {
             const newDice = engine.rerollDie(peerId as string, index);
             if (newDice) { setMyDice([...newDice]); syncState(); }
         } else {
-            broadcast({ type: 'REROLL_DIE', data: { index } });
+            sendToHost({ type: 'REROLL_DIE', data: { index } });
         }
     };
 
@@ -481,7 +484,7 @@ export const useGame = (): UseGameReturn => {
             engine.assignCheat(peerId as string, cheatType);
             syncState();
         } else {
-            broadcast({ type: 'SELECT_CHEAT', data: { cheat: cheatType } });
+            sendToHost({ type: 'SELECT_CHEAT', data: { cheat: cheatType } });
         }
     };
 
@@ -515,7 +518,7 @@ export const useGame = (): UseGameReturn => {
                 setSpectatingDice([...engineTarget.dice]);
             }
         } else {
-            broadcast({ type: 'SPECTATE', data: { targetId } });
+            sendToHost({ type: 'SPECTATE', data: { targetId } });
         }
     };
 
@@ -552,7 +555,7 @@ export const useGame = (): UseGameReturn => {
         if (isHost) {
             startRound();
         } else {
-            broadcast({ type: 'VOTE_NEXT_ROUND', data: {} });
+            sendToHost({ type: 'VOTE_NEXT_ROUND', data: {} as Record<string, never> });
             setNextRoundVotes(prev => new Set([...prev, peerId as string]));
         }
     };

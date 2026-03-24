@@ -22,8 +22,8 @@ export interface Bid {
 
 export interface ChallengeResult {
     loserId: string;
-    count: number; // actual count of the bid face
-    actualCount: number; // same as count, used for clarity
+    count: number;
+    actualCount: number;
     shieldUsed: boolean;
 }
 
@@ -41,7 +41,46 @@ export interface GameLogEntry {
     [key: string]: any;
 }
 
-export interface PeerMessage {
-    type: string;
-    data: any;
+// ── Typed peer messages ────────────────────────────────────────────────────────
+
+/** Payload carried on every STATE_SYNC message from host → clients. */
+export interface StateSyncPayload {
+    gameState: GameState;
+    players: Player[];
+    currentTurnIndex: number;
+    currentBid: Bid;
+    gameOptions: GameOptions;
+    gameLog: GameLogEntry[];
+    // Optional personal / per-client fields
+    myDice?: number[];
+    challengeResult?: ChallengeResult | null;
+    peekInfo?: { playerName: string; dieValue: number } | null;
+    loadedDieHandled?: boolean;
+    nextRoundVotes?: string[];
+    roundReset?: boolean;
+    spectatingDice?: number[];
+    spectatingName?: string;
 }
+
+/** Messages sent from a client → host. */
+export type ClientMessage =
+    | { type: 'JOIN';             data: { name: string; asSpectator: boolean } }
+    | { type: 'PLACE_BID';       data: { count: number; face: number } }
+    | { type: 'CHALLENGE';       data: Record<string, never> }
+    | { type: 'USE_PEEK';        data: { targetPlayerId: string } }
+    | { type: 'USE_SLIP';        data: Record<string, never> }
+    | { type: 'USE_MAGIC_DICE';  data: Record<string, never> }
+    | { type: 'REROLL_DIE';      data: { index: number } }
+    | { type: 'SELECT_CHEAT';    data: { cheat: CheatType } }
+    | { type: 'VOTE_NEXT_ROUND'; data: Record<string, never> }
+    | { type: 'SPECTATE';        data: { targetId: string } }
+    | { type: 'PING';            data: Record<string, never> };
+
+/** Messages sent from host → clients. */
+export type HostMessage =
+    | { type: 'STATE_SYNC'; data: StateSyncPayload }
+    | { type: 'KICKED';     data: Record<string, never> }
+    | { type: 'PONG';       data: Record<string, never> };
+
+/** Union of all peer messages (convenience alias). */
+export type PeerMessage = ClientMessage | HostMessage;
