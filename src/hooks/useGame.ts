@@ -5,7 +5,7 @@ import { validateMessage, sanitizeName } from '../utils/validation';
 import { formatGameLogAsText, formatGameLogAsJSON, downloadGameLog } from '../utils/gameLogger';
 import { Player, Bid, GameState, GameOptions, ChallengeResult, GameLogEntry, CheatType, ClientMessage, StateSyncPayload } from '../types';
 
-const DEFAULT_OPTIONS: GameOptions = { startingDice: 5, eliminationThreshold: 0, wildsEnabled: true, honorSystemCheats: false };
+const DEFAULT_OPTIONS: GameOptions = { startingDice: 5, eliminationThreshold: 0, wildsEnabled: true, honorSystemCheats: false, hostBonusDice: 0 };
 
 export interface UseGameReturn {
     gameState: GameState;
@@ -330,6 +330,7 @@ export const useGame = (): UseGameReturn => {
             setIsHost(true);
             const sanitizedName = sanitizeName(name);
             engine.addPlayer(id, sanitizedName);
+            engine.setHost(id);
 
             setChallengeResult(null);
             setPeekInfo(null);

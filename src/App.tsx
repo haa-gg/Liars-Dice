@@ -514,6 +514,30 @@ function App() {
                                 )}
                             </div>
 
+                            <div className="settings-section">
+                                <h4>Host Handicap</h4>
+                                <div className="settings-row">
+                                    <label>Your Bonus Dice</label>
+                                    <select
+                                        className="input-nautical settings-select"
+                                        value={gameOptions.hostBonusDice ?? 0}
+                                        onChange={e => setGameOptions({ hostBonusDice: Number(e.target.value) })}
+                                        disabled={gameState !== 'LOBBY'}
+                                        style={{ opacity: gameState !== 'LOBBY' ? 0.5 : 1 }}
+                                    >
+                                        <option value={0}>None (fair game)</option>
+                                        {[1,2,3,4,5,6,7,8,9,10].map(n => (
+                                            <option key={n} value={n}>+{n} dice</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                {(gameOptions.hostBonusDice ?? 0) > 0 && (
+                                    <p className="settings-sub" style={{ marginTop: '-0.5rem', fontSize: '0.75rem', opacity: 0.7 }}>
+                                        You'll start with {(gameOptions.startingDice) + (gameOptions.hostBonusDice ?? 0)} dice vs. {gameOptions.startingDice} for everyone else
+                                    </p>
+                                )}
+                            </div>
+
                             {players.length > 0 && !gameOptions.honorSystemCheats && (
                                 <div className="settings-section">
                                     <h4>Cheats</h4>
@@ -576,19 +600,12 @@ function App() {
                         spectatingDice={spectatingDice}
                         spectatingName={spectatingName}
                         onSetSpectateTarget={setSpectateTarget}
+                        onShowRules={() => setShowRules(v => !v)}
                     />
                 </div>
             )}
 
-            {/* ── GLOBAL RULES BUTTON ── */}
-            <button
-                className="rules-btn"
-                onClick={() => setShowRules(v => !v)}
-                title="Rules"
-                aria-label="Toggle rules"
-            >
-                ?
-            </button>
+
 
             {/* ── RULES POPOVER ── */}
             {showRules && (

@@ -32,6 +32,7 @@ export interface GameOptions {
     eliminationThreshold: number;
     wildsEnabled: boolean;
     honorSystemCheats: boolean;
+    hostBonusDice: number;
 }
 
 export interface GameLogEntry {

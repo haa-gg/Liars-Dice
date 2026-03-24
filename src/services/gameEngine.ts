@@ -25,7 +25,7 @@ export const CHEAT_LABELS: Record<CheatType, string> = {
     magic_dice: 'Magic Dice',
 };
 
-const DEFAULT_OPTIONS: GameOptions = { startingDice: 5, eliminationThreshold: 0, wildsEnabled: true, honorSystemCheats: false };
+const DEFAULT_OPTIONS: GameOptions = { startingDice: 5, eliminationThreshold: 0, wildsEnabled: true, honorSystemCheats: false, hostBonusDice: 0 };
 
 class GameEngine {
     options: GameOptions = { ...DEFAULT_OPTIONS };
@@ -39,6 +39,7 @@ class GameEngine {
     gameLog: GameLogEntry[] = [];
     currentRoundNumber: number = 0;
     gameStartTime: string | null = null;
+    hostId: string | null = null;
 
     constructor() {
         this.reset();
@@ -56,10 +57,15 @@ class GameEngine {
         this.gameLog = [];  // Full game log for export
         this.currentRoundNumber = 0;
         this.gameStartTime = null;
+        this.hostId = null;
     }
 
     setOptions(opts: Partial<GameOptions>) {
         this.options = { ...this.options, ...opts };
+    }
+
+    setHost(id: string) {
+        this.hostId = id;
     }
 
     markPlayerDisconnected(id: string) {
@@ -186,7 +192,9 @@ class GameEngine {
             this.players.forEach(p => {
                 if (p.permanentSpectator) return; // stays on the sidelines
                 p.active = true;
-                p.diceCount = this.options.startingDice;
+                p.diceCount = p.id === this.hostId
+                    ? this.options.startingDice + (this.options.hostBonusDice ?? 0)
+                    : this.options.startingDice;
                 p.dice = [];
                 p.cheat = this.options.honorSystemCheats ? null : p.cheat;
                 p.cheatUsed = false;
@@ -202,6 +210,15 @@ class GameEngine {
                     p.isSpectator = false;
                 }
             });
+
+            // First-ever round from LOBBY: host's diceCount was set in addPlayer (= startingDice).
+            // Bump it now so the bonus applies from game start.
+            if (this.currentRoundNumber === 0 && this.hostId && (this.options.hostBonusDice ?? 0) > 0) {
+                const host = this.players.find(p => p.id === this.hostId);
+                if (host && host.active && !host.permanentSpectator) {
+                    host.diceCount = this.options.startingDice + this.options.hostBonusDice;
+                }
+            }
         }
 
         this.currentRoundNumber++;

@@ -132,3 +132,12 @@ export const IconUserMinus: React.FC<IconProps> = ({ size = defaultProps.size, .
         <line x1="23" y1="11" x2="17" y2="11" />
     </svg>
 );
+
+export const IconMenu: React.FC<IconProps> = ({ size = defaultProps.size, ...props }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" {...defaultProps} {...props}>
+        <line x1="3" y1="6"  x2="21" y2="6"  />
+        <line x1="3" y1="12" x2="21" y2="12" />
+        <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+);
+
