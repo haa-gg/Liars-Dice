@@ -31,6 +31,7 @@ export interface UseGameReturn {
     spectatingName: string | null;
     isReconnecting: boolean;
     reconnect: () => Promise<string | null>;
+    reconnectAsHost: (name: string) => Promise<string | null>;
     setGameOptions: (opts: Partial<GameOptions>) => void;
     assignCheat: (playerId: string, cheat: CheatType | null) => void;
     startRoom: (name: string) => Promise<boolean>;
@@ -344,6 +345,28 @@ export const useGame = (): UseGameReturn => {
         }
     };
 
+    const reconnectAsHost = async (name: string) => {
+        try {
+            engine.reset();
+            const id = await reconnect();
+            if (!id) throw new Error('Failed to get Peer ID');
+            setIsHost(true);
+            const sanitizedName = sanitizeName(name);
+            engine.addPlayer(id, sanitizedName);
+            engine.setHost(id);
+
+            setChallengeResult(null);
+            setPeekInfo(null);
+            setLoadedDieActive(false);
+            setMyDice([]);
+
+            syncState();
+            return id;
+        } catch (err) {
+            return null;
+        }
+    };
+
     const joinRoom = async (hostId: string, name: string, asSpectator = false): Promise<boolean> => {
         await initialize();
         const sanitizedName = sanitizeName(name);
@@ -594,7 +617,7 @@ export const useGame = (): UseGameReturn => {
         challengeResult, gameOptions, myCheat, myCheatUsed,
         peekInfo, peekTargetId, loadedDieActive, gameLog, nextRoundVotes,
         spectatingId, spectatingDice, spectatingName,
-        isReconnecting, reconnect,
+        isReconnecting, reconnect, reconnectAsHost,
         setGameOptions, assignCheat,
         startRoom, joinRoom, rejoinRoom, startRound, placeBid, challenge,
         usePeek, activateLoadedDie, rerollDie, dismissPeek, useSlip, useMagicDice, selectCheat,

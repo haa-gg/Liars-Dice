@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Dice from './Dice';
 import { formatGameLogAsText } from '../utils/gameLogger';
 import { Player, Bid, GameState, ChallengeResult, GameOptions, GameLogEntry, CheatType } from '../types';
-import { IconScroll, IconCross, IconUserMinus, IconInfo, IconFlag, IconSkull, IconSpectator, IconMenu } from './Icons';
+import MainMenu from './MainMenu';
+import { IconCross, IconUserMinus, IconInfo, IconFlag, IconSkull, IconSpectator } from './Icons';
 import './GameBoard.css';
 
 // @ts-ignore
@@ -100,8 +101,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
     const [showGameLog, setShowGameLog] = useState<boolean>(false);
     const [showCheatInfo, setShowCheatInfo] = useState<boolean>(false);
     const [showStartConfirmation, setShowStartConfirmation] = useState<boolean>(false);
-    const [showMenu, setShowMenu] = useState<boolean>(false);
-    const [showCredits, setShowCredits] = useState<boolean>(false);
     const [bidError, setBidError] = useState<string>('');
 
     // Generate text preview of game log
@@ -159,89 +158,14 @@ const GameBoard: React.FC<GameBoardProps> = ({
         ? players.find(p => p.active)
         : null;
 
-    const menuItemStyle: React.CSSProperties = {
-        background: 'none',
-        border: 'none',
-        width: '100%',
-        textAlign: 'left',
-        padding: '0.55rem 1rem',
-        cursor: 'pointer',
-        fontSize: '0.9rem',
-        color: 'var(--color-ink)',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.4rem',
-    };
-
     return (
         <div className="game-board-layout">
-            {/* ── HAMBURGER MENU BUTTON ── */}
-            <div style={{ position: 'absolute', top: '0.75rem', right: '0.75rem', zIndex: 50 }}>
-                <button
-                    className="log-btn"
-                    onClick={() => setShowMenu(true)}
-                    title="Menu"
-                    aria-label="Open menu"
-                    style={{ position: 'relative' }}
-                >
-                    <IconMenu size="1.4em" />
-                </button>
-            </div>
-
-            {/* ── SIDE MENU DRAWER ── */}
-            {showMenu && (
-                <div className="menu-backdrop" onClick={() => setShowMenu(false)} />
-            )}
-
-            <div className={`side-menu ${showMenu ? 'open' : 'closed'}`}>
-                <div className="side-menu-header">
-                    <h2>Menu</h2>
-                    <button className="side-menu-close" onClick={() => setShowMenu(false)}>
-                        <IconCross size="1.2em" />
-                    </button>
-                </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', padding: '0.5rem 0' }}>
-                    {/* Rules */}
-                    <button
-                        onClick={() => { setShowMenu(false); onShowRules?.(); }}
-                        style={menuItemStyle}
-                    >
-                        Rules
-                    </button>
-
-                    {/* Game Log */}
-                    <button
-                        onClick={() => { setShowMenu(false); setShowGameLog(true); }}
-                        disabled={!gameLog || gameLog.length === 0}
-                        style={{ ...menuItemStyle, opacity: (!gameLog || gameLog.length === 0) ? 0.4 : 1 }}
-                    >
-                        Game Log
-                    </button>
-
-                    <hr style={{ margin: '0.5rem 1.5rem', opacity: 0.1 }} />
-
-                    {/* Credits */}
-                    <button
-                        onClick={() => { setShowMenu(false); setShowCredits(true); }}
-                        style={menuItemStyle}
-                    >
-                        Credits
-                    </button>
-
-                    <hr style={{ margin: '0.5rem 1.5rem', opacity: 0.1 }} />
-
-                    {/* Leave Game */}
-                    {onLeaveGame && (
-                        <button
-                            onClick={() => { setShowMenu(false); onLeaveGame(); }}
-                            style={{ ...menuItemStyle, color: 'var(--color-blood)', fontWeight: 'bold' }}
-                        >
-                            Leave Game
-                        </button>
-                    )}
-                </div>
-            </div>
+            <MainMenu
+                onShowRules={onShowRules}
+                onShowGameLog={() => setShowGameLog(true)}
+                onLeaveGame={onLeaveGame}
+                gameLogEmpty={!gameLog || gameLog.length === 0}
+            />
 
             {/* ── GAME LOG PANEL ── */}
             {showGameLog && (
@@ -277,21 +201,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
                 </div>
             )}
 
-            {/* ── CREDITS MODAL ── */}
-            {showCredits && (
-                <div className="rules-overlay" onClick={() => setShowCredits(false)}>
-                    <div className="parchment-panel" style={{ maxWidth: 420, width: '90%', textAlign: 'center' }} onClick={e => e.stopPropagation()}>
-                        <button className="rules-close" onClick={() => setShowCredits(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCross size="0.8em" /></button>
-                        <h2 style={{ marginTop: 0 }}>Credits</h2>
-                        <div style={{ textAlign: 'left', lineHeight: 1.7, fontSize: '0.9rem' }}>
-                            <p><strong>Pixel Dice</strong><br />
-                                By <a href="https://opengameart.org/users/vircon32" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-gold)' }}>Vircon32</a> on OpenGameArt<br />
-                                Licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-gold)' }}>CC BY 4.0</a>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             {/* ── CHEAT INFO POPUP ── */}
             {showCheatInfo && (

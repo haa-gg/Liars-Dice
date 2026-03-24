@@ -1,4 +1,5 @@
 import React from 'react';
+import { useUserSettings } from '../hooks/SettingsContext';
 import './Dice.css';
 
 // @ts-ignore
@@ -10,15 +11,33 @@ interface DiceProps {
     isSlipped?: boolean;
 }
 
+const renderHtmlDie = (value: number) => {
+    switch(value) {
+        case 1: return <div className="dice-html"><div className="dice-row center" style={{marginTop:'auto', marginBottom:'auto'}}><span className="dice-dot"/></div></div>;
+        case 2: return <div className="dice-html"><div className="dice-row"><span className="dice-dot"/></div><div className="dice-row right"><span className="dice-dot"/></div></div>;
+        case 3: return <div className="dice-html"><div className="dice-row"><span className="dice-dot"/></div><div className="dice-row center"><span className="dice-dot"/></div><div className="dice-row right"><span className="dice-dot"/></div></div>;
+        case 4: return <div className="dice-html"><div className="dice-row"><span className="dice-dot"/><span className="dice-dot"/></div><div className="dice-row"><span className="dice-dot"/><span className="dice-dot"/></div></div>;
+        case 5: return <div className="dice-html"><div className="dice-row"><span className="dice-dot"/><span className="dice-dot"/></div><div className="dice-row center"><span className="dice-dot"/></div><div className="dice-row"><span className="dice-dot"/><span className="dice-dot"/></div></div>;
+        case 6: return <div className="dice-html"><div className="dice-row"><span className="dice-dot"/><span className="dice-dot"/></div><div className="dice-row"><span className="dice-dot"/><span className="dice-dot"/></div><div className="dice-row"><span className="dice-dot"/><span className="dice-dot"/></div></div>;
+        default: return <div className="dice-html"/>;
+    }
+};
+
 const Dice: React.FC<DiceProps> = ({ value, rolling, isSlipped }) => {
+    const { settings } = useUserSettings();
+
     return (
         <div className={`dice-img-container ${rolling ? 'rolling' : ''} ${isSlipped ? 'slipped' : ''}`}>
-            <img
-                src={`${BASE_URL}images/dice/pixel-dice-${value}.png`}
-                alt={`Die showing ${value}`}
-                className="dice-img"
-                draggable={false}
-            />
+            {settings.diceStyle === 'html' ? (
+                renderHtmlDie(value)
+            ) : (
+                <img
+                    src={`${BASE_URL}images/dice/${settings.diceStyle}-dice-${value}.png`}
+                    alt={`Die showing ${value}`}
+                    className="dice-img"
+                    draggable={false}
+                />
+            )}
         </div>
     );
 };
