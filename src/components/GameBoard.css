@@ -622,7 +622,7 @@
     .player-node:nth-child(4),
     .player-node:nth-child(5),
     .player-node:nth-child(6) {
-        position: static;
+        position: relative;
         transform: none;
         top: auto;
         left: auto;

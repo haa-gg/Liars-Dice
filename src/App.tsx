@@ -10,6 +10,8 @@ import './components/GameBoard.css';
 import './components/LobbySettings.css';
 import { IconScroll, IconGear, IconUsers, IconCheck, IconCross, IconCopy } from './components/Icons';
 import MainMenu from './components/MainMenu';
+import TutorialOverlay from './components/TutorialOverlay';
+import { useTutorialGame } from './hooks/useTutorialGame';
 import { SettingsProvider } from './hooks/SettingsContext';
 
 interface CheatOption {
@@ -55,7 +57,17 @@ interface SessionData {
 }
 
 function App() {
-    const game: UseGameReturn = useGame();
+    const [inLobby, setInLobby] = useState<boolean>(true);
+    const [inTutorial, setInTutorial] = useState<boolean>(false);
+
+    const realGame = useGame();
+    const tutorialGame = useTutorialGame(() => {
+        setInTutorial(false);
+        setInLobby(true);
+    });
+
+    const game = (inTutorial ? tutorialGame : realGame) as UseGameReturn;
+    
     const {
         gameState, players, currentTurn, currentBid, myDice,
         isHost, error, peerId, challengeResult,
@@ -75,7 +87,6 @@ function App() {
         const params = new URLSearchParams(window.location.search);
         return params.get('join') ?? '';
     });
-    const [inLobby, setInLobby] = useState<boolean>(true);
     const [copied, setCopied] = useState<boolean>(false);
     const [showSettings, setShowSettings] = useState<boolean>(false);
     const [showRules, setShowRules] = useState<boolean>(false);
@@ -315,7 +326,14 @@ function App() {
             <div className="game-container">
                 {inLobby ? (
                     <div className="lobby-overlay">
-                        <MainMenu onShowRules={() => setShowRules(true)} />
+                        <MainMenu
+                            onShowRules={() => setShowRules(true)}
+                            onPlayTutorial={() => {
+                                tutorialGame.resetTutorial();
+                                setInTutorial(true);
+                                setInLobby(false);
+                            }}
+                        />
                         <div className="logo-container">
                             <div className="scanlines">
                                 <img src={`${import.meta.env.BASE_URL}images/logo-clear.png`} alt="Liar's Dice Logo" style={{ display: 'block', width: '90%', height: 'auto', margin: '40px auto 0px auto', flexShrink: 0 }} />
@@ -581,6 +599,8 @@ function App() {
                                 )}
                             </div>
                         )}
+
+                        {inTutorial && <TutorialOverlay tutorialStep={tutorialGame.tutorialStep} />}
 
                         <GameBoard
                             players={players}

@@ -6,6 +6,7 @@ interface MainMenuProps {
     onShowRules?: () => void;
     onShowGameLog?: () => void;
     onLeaveGame?: () => void;
+    onPlayTutorial?: () => void;
     gameLogEmpty?: boolean;
 }
 
@@ -13,6 +14,7 @@ const MainMenu: React.FC<MainMenuProps> = ({
     onShowRules,
     onShowGameLog,
     onLeaveGame,
+    onPlayTutorial,
     gameLogEmpty = false,
 }) => {
     const [showMenu, setShowMenu] = useState(false);
@@ -104,6 +106,19 @@ const MainMenu: React.FC<MainMenuProps> = ({
                     >
                         Credits
                     </button>
+
+                    {onPlayTutorial && (
+                        <>
+                            <hr style={{ margin: '0.5rem 1.5rem', opacity: 0.1 }} />
+                            {/* Play Tutorial */}
+                            <button
+                                onClick={() => { setShowMenu(false); onPlayTutorial(); }}
+                                style={menuItemStyle}
+                            >
+                                Play Tutorial
+                            </button>
+                        </>
+                    )}
 
                     {onLeaveGame && (
                         <>
