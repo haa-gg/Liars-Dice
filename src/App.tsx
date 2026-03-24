@@ -288,6 +288,13 @@ function App() {
         setPlayerName(generateRandomName());
     };
 
+    const handleLeaveGame = () => {
+        if (window.confirm("Are you sure you want to leave the game? (You can reconnect from the lobby if you change your mind)")) {
+            // This is literally just a fancy button that refreshes the page
+            window.location.href = window.location.pathname;
+        }
+    };
+
     // Human-readable summary of current rules
     const rulesSummary = [
         `${gameOptions.startingDice} dice`,
@@ -526,7 +533,7 @@ function App() {
                                         style={{ opacity: gameState !== 'LOBBY' ? 0.5 : 1 }}
                                     >
                                         <option value={0}>None (fair game)</option>
-                                        {[1,2,3,4,5,6,7,8,9,10].map(n => (
+                                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
                                             <option key={n} value={n}>+{n} dice</option>
                                         ))}
                                     </select>
@@ -601,6 +608,7 @@ function App() {
                         spectatingName={spectatingName}
                         onSetSpectateTarget={setSpectateTarget}
                         onShowRules={() => setShowRules(v => !v)}
+                        onLeaveGame={handleLeaveGame}
                     />
                 </div>
             )}

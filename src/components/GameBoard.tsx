@@ -53,6 +53,7 @@ interface GameBoardProps {
     spectatingName?: string | null;
     onSetSpectateTarget?: (targetId: string) => void;
     onShowRules?: () => void;
+    onLeaveGame?: () => void;
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({
@@ -92,6 +93,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
     spectatingName = null,
     onSetSpectateTarget,
     onShowRules,
+    onLeaveGame,
 }) => {
     const [bidCount, setBidCount] = useState<number>(currentBid?.count || 1);
     const [bidFace, setBidFace] = useState<number>(currentBid?.face || 2);
@@ -226,6 +228,18 @@ const GameBoard: React.FC<GameBoardProps> = ({
                     >
                         Credits
                     </button>
+
+                    <hr style={{ margin: '0.5rem 1.5rem', opacity: 0.1 }} />
+
+                    {/* Leave Game */}
+                    {onLeaveGame && (
+                        <button
+                            onClick={() => { setShowMenu(false); onLeaveGame(); }}
+                            style={{ ...menuItemStyle, color: 'var(--color-blood)', fontWeight: 'bold' }}
+                        >
+                            Leave Game
+                        </button>
+                    )}
                 </div>
             </div>
 
