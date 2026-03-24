@@ -55,6 +55,7 @@ interface GameBoardProps {
     onSetSpectateTarget?: (targetId: string) => void;
     onShowRules?: () => void;
     onLeaveGame?: () => void;
+    onAddBot?: () => void;
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({
@@ -95,6 +96,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
     onSetSpectateTarget,
     onShowRules,
     onLeaveGame,
+    onAddBot,
 }) => {
     const [bidCount, setBidCount] = useState<number>(currentBid?.count || 1);
     const [bidFace, setBidFace] = useState<number>(currentBid?.face || 2);
@@ -633,8 +635,13 @@ const GameBoard: React.FC<GameBoardProps> = ({
                 )}
 
                 {isHost && gameState === 'LOBBY' && players.length > 0 && (
-                    <div className="bidding-controls parchment-panel" style={{ textAlign: 'center', marginTop: '1rem' }}>
-                        <h3 style={{ marginBottom: '1rem' }}>Ready to bet the farm?</h3>
+                    <div className="bidding-controls parchment-panel" style={{ textAlign: 'center', marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                        <h3 style={{ marginBottom: '0.5rem' }}>Ready to bet the farm?</h3>
+                        {onAddBot && players.length < 10 && (
+                            <button className="btn-nautical" style={{ fontSize: '1rem', padding: '0.5rem 2rem', background: 'var(--color-wood-mid)' }} onClick={onAddBot}>
+                                + Spawn Bot Player
+                            </button>
+                        )}
                         <button className="btn-nautical" style={{ fontSize: '1.2rem', padding: '0.8rem 2rem' }} onClick={() => setShowStartConfirmation(true)}>
                             Start Round
                         </button>

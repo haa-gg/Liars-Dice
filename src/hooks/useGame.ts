@@ -3,6 +3,8 @@ import engine, { GAME_STATES, CHEATS } from '../services/gameEngine';
 import { usePeer } from './usePeer';
 import { validateMessage, sanitizeName } from '../utils/validation';
 import { formatGameLogAsText, formatGameLogAsJSON, downloadGameLog } from '../utils/gameLogger';
+import { getBotAction } from '../utils/botLogic';
+import randomNames from '../data/randomNames.json';
 import { Player, Bid, GameState, GameOptions, ChallengeResult, GameLogEntry, CheatType, ClientMessage, StateSyncPayload } from '../types';
 
 const DEFAULT_OPTIONS: GameOptions = { startingDice: 5, eliminationThreshold: 0, wildsEnabled: true, honorSystemCheats: false, hostBonusDice: 0 };
@@ -38,6 +40,7 @@ export interface UseGameReturn {
     joinRoom: (hostId: string, name: string, asSpectator?: boolean) => Promise<boolean>;
     rejoinRoom: (hostId: string, name: string) => Promise<boolean>;
     startRound: () => void;
+    addBot: () => void;
     placeBid: (count: number, face: number) => void;
     challenge: () => void;
     usePeek: (targetPlayerId: string) => void;
@@ -290,7 +293,7 @@ export const useGame = (): UseGameReturn => {
         if (!isHost) return;
 
         const connectedIds = new Set([peerId as string, ...connections]);
-        const disconnectedPlayers = engine.players.filter(p => p.connected && !connectedIds.has(p.id));
+        const disconnectedPlayers = engine.players.filter(p => p.connected && !p.id.startsWith('BOT_') && !connectedIds.has(p.id));
 
         if (disconnectedPlayers.length > 0) {
             disconnectedPlayers.forEach(p => {
@@ -611,6 +614,38 @@ export const useGame = (): UseGameReturn => {
         }, 500);
     };
 
+    const addBot = () => {
+        if (!isHost) return;
+        const botId = `BOT_${Date.now()}`;
+        const validNames = (randomNames as any).names || randomNames;
+        const name = validNames[Math.floor(Math.random() * validNames.length)] + " (Bot)";
+        
+        if (engine.addPlayer(botId, name, false)) {
+            syncState();
+        }
+    };
+
+    // Bot turn logic
+    useEffect(() => {
+        if (!isHost || gameState !== 'BIDDING' || !currentTurn) return;
+
+        if (currentTurn.startsWith('BOT_')) {
+            const timer = setTimeout(() => {
+                const action = getBotAction(engine);
+                if (action.type === 'BID') {
+                    if (engine.placeBid(currentTurn, action.count, action.face)) syncState();
+                } else if (action.type === 'CHALLENGE') {
+                    const result = engine.challenge(currentTurn);
+                    if (result) {
+                        setChallengeResult(result);
+                        syncState({ challengeResult: result });
+                    }
+                }
+            }, 3000); // 3 second thought delay
+            return () => clearTimeout(timer);
+        }
+    }, [gameState, currentTurn, isHost, syncState]);
+
     return {
         gameState, players, currentTurn, currentBid, myDice,
         isHost, error, peerId, connections,
@@ -622,6 +657,6 @@ export const useGame = (): UseGameReturn => {
         startRoom, joinRoom, rejoinRoom, startRound, placeBid, challenge,
         usePeek, activateLoadedDie, rerollDie, dismissPeek, useSlip, useMagicDice, selectCheat,
         downloadTextLog, downloadJSONLog, voteNextRound, kickPlayer,
-        setPeekTargetId, setSpectateTarget,
+        setPeekTargetId, setSpectateTarget, addBot,
     };
 };

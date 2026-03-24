@@ -77,7 +77,7 @@ function App() {
         setGameOptions, assignCheat,
         startRoom, joinRoom, rejoinRoom, placeBid, challenge,
         usePeek, activateLoadedDie, rerollDie, dismissPeek, useSlip, useMagicDice, selectCheat,
-        downloadTextLog, downloadJSONLog, voteNextRound, kickPlayer, setPeekTargetId, setSpectateTarget,
+        downloadTextLog, downloadJSONLog, voteNextRound, kickPlayer, setPeekTargetId, setSpectateTarget, addBot,
     } = game;
 
     const [playerName, setPlayerName] = useState<string>(() => {
@@ -306,9 +306,15 @@ function App() {
     };
 
     const handleLeaveGame = () => {
-        if (window.confirm("Are you sure you want to leave the game? (You can reconnect from the lobby if you change your mind)")) {
-            // This is literally just a fancy button that refreshes the page
-            window.location.href = window.location.pathname;
+        if (isHost) {
+            if (window.confirm("Are you sure you want to permanently close the table? This will clear your session and end the game for everyone.")) {
+                localStorage.removeItem('liarsDiceSession');
+                window.location.href = window.location.pathname;
+            }
+        } else {
+            if (window.confirm("Are you sure you want to leave the game? (You can reconnect from the lobby if you change your mind)")) {
+                window.location.href = window.location.pathname;
+            }
         }
     };
 
@@ -640,6 +646,7 @@ function App() {
                             onSetSpectateTarget={setSpectateTarget}
                             onShowRules={() => setShowRules(v => !v)}
                             onLeaveGame={handleLeaveGame}
+                            onAddBot={addBot}
                         />
                     </div>
                 )}
