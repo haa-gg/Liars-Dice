@@ -9,6 +9,7 @@ interface DiceProps {
     value: number;
     rolling?: boolean;
     isSlipped?: boolean;
+    isMagic?: boolean;
 }
 
 const renderHtmlDie = (value: number) => {
@@ -23,11 +24,11 @@ const renderHtmlDie = (value: number) => {
     }
 };
 
-const Dice: React.FC<DiceProps> = ({ value, rolling, isSlipped }) => {
+const Dice: React.FC<DiceProps> = ({ value, rolling, isSlipped, isMagic }) => {
     const { settings } = useUserSettings();
 
     return (
-        <div className={`dice-img-container ${rolling ? 'rolling' : ''} ${isSlipped ? 'slipped' : ''}`}>
+        <div className={`dice-img-container ${rolling ? 'rolling' : ''} ${isSlipped ? 'slipped' : ''} ${isMagic ? 'magic' : ''}`}>
             {settings.diceStyle === 'html' ? (
                 renderHtmlDie(value)
             ) : (

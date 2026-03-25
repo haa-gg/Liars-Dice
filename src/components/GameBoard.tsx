@@ -523,7 +523,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
                                 }
                             }}
                         >
-                            <Dice value={val} isSlipped={i >= myBaseDiceCount} />
+                            <Dice value={val} isSlipped={i >= myBaseDiceCount} isMagic={i >= myBaseDiceCount && myCheat === 'magic_dice'} />
                         </div>
                     ))}
                     {myDice.length === 0 && gameState === 'LOBBY' && (

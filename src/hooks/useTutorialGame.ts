@@ -7,7 +7,7 @@ export const useTutorialGame = (onLeaveTutorial: () => void) => {
     const [players] = useState<Player[]>([
         { id: peerId, name: 'You (Captain)', active: true, diceCount: 5, connected: true, dice: [], cheat: null, cheatUsed: false },
         { id: 'BOT_1', name: 'Botbeard', active: true, diceCount: 5, connected: true, dice: [], cheat: null, cheatUsed: false },
-        { id: 'BOT_2', name: 'Scallywag', active: true, diceCount: 5, connected: true, dice: [], cheat: null, cheatUsed: false },
+        { id: 'BOT_2', name: 'Tin Whiskers', active: true, diceCount: 5, connected: true, dice: [], cheat: null, cheatUsed: false },
     ]);
     const [currentTurn, setCurrentTurn] = useState<string | null>(null);
     const [currentBid, setCurrentBid] = useState<Bid>({ count: 0, face: 2 });
@@ -75,17 +75,17 @@ export const useTutorialGame = (onLeaveTutorial: () => void) => {
     return {
         gameState, players, currentTurn, currentBid, myDice,
         isHost: true, error: null, peerId, connections: [],
-        challengeResult, gameOptions: { startingDice: 5, eliminationThreshold: 0, wildsEnabled: true, honorSystemCheats: false }, 
+        challengeResult, gameOptions: { startingDice: 5, eliminationThreshold: 0, wildsEnabled: true, honorSystemCheats: false },
         myCheat: null as any, myCheatUsed: false,
         peekInfo: null, peekTargetId: null, loadedDieActive: false, gameLog: [], nextRoundVotes: new Set<string>(),
         spectatingId: null, spectatingDice: [], spectatingName: null,
-        isReconnecting: false, reconnect: () => {}, reconnectAsHost: () => {},
-        setGameOptions: () => {}, assignCheat: () => {},
-        startRoom: () => {}, joinRoom: () => {}, rejoinRoom: () => {}, startRound, placeBid, challenge: () => {},
-        usePeek: () => {}, activateLoadedDie: () => {}, rerollDie: () => {}, dismissPeek: () => {}, useSlip: () => {}, useMagicDice: () => {}, selectCheat: () => {},
-        downloadTextLog: () => {}, downloadJSONLog: () => {}, voteNextRound, kickPlayer: () => {},
-        setPeekTargetId: () => {}, setSpectateTarget: () => {},
-        
+        isReconnecting: false, reconnect: () => { }, reconnectAsHost: () => { },
+        setGameOptions: () => { }, assignCheat: () => { },
+        startRoom: () => { }, joinRoom: () => { }, rejoinRoom: () => { }, startRound, placeBid, challenge: () => { },
+        usePeek: () => { }, activateLoadedDie: () => { }, rerollDie: () => { }, dismissPeek: () => { }, useSlip: () => { }, useMagicDice: () => { }, selectCheat: () => { },
+        downloadTextLog: () => { }, downloadJSONLog: () => { }, voteNextRound, kickPlayer: () => { },
+        setPeekTargetId: () => { }, setSpectateTarget: () => { },
+
         // Extracted variables for overlay & control:
         tutorialStep, resetTutorial
     };

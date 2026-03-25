@@ -74,3 +74,30 @@
     background-color: var(--color-wood-dark, #3d2b1f);
     box-shadow: inset 0 2px 3px rgba(0,0,0,0.6);
 }
+
+/* Slipped HTML Dice Styles (Slip cheat) */
+.dice-img-container.slipped:not(.magic) .dice-html {
+    background-color: #ffd6d6;
+    border-color: #cc0000;
+}
+
+.dice-img-container.slipped:not(.magic) .dice-html .dice-dot {
+    background-color: #8b0000;
+}
+
+/* Magic HTML Dice Styles (Magic Dice cheat) */
+.dice-img-container.magic .dice-html {
+    background-color: #e6d9ff;
+    border-color: #8c33ff;
+    box-shadow: inset 0 0 10px rgba(140, 51, 255, 0.2), 0 0 12px rgba(140, 51, 255, 0.6);
+}
+
+.dice-img-container.magic .dice-html .dice-dot {
+    background-color: #4b0082;
+    box-shadow: inset 0 2px 3px rgba(0,0,0,0.6), 0 0 5px rgba(140, 51, 255, 0.8);
+}
+
+/* Magic Image Dice Styles (for pixel/doodle) */
+.dice-img-container.magic .dice-img {
+    filter: sepia(1) saturate(7) hue-rotate(210deg) brightness(0.9) drop-shadow(0 0 5px rgba(140, 51, 255, 0.5));
+}
