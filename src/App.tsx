@@ -40,11 +40,11 @@ interface Rule {
 const iconStyle = { width: '1.2em', height: '1.2em', verticalAlign: 'middle' };
 
 const RULES: Rule[] = [
-    { icon: <img src={`${BASE_URL}images/dice.png`} alt="dice" style={iconStyle} />, text: 'Each player holds 5 dice, kept secret from others.' },
+    { icon: <img src={`${BASE_URL}images/dice-hero-v2.png`} alt="dice" style={iconStyle} />, text: 'Each player holds 5 dice, kept secret from others.' },
     { icon: <img src={`${BASE_URL}images/megaphone.png`} alt="megaphone" style={iconStyle} />, text: 'On your turn, bid how many dice of a face value exist across ALL hands (e.g. "three 4s").' },
     { icon: <img src={`${BASE_URL}images/ace-of-spades.png`} alt="ace" style={iconStyle} />, text: 'Each bid must raise the count — or same count with a higher face.' },
     { icon: <img src={`${BASE_URL}images/cards.png`} alt="cards" style={iconStyle} />, text: '1s are wild — they count as any face.' },
-    { icon: <img src={`${BASE_URL}images/bell.png`} alt="bell" style={iconStyle} />, text: 'Call "Liar!" to challenge the last bid.' },
+    { icon: <img src={`${BASE_URL}images/bell-2.png`} alt="bell" style={iconStyle} />, text: 'Call "Liar!" to challenge the last bid.' },
     { icon: <img src={`${BASE_URL}images/scales.png`} alt="scales" style={iconStyle} />, text: 'If the actual count ≥ the bid → challenger loses a die. Otherwise the bidder loses.' },
     { icon: <img src={`${BASE_URL}images/skull.png`} alt="skull" style={iconStyle} />, text: 'Lose all your dice and you\'re out. Last crew standing wins!' },
 ];
@@ -67,7 +67,7 @@ function App() {
     });
 
     const game = (inTutorial ? tutorialGame : realGame) as UseGameReturn;
-    
+
     const {
         gameState, players, currentTurn, currentBid, myDice,
         isHost, error, peerId, challengeResult,
@@ -352,7 +352,10 @@ function App() {
                                 </div>
                             </div>
                         </div>
-                        <div className="parchment-panel">
+                        <div 
+                            className="parchment-panel main-lobby-panel"
+                            style={{ '--bg-stain': `url(${BASE_URL}images/bg-distress-2.png)` } as React.CSSProperties}
+                        >
                             <div className="form-group" style={{ marginBottom: '1rem' }}>
                                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Player Name</label>
                                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'stretch' }}>
@@ -656,7 +659,11 @@ function App() {
                 {/* ── RULES POPOVER ── */}
                 {showRules && (
                     <div className="rules-overlay" onClick={() => setShowRules(false)}>
-                        <div className="rules-panel parchment-panel" onClick={e => e.stopPropagation()}>
+                        <div
+                            className="rules-panel parchment-panel"
+                            onClick={e => e.stopPropagation()}
+                            style={{ '--bg-stain': `url(${BASE_URL}images/stain-distress.png)` } as React.CSSProperties}
+                        >
                             <button className="rules-close" onClick={() => setShowRules(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCross size="0.8em" /></button>
                             <h2>How to Play</h2>
                             <ul className="rules-list">

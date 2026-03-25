@@ -395,6 +395,23 @@
     padding: 2.5rem !important;
 }
 
+.rules-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.2;
+    background-image: var(--bg-stain);
+    background-size: 100% 100%;
+    background-position: center;
+}
+
+.rules-panel > * {
+    position: relative;
+    z-index: 1;
+}
+
 .rules-close {
     position: absolute;
     top: 1rem;

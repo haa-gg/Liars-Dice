@@ -60,6 +60,23 @@ h1 {
   margin: 40px auto 0px auto;
 }
 
+.main-lobby-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.15;
+  background-image: var(--bg-stain);
+  background-size: 100% 100%;
+  background-position: center;
+}
+
+.main-lobby-panel>* {
+  position: relative;
+  z-index: 1;
+}
+
 
 
 .btn-nautical {

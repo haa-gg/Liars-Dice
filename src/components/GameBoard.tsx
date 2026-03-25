@@ -207,7 +207,14 @@ const GameBoard: React.FC<GameBoardProps> = ({
             {/* ── CHEAT INFO POPUP ── */}
             {showCheatInfo && (
                 <div className="rules-overlay" onClick={() => setShowCheatInfo(false)}>
-                    <div className="rules-panel parchment-panel" onClick={e => e.stopPropagation()} style={{ maxWidth: '400px' }}>
+                    <div 
+                        className="rules-panel parchment-panel" 
+                        onClick={e => e.stopPropagation()} 
+                        style={{ 
+                            maxWidth: '400px',
+                            '--bg-stain': `url(${BASE_URL}images/stain-distress.png)` 
+                        } as React.CSSProperties}
+                    >
                         <button className="rules-close" onClick={() => setShowCheatInfo(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCross size="0.8em" /></button>
                         <h2>Cheat Abilities</h2>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
@@ -323,9 +330,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
                     <div className="result-panel parchment-panel">
                         <div className="result-icon">
                             <img
-                                src={challengeResult.loserId === peerId ? `${BASE_URL}images/lose.png` : `${BASE_URL}images/win.png`}
+                                src={challengeResult.loserId === peerId ? `${BASE_URL}images/lose-2.png` : `${BASE_URL}images/win.png`}
                                 alt={challengeResult.loserId === peerId ? "You Lost" : "Victory"}
-                                style={{ width: '120px', height: '120px' }}
+                                style={{ width: '200px', height: '200px' }}
                             />
                         </div>
                         <h2>

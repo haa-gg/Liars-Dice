@@ -18,6 +18,9 @@ dist-ssr
 build
 *.local
 
+#Brushes
+brushes
+
 # Testing
 coverage
 .nyc_output

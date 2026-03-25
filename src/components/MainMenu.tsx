@@ -187,6 +187,13 @@ const MainMenu: React.FC<MainMenuProps> = ({
                                 By <a href="https://opengameart.org/users/vircon32" target="_blank" rel="noopener noreferrer">Vircon32</a> on OpenGameArt<br />
                                 Licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>
                             </p>
+                            <p><strong>A bunch of the engraved looking icons</strong><br />
+                                Brushes by <a href="https://www.brusheezy.com">Brusheezy</a>
+                            </p>
+                            <p><strong>Hand-Drawn Bones</strong><br />
+                                By <a href="http://www.sdwhaven.com/">Stacy David Wallingford</a><br />
+                                <a href="http://twitter.com/sdwhaven">Twitter</a>
+                            </p>
                         </div>
                     </div>
                 </div>
