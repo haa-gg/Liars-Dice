@@ -186,6 +186,25 @@
     width: 100%;
     max-width: 300px;
     box-sizing: border-box;
+    position: relative;
+}
+
+.bidding-controls::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.15;
+    background-image: var(--bg-bidding-controls, url('/images/bg-distress-1.png'));
+    background-size: cover;
+    background-position: center;
+    border-radius: inherit;
+}
+
+.bidding-controls > * {
+    position: relative;
+    z-index: 1;
 }
 
 .bid-inputs {

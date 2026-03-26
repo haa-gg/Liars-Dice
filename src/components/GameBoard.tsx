@@ -599,7 +599,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
                 </div>
 
                 {isMyTurn && (gameState === 'BIDDING') && !loadedDieActive && (
-                    <div className="bidding-controls parchment-panel">
+                    <div className="bidding-controls parchment-panel" style={{ '--bg-bidding-controls': `url(${BASE_URL}images/bg-distress-1.png)` } as React.CSSProperties}>
                         <h3>Your Turn, Good Luck!</h3>
                         <div className="bid-inputs">
                             <div className="custom-stepper">
@@ -642,7 +642,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
                 )}
 
                 {isHost && gameState === 'LOBBY' && players.length > 0 && (
-                    <div className="bidding-controls parchment-panel" style={{ textAlign: 'center', marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                    <div className="bidding-controls parchment-panel" style={{ textAlign: 'center', marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.8rem', '--bg-bidding-controls': `url(${BASE_URL}images/bg-distress-1.png)` } as React.CSSProperties}>
                         <h3 style={{ marginBottom: '0.5rem' }}>Ready to bet the farm?</h3>
                         {onAddBot && players.length < 10 && (
                             <button className="btn-nautical" style={{ fontSize: '1rem', padding: '0.5rem 2rem', background: 'var(--color-wood-mid)' }} onClick={onAddBot}>
