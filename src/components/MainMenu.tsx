@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { useUserSettings, DiceStyle } from '../hooks/SettingsContext';
 import { IconMenu, IconCross, IconRules, IconGear, IconScroll } from './Icons';
 
+// @ts-ignore
+const BASE_URL = import.meta.env.BASE_URL;
+
 interface MainMenuProps {
     onShowRules?: () => void;
     onShowGameLog?: () => void;
@@ -56,7 +59,10 @@ const MainMenu: React.FC<MainMenuProps> = ({
                 <div className="menu-backdrop" onClick={() => setShowMenu(false)} />
             )}
 
-            <div className={`side-menu ${showMenu ? 'open' : 'closed'}`}>
+            <div 
+                className={`side-menu ${showMenu ? 'open' : 'closed'}`}
+                style={{ '--bg-stain': `url(${BASE_URL}images/bg-distress-3.png)` } as React.CSSProperties}
+            >
                 <div className="side-menu-header">
                     <h2>Menu</h2>
                     <button className="side-menu-close" onClick={() => setShowMenu(false)}>
