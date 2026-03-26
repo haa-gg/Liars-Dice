@@ -45,4 +45,4 @@ npm run build
 - PeerJS for WebRTC connections
 
 ## License
-GPL-3.0
+Apache-2.0

@@ -56,7 +56,13 @@ interface SessionData {
     timestamp: number;
 }
 
-function App() {
+export interface AppConfig {
+    hideDonation?: boolean;
+    onLobbyStateChange?: (inLobby: boolean) => void;
+    extraLobbyContent?: React.ReactNode;
+}
+
+export default function App({ config }: { config?: AppConfig } = {}) {
     const [inLobby, setInLobby] = useState<boolean>(true);
     const [inTutorial, setInTutorial] = useState<boolean>(false);
 
@@ -96,6 +102,13 @@ function App() {
     const [joinAsSpectator, setJoinAsSpectator] = useState(false);
     const pingIntervalRef = useRef<number | null>(null);
     const pingAttemptsRef = useRef<number>(0);
+
+    // Notify wrapper of lobby state
+    useEffect(() => {
+        if (config?.onLobbyStateChange) {
+            config.onLobbyStateChange(inLobby);
+        }
+    }, [inLobby, config?.onLobbyStateChange]);
 
     // Prevent accidental refresh
     useEffect(() => {
@@ -421,14 +434,18 @@ function App() {
                                 )}
                             </div>
 
+                            {config?.extraLobbyContent}
+
                             {error && <p style={{ color: 'var(--color-blood)', marginTop: '1rem' }}>{error}</p>}
                         </div>
 
                         <div className="lobby-footer">
-                            &copy; {new Date().getFullYear()} Liar&apos;s Dice. Licensed under GPLv3.<br />
+                            &copy; {new Date().getFullYear()} Liar&apos;s Dice. Licensed under Apache 2.0.<br />
                             Check out the <a style={{ color: 'var(--color-gold)', marginTop: '1rem' }} href="https://github.com/haa-gg/liars-dice" target="_blank">github repo</a>
                             <br />
-                            <a style={{ color: 'var(--color-gold)', marginTop: '1rem' }} href="https://buy.stripe.com/bJe3cu35NaEt8LO5Hq9bO00" target="_blank">Buy me an ale!</a>
+                            {!config?.hideDonation && (
+                                <a style={{ color: 'var(--color-gold)', marginTop: '1rem' }} href="https://buy.stripe.com/bJe3cu35NaEt8LO5Hq9bO00" target="_blank">Buy me an ale!</a>
+                            )}
                         </div>
                     </div>
                 ) : (
@@ -678,5 +695,3 @@ function App() {
         </SettingsProvider>
     );
 }
-
-export default App;
