@@ -57,6 +57,7 @@ interface SessionData {
 }
 
 export interface AppConfig {
+    isAdFree?: boolean;
     hideDonation?: boolean;
     onLobbyStateChange?: (inLobby: boolean) => void;
     extraLobbyContent?: React.ReactNode;
@@ -365,7 +366,7 @@ export default function App({ config }: { config?: AppConfig } = {}) {
                                 </div>
                             </div>
                         </div>
-                        <div 
+                        <div
                             className="parchment-panel main-lobby-panel"
                             style={{ '--bg-stain': `url(${BASE_URL}images/bg-distress-2.png)` } as React.CSSProperties}
                         >
@@ -443,7 +444,7 @@ export default function App({ config }: { config?: AppConfig } = {}) {
                             &copy; {new Date().getFullYear()} Liar&apos;s Dice. Licensed under Apache 2.0.<br />
                             Check out the <a style={{ color: 'var(--color-gold)', marginTop: '1rem' }} href="https://github.com/haa-gg/liars-dice" target="_blank">github repo</a>
                             <br />
-                            {!config?.hideDonation && (
+                            {!config?.hideDonation && !config?.isAdFree && (
                                 <a style={{ color: 'var(--color-gold)', marginTop: '1rem' }} href="https://buy.stripe.com/bJe3cu35NaEt8LO5Hq9bO00" target="_blank">Buy me an ale!</a>
                             )}
                         </div>
