@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useUserSettings, DiceStyle } from '../hooks/SettingsContext';
-import { IconMenu, IconCross, IconRules, IconGear, IconScroll } from './Icons';
+import { IconMenu, IconCross, IconRules, IconGear, IconScroll, IconInfo } from './Icons';
 
 // @ts-ignore
 const BASE_URL = import.meta.env.BASE_URL;
@@ -23,6 +23,7 @@ const MainMenu: React.FC<MainMenuProps> = ({
     const [showMenu, setShowMenu] = useState(false);
     const [showCredits, setShowCredits] = useState(false);
     const [showUserSettings, setShowUserSettings] = useState(false);
+    const [showFaq, setShowFaq] = useState(false);
     const { settings, updateSettings } = useUserSettings();
 
     const menuItemStyle: React.CSSProperties = {
@@ -59,7 +60,7 @@ const MainMenu: React.FC<MainMenuProps> = ({
                 <div className="menu-backdrop" onClick={() => setShowMenu(false)} />
             )}
 
-            <div 
+            <div
                 className={`side-menu ${showMenu ? 'open' : 'closed'}`}
                 style={{ '--bg-stain': `url(${BASE_URL}images/bg-distress-3.png)` } as React.CSSProperties}
             >
@@ -125,6 +126,14 @@ const MainMenu: React.FC<MainMenuProps> = ({
                             </button>
                         </>
                     )}
+
+                    {/* FAQ */}
+                    <button
+                        onClick={() => { setShowMenu(false); setShowFaq(true); }}
+                        style={menuItemStyle}
+                    >
+                        FAQ
+                    </button>
 
                     {onLeaveGame && (
                         <>
@@ -200,6 +209,23 @@ const MainMenu: React.FC<MainMenuProps> = ({
                                 By <a href="http://www.sdwhaven.com/">Stacy David Wallingford</a><br />
                                 <a href="http://twitter.com/sdwhaven">Twitter</a>
                             </p>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* ── FAQ MODAL ── */}
+            {showFaq && (
+                <div className="rules-overlay" onClick={() => setShowFaq(false)}>
+                    <div className="parchment-panel"
+                        style={{ maxWidth: 420, width: '90%', '--bg-stain': `url(${BASE_URL}images/stain-distress.png)` } as React.CSSProperties}
+                        onClick={e => e.stopPropagation()}>
+                        <button className="rules-close" onClick={() => setShowFaq(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCross size="0.8em" /></button>
+                        <h2 style={{ marginTop: 0, textAlign: 'center' }}>FAQ</h2>
+                        <div style={{ marginTop: '1.5rem', textAlign: 'left', lineHeight: 1.6, fontSize: '0.95rem' }}>
+                            <div style={{ marginBottom: '1.5rem', borderBottom: '1px solid rgba(0,0,0,0.1)', paddingBottom: '1rem' }}>
+                                <p style={{ fontWeight: 'bold', marginBottom: '0.4rem', color: 'var(--color-ink)' }}>Q: What is The Prohibition Court?</p>
+                                <p style={{ marginTop: 0, opacity: 0.9 }}>A: More on that coming</p>
+                            </div>
                         </div>
                     </div>
                 </div>
