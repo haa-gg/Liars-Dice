@@ -233,6 +233,10 @@ const MainMenu: React.FC<MainMenuProps> = ({
                         <h2 style={{ marginTop: 0, textAlign: 'center' }}>FAQ</h2>
                         <div style={{ marginTop: '1.5rem', textAlign: 'left', lineHeight: 1.6, fontSize: '0.95rem' }}>
                             <div style={{ marginBottom: '1.5rem', borderBottom: '1px solid rgba(0,0,0,0.1)', paddingBottom: '1rem' }}>
+                                <p style={{ fontWeight: 'bold', marginBottom: '0.4rem', color: 'var(--color-ink)' }}>Q: Got an easy way to learn this game?</p>
+                                <p style={{ marginTop: 0, opacity: 0.9 }}>A: Yeah! There's a tutorial in the hamburger menu and if you're looking for a bit more training you can fire up a new table and add bots. Game masters, you'll want to poke around the game settings menu to learn the ropes with the cheat menu and how to buff up your "character" in case you want something like a roguelte dice boss for your party to face.</p>
+                                <p style={{ fontWeight: 'bold', marginBottom: '0.4rem', color: 'var(--color-ink)' }}>Q: Why make this?</p>
+                                <p style={{ marginTop: 0, opacity: 0.9 }}>A: While there are other versions rolling around the internet, I didn't find one that really worked for tabletop games where you might be playing a scoundrel who's skilled at cheating in bar games. As such there's a whole panel of cheats the host can enable that allow you to do stuff like peek a targets dice, re-roll, and increasingly wild methods of cheating. This helps bridge the gap between doing something like a sleight of hand check and having an interesting impact on the game without having to simply declare they won based on a skill check.</p>
                                 <p style={{ fontWeight: 'bold', marginBottom: '0.4rem', color: 'var(--color-ink)' }}>Q: What is The Prohibition Court?</p>
                                 <p style={{ marginTop: 0, opacity: 0.9 }}>A: More on that coming</p>
                             </div>
