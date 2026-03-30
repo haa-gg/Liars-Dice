@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { useGame, UseGameReturn } from './hooks/useGame';
 import peerService from './services/peerService';
 import GameBoard from './components/GameBoard';
@@ -13,6 +14,7 @@ import MainMenu from './components/MainMenu';
 import TutorialOverlay from './components/TutorialOverlay';
 import { useTutorialGame } from './hooks/useTutorialGame';
 import { SettingsProvider } from './hooks/SettingsContext';
+import PrivacyPolicy from './components/PrivacyPolicy';
 
 interface CheatOption {
     value: CheatType | '';
@@ -341,7 +343,9 @@ export default function App({ config }: { config?: AppConfig } = {}) {
             : 'Standard elim.',
     ].join(' · ');
 
-    return (
+    const navigate = useNavigate();
+
+    const gameLayout = (
         <SettingsProvider>
             <div className="game-container">
                 {inLobby ? (
@@ -356,7 +360,7 @@ export default function App({ config }: { config?: AppConfig } = {}) {
                         />
                         <div className="logo-container">
                             <div className="scanlines">
-                                <img src={`${import.meta.env.BASE_URL}images/logo-clear.png`} alt="Liar's Dice Logo" style={{ display: 'block', width: '90%', height: 'auto', margin: '40px auto 0px auto', flexShrink: 0 }} />
+                                <img src={`${BASE_URL}images/logo-clear.png`} alt="Liar's Dice Logo" style={{ display: 'block', width: '90%', height: 'auto', margin: '40px auto 0px auto', flexShrink: 0 }} />
                             </div>
                             <div style={{ textAlign: 'center' }}>
 
@@ -441,7 +445,13 @@ export default function App({ config }: { config?: AppConfig } = {}) {
                         </div>
 
                         <div className="lobby-footer">
-                            &copy; {new Date().getFullYear()} Liar&apos;s Dice. Licensed under Apache 2.0.<br />
+                            &copy; {new Date().getFullYear()} Liar&apos;s Dice. Licensed under Apache 2.0. · <button 
+                                onClick={() => navigate('/privacy')}
+                                style={{ background: 'none', border: 'none', color: 'var(--color-gold)', cursor: 'pointer', padding: 0, font: 'inherit', textDecoration: 'underline' }}
+                            >
+                                Privacy Policy
+                            </button>
+                            <br />
                             Check out the <a style={{ color: 'var(--color-gold)', marginTop: '1rem' }} href="https://github.com/haa-gg/liars-dice" target="_blank">github repo</a>
                             <br />
                             {!config?.hideDonation && !config?.isAdFree && (
@@ -694,5 +704,12 @@ export default function App({ config }: { config?: AppConfig } = {}) {
                 )}
             </div>
         </SettingsProvider>
+    );
+
+    return (
+        <Routes>
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="*" element={gameLayout} />
+        </Routes>
     );
 }

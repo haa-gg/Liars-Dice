@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useUserSettings, DiceStyle } from '../hooks/SettingsContext';
 import { IconMenu, IconCross, IconRules, IconGear, IconScroll, IconInfo } from './Icons';
 
@@ -134,6 +135,15 @@ const MainMenu: React.FC<MainMenuProps> = ({
                     >
                         FAQ
                     </button>
+
+                    {/* Privacy Policy */}
+                    <Link
+                        to="/privacy"
+                        style={{ ...menuItemStyle, textDecoration: 'none' }}
+                        onClick={() => setShowMenu(false)}
+                    >
+                        Privacy Policy
+                    </Link>
 
                     {onLeaveGame && (
                         <>
