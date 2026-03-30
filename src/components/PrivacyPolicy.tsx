@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconCross } from './Icons';
 
@@ -7,6 +7,16 @@ const BASE_URL = import.meta.env.BASE_URL;
 
 const PrivacyPolicy: React.FC = () => {
     const navigate = useNavigate();
+ 
+    useEffect(() => {
+        const hash = window.location.hash;
+        if (hash) {
+            const element = document.getElementById(hash.slice(1));
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+    }, []);
 
     return (
         <div className="lobby-overlay" style={{ overflowY: 'auto', padding: '2rem 1rem', display: 'block' }}>
@@ -97,12 +107,43 @@ const PrivacyPolicy: React.FC = () => {
                         </p>
                     </section>
 
+                    <section id="data-deletion" style={{ marginBottom: '2rem' }}>
+                        <h2 style={{ fontSize: '1.5rem', borderBottom: '1px solid rgba(0,0,0,0.1)', paddingBottom: '0.5rem', marginBottom: '1rem' }}>
+                            Data Deletion
+                        </h2>
+                        <p>
+                            We value your privacy and don't store your data on our servers. However, you can manage the data stored locally on your device:
+                        </p>
+                        <ul style={{ paddingLeft: '1.5rem', margin: '1rem 0' }}>
+                            <li>
+                                <strong>Local Settings:</strong> To delete your saved Captain name and preferences, you can clear your browser's local storage for this site or use the button below.
+                            </li>
+                            <li>
+                                <strong>Analytics:</strong> Since Google Analytics data is anonymous and not linked to an identity, it cannot be deleted on a per-user basis. However, you can prevent future collection by using browser "Do Not Track" settings or ad-blockers.
+                            </li>
+                        </ul>
+                        <div style={{ marginTop: '1rem' }}>
+                            <button 
+                                className="btn-nautical" 
+                                style={{ fontSize: '0.9rem', padding: '0.5rem 1rem' }}
+                                onClick={() => {
+                                    if (window.confirm("This will clear your saved name and settings. Are you sure?")) {
+                                        localStorage.clear();
+                                        window.location.reload();
+                                    }
+                                }}
+                            >
+                                Clear Local Data
+                            </button>
+                        </div>
+                    </section>
+
                     <section style={{ marginBottom: '2rem' }}>
                         <h2 style={{ fontSize: '1.5rem', borderBottom: '1px solid rgba(0,0,0,0.1)', paddingBottom: '0.5rem', marginBottom: '1rem' }}>
                             Questions?
                         </h2>
                         <p>
-                            If you have questions about our privacy practices, you can reach out via the 
+                            If you have questions about our privacy practices or wish to request data deletion, you can reach out via the 
                             <a href="https://github.com/haa-gg/liars-dice" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-blood)', fontWeight: 'bold', marginLeft: '0.3rem' }}>
                                 GitHub repository
                             </a>.
