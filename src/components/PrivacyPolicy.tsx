@@ -5,7 +5,11 @@ import { IconCross } from './Icons';
 // @ts-ignore
 const BASE_URL = import.meta.env.BASE_URL;
 
-const PrivacyPolicy: React.FC = () => {
+interface PrivacyPolicyProps {
+    onClearAllData?: () => Promise<void> | void;
+}
+
+const PrivacyPolicy: React.FC<PrivacyPolicyProps> = ({ onClearAllData }) => {
     const navigate = useNavigate();
  
     useEffect(() => {
@@ -50,7 +54,7 @@ const PrivacyPolicy: React.FC = () => {
 
                 <div className="policy-content" style={{ lineHeight: '1.6', fontSize: '1rem', color: 'var(--color-ink)' }}>
                     <p style={{ fontStyle: 'italic', marginBottom: '2rem', textAlign: 'center' }}>
-                        Last Updated: March 29, 2026
+                        Last Updated: March 31, 2026
                     </p>
 
                     <section style={{ marginBottom: '2rem' }}>
@@ -73,6 +77,16 @@ const PrivacyPolicy: React.FC = () => {
                             This helps us identify technical issues and understand which features are most popular. 
                             Google Analytics collects anonymous usage data such as page views and session duration. 
                             This data is not linked to any personal identity.
+                        </p>
+
+                        <h3 style={{ fontSize: '1.1rem', marginTop: '1rem' }}>AdMob & In-App Advertising (Mobile Only)</h3>
+                        <p>
+                            In our mobile applications, we use Google AdMob to display banner advertisements. AdMob may collect and use data including your device's Advertising ID and general device information to provide these advertisements. This data helps AdMob ensure advertisements are relevant and measure their performance.
+                        </p>
+
+                        <h3 style={{ fontSize: '1.1rem', marginTop: '1rem' }}>RevenueCat (Mobile Only)</h3>
+                        <p>
+                            To process in-app purchases (such as removing advertisements), we use RevenueCat. RevenueCat collects anonymous App-User IDs and a history of purchases made within the app to properly grant you access to the features you have purchased. No sensitive payment information (like credit card numbers) is collected or stored by us or RevenueCat; this is handled entirely by the Google Play Store or Apple App Store.
                         </p>
 
                         <h3 style={{ fontSize: '1.1rem', marginTop: '1rem' }}>GitHub Pages</h3>
@@ -126,14 +140,21 @@ const PrivacyPolicy: React.FC = () => {
                             <button 
                                 className="btn-nautical" 
                                 style={{ fontSize: '0.9rem', padding: '0.5rem 1rem' }}
-                                onClick={() => {
-                                    if (window.confirm("This will clear your saved name and settings. Are you sure?")) {
+                                onClick={async () => {
+                                    const message = onClearAllData 
+                                        ? "This will clear your saved name, settings, and WIPE OUT any ad-removal purchases currently active on this device. Are you absolutely sure?" 
+                                        : "This will clear your saved name and settings. Are you sure?";
+
+                                    if (window.confirm(message)) {
                                         localStorage.clear();
+                                        if (onClearAllData) {
+                                            await onClearAllData();
+                                        }
                                         window.location.reload();
                                     }
                                 }}
                             >
-                                Clear Local Data
+                                Delete My Data
                             </button>
                         </div>
                     </section>

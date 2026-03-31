@@ -63,6 +63,7 @@ export interface AppConfig {
     hideDonation?: boolean;
     onLobbyStateChange?: (inLobby: boolean) => void;
     extraLobbyContent?: React.ReactNode;
+    onClearAllData?: () => Promise<void> | void;
 }
 
 export default function App({ config }: { config?: AppConfig } = {}) {
@@ -708,7 +709,7 @@ export default function App({ config }: { config?: AppConfig } = {}) {
 
     return (
         <Routes>
-            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/privacy" element={<PrivacyPolicy onClearAllData={config?.onClearAllData} />} />
             <Route path="*" element={gameLayout} />
         </Routes>
     );
