@@ -202,7 +202,7 @@
     border-radius: inherit;
 }
 
-.bidding-controls > * {
+.bidding-controls>* {
     position: relative;
     z-index: 1;
 }
@@ -345,7 +345,7 @@
     background-position: center;
 }
 
-.side-menu > * {
+.side-menu>* {
     position: relative;
     z-index: 1;
 }
@@ -443,7 +443,7 @@
     background-position: center;
 }
 
-.rules-panel > * {
+.rules-panel>* {
     position: relative;
     z-index: 1;
 }
@@ -630,7 +630,7 @@
 
 
     .table-container {
-        padding-top: 60px;
+        padding-top: 90px;
     }
 
 
