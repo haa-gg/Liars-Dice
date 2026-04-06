@@ -75,6 +75,7 @@ export type ClientMessage =
     | { type: 'SELECT_CHEAT';    data: { cheat: CheatType } }
     | { type: 'VOTE_NEXT_ROUND'; data: Record<string, never> }
     | { type: 'SPECTATE';        data: { targetId: string } }
+    | { type: 'LEAVE';           data: Record<string, never> }
     | { type: 'PING';            data: Record<string, never> };
 
 /** Messages sent from host → clients. */

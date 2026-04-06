@@ -84,7 +84,7 @@ export const useTutorialGame = (onLeaveTutorial: () => void) => {
         startRoom: () => { }, joinRoom: () => { }, rejoinRoom: () => { }, startRound, placeBid, challenge: () => { },
         usePeek: () => { }, activateLoadedDie: () => { }, rerollDie: () => { }, dismissPeek: () => { }, useSlip: () => { }, useMagicDice: () => { }, selectCheat: () => { },
         downloadTextLog: () => { }, downloadJSONLog: () => { }, voteNextRound, kickPlayer: () => { },
-        setPeekTargetId: () => { }, setSpectateTarget: () => { },
+        setPeekTargetId: () => { }, setSpectateTarget: () => { }, leaveRoom: () => { },
 
         // Extracted variables for overlay & control:
         tutorialStep, resetTutorial

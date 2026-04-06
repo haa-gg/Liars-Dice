@@ -47,6 +47,8 @@ export const validateMessage = (msg: any): msg is PeerMessage => {
         case 'USE_SLIP':
         case 'USE_MAGIC_DICE':
         case 'VOTE_NEXT_ROUND':
+        case 'LEAVE':
+        case 'PING':
         case 'KICKED':
             return true;  // No data validation needed
 

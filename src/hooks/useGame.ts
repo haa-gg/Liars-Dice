@@ -56,6 +56,7 @@ export interface UseGameReturn {
     kickPlayer: (playerId: string) => void;
     setPeekTargetId: (id: string | null) => void;
     setSpectateTarget: (targetId: string) => void;
+    leaveRoom: () => void;
 }
 
 export const useGame = (): UseGameReturn => {
@@ -244,6 +245,11 @@ export const useGame = (): UseGameReturn => {
                     });
                 }
             }
+            if (type === 'LEAVE') {
+                engine.removePlayer(lastMessage.from);
+                closeConnection(lastMessage.from);
+                syncState();
+            }
         } else {
             if (type === 'STATE_SYNC') {
                 setGameState(data.gameState);
@@ -420,6 +426,12 @@ export const useGame = (): UseGameReturn => {
                 reject(new Error("Failed to initialize connection."));
             }
         });
+    };
+
+    const leaveRoom = () => {
+        if (!isHost) {
+            sendToHost({ type: 'LEAVE', data: {} as Record<string, never> });
+        }
     };
 
     const setGameOptions = (opts: Partial<GameOptions>) => {
@@ -657,6 +669,6 @@ export const useGame = (): UseGameReturn => {
         startRoom, joinRoom, rejoinRoom, startRound, placeBid, challenge,
         usePeek, activateLoadedDie, rerollDie, dismissPeek, useSlip, useMagicDice, selectCheat,
         downloadTextLog, downloadJSONLog, voteNextRound, kickPlayer,
-        setPeekTargetId, setSpectateTarget, addBot,
+        setPeekTargetId, setSpectateTarget, addBot, leaveRoom,
     };
 };
