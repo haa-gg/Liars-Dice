@@ -206,6 +206,7 @@ const MainMenu: React.FC<MainMenuProps> = ({
                                     <li>Levena Currer</li>
                                     <li>Phobos</li>
                                     <li>Hesper</li>
+                                    <li>Rotgun "Gun Burn" Khaosbern</li>
                                 </ul>
                             </p>
                             <p><strong>Pixel Dice</strong><br />
