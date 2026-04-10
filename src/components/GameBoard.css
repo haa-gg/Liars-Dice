@@ -925,3 +925,33 @@
         background-position: 0 50%;
     }
 }
+
+/* ── TUTORIAL HIGHLIGHT ANIMATION ── */
+@keyframes highlight-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+}
+
+.tutorial-highlight {
+    animation: highlight-pulse 1.5s infinite;
+    position: relative;
+    border: 2px solid var(--color-gold) !important;
+}
+
+.tutorial-highlight::after {
+    content: "👈";
+    position: absolute;
+    left: 105%;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.5rem;
+    animation: point-left 1s infinite alternate ease-in-out;
+    pointer-events: none;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+@keyframes point-left {
+    0% { transform: translate(0, -50%); }
+    100% { transform: translate(8px, -50%); }
+}

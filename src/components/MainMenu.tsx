@@ -11,6 +11,7 @@ interface MainMenuProps {
     onShowGameLog?: () => void;
     onLeaveGame?: () => void;
     onPlayTutorial?: () => void;
+    onPlayDmTutorial?: () => void;
     gameLogEmpty?: boolean;
 }
 
@@ -19,6 +20,7 @@ const MainMenu: React.FC<MainMenuProps> = ({
     onShowGameLog,
     onLeaveGame,
     onPlayTutorial,
+    onPlayDmTutorial,
     gameLogEmpty = false,
 }) => {
     const [showMenu, setShowMenu] = useState(false);
@@ -115,16 +117,25 @@ const MainMenu: React.FC<MainMenuProps> = ({
                         Credits
                     </button>
 
-                    {onPlayTutorial && (
+                    {(onPlayTutorial || onPlayDmTutorial) && (
                         <>
                             <hr style={{ margin: '0.5rem 1.5rem', opacity: 0.1 }} />
-                            {/* Play Tutorial */}
-                            <button
-                                onClick={() => { setShowMenu(false); onPlayTutorial(); }}
-                                style={menuItemStyle}
-                            >
-                                Play Tutorial
-                            </button>
+                            {onPlayTutorial && (
+                                <button
+                                    onClick={() => { setShowMenu(false); onPlayTutorial(); }}
+                                    style={menuItemStyle}
+                                >
+                                    Play Tutorial
+                                </button>
+                            )}
+                            {onPlayDmTutorial && (
+                                <button
+                                    onClick={() => { setShowMenu(false); onPlayDmTutorial(); }}
+                                    style={menuItemStyle}
+                                >
+                                    DM Tutorial (Cheats)
+                                </button>
+                            )}
                         </>
                     )}
 

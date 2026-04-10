@@ -13,6 +13,8 @@ import { IconScroll, IconGear, IconUsers, IconCheck, IconCross, IconCopy } from 
 import MainMenu from './components/MainMenu';
 import TutorialOverlay from './components/TutorialOverlay';
 import { useTutorialGame } from './hooks/useTutorialGame';
+import DmTutorialOverlay from './components/DmTutorialOverlay';
+import { useDmTutorial } from './hooks/useDmTutorial';
 import { SettingsProvider } from './hooks/SettingsContext';
 import PrivacyPolicy from './components/PrivacyPolicy';
 
@@ -69,14 +71,19 @@ export interface AppConfig {
 export default function App({ config }: { config?: AppConfig } = {}) {
     const [inLobby, setInLobby] = useState<boolean>(true);
     const [inTutorial, setInTutorial] = useState<boolean>(false);
+    const [inDmTutorial, setInDmTutorial] = useState<boolean>(false);
 
     const realGame = useGame();
     const tutorialGame = useTutorialGame(() => {
         setInTutorial(false);
         setInLobby(true);
     });
+    const dmTutorialGame = useDmTutorial(() => {
+        setInDmTutorial(false);
+        setInLobby(true);
+    });
 
-    const game = (inTutorial ? tutorialGame : realGame) as UseGameReturn;
+    const game = (inDmTutorial ? dmTutorialGame : inTutorial ? tutorialGame : realGame) as UseGameReturn;
 
     const {
         gameState, players, currentTurn, currentBid, myDice,
@@ -364,6 +371,11 @@ export default function App({ config }: { config?: AppConfig } = {}) {
                                 setInTutorial(true);
                                 setInLobby(false);
                             }}
+                            onPlayDmTutorial={() => {
+                                dmTutorialGame.resetDmTutorial();
+                                setInDmTutorial(true);
+                                setInLobby(false);
+                            }}
                         />
                         <div className="logo-container">
                             <div className="scanlines">
@@ -485,7 +497,7 @@ export default function App({ config }: { config?: AppConfig } = {}) {
 
                             {isHost && (
                                 <button
-                                    className={`settings-toggle-btn ${showSettings ? 'active' : ''}`}
+                                    className={`settings-toggle-btn ${showSettings ? 'active' : ''} ${inDmTutorial && dmTutorialGame.dmTutorialStep === 0 && !showSettings ? 'tutorial-highlight' : ''}`}
                                     onClick={() => setShowSettings(v => !v)}
                                     title="Game Settings"
                                 >
@@ -576,10 +588,10 @@ export default function App({ config }: { config?: AppConfig } = {}) {
                                         </button>
                                     </div>
 
-                                    <div className="settings-row">
+                                    <div className="settings-row" style={{ position: 'relative' }}>
                                         <label>Honor System Cheats</label>
                                         <button
-                                            className={`toggle-btn ${gameOptions.honorSystemCheats ? 'on' : 'off'}`}
+                                            className={`toggle-btn ${gameOptions.honorSystemCheats ? 'on' : 'off'} ${inDmTutorial && dmTutorialGame.dmTutorialStep === 0 && showSettings && !gameOptions.honorSystemCheats ? 'tutorial-highlight' : ''}`}
                                             onClick={() => setGameOptions({ honorSystemCheats: !gameOptions.honorSystemCheats })}
                                             disabled={gameState !== 'LOBBY'}
                                             style={{ opacity: gameState !== 'LOBBY' ? 0.5 : 1, cursor: gameState !== 'LOBBY' ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
@@ -645,6 +657,7 @@ export default function App({ config }: { config?: AppConfig } = {}) {
                         )}
 
                         {inTutorial && <TutorialOverlay tutorialStep={tutorialGame.tutorialStep} />}
+                        {inDmTutorial && <DmTutorialOverlay dmTutorialStep={dmTutorialGame.dmTutorialStep} onContinue={dmTutorialGame.advanceDmTutorial} />}
 
                         <GameBoard
                             players={players}

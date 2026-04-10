@@ -13,9 +13,9 @@ export const TutorialOverlay: React.FC<TutorialOverlayProps> = ({ tutorialStep }
     } else if (tutorialStep === 2) {
         message = "It's your turn! Botbeard bid exactly one 2. You must raise the count or the face. Since you rolled two 3s, raise the bid to two 3s using the controls below.";
     } else if (tutorialStep === 3) {
-        message = "Great bid! Now it's Tin Whiskers' turn. Will he raise your bid, or call you a Liar?";
+        message = "Great bid! Now it's Mister Roboto's turn. Will he raise your bid, or call you a Liar?";
     } else if (tutorialStep === 4) {
-        message = "Tin Whiskers called you a Liar! But you were telling the truth, and he had some 3s too. The total count was 4, more than your bid of 2. Tin Whiskers loses a die! That's the basics. You can add some bots to play against in a regular room for more practice. Click 'Next Round' to end the tutorial.";
+        message = "Mister Roboto called you a Liar! But you were telling the truth, and he had some 3s too. The total count was 4, more than your bid of 2. Tin Whiskers loses a die! That's the basics. You can add some bots to play against in a regular room for more practice. Click 'Next Round' to end the tutorial.";
     }
 
     if (!message) return null;

@@ -207,12 +207,12 @@ const GameBoard: React.FC<GameBoardProps> = ({
             {/* ── CHEAT INFO POPUP ── */}
             {showCheatInfo && (
                 <div className="rules-overlay" onClick={() => setShowCheatInfo(false)}>
-                    <div 
-                        className="rules-panel parchment-panel" 
-                        onClick={e => e.stopPropagation()} 
-                        style={{ 
+                    <div
+                        className="rules-panel parchment-panel"
+                        onClick={e => e.stopPropagation()}
+                        style={{
                             maxWidth: '400px',
-                            '--bg-stain': `url(${BASE_URL}images/stain-distress.png)` 
+                            '--bg-stain': `url(${BASE_URL}images/stain-distress.png)`
                         } as React.CSSProperties}
                     >
                         <button className="rules-close" onClick={() => setShowCheatInfo(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCross size="0.8em" /></button>
@@ -476,7 +476,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
                 {!myCheat && gameState === 'BIDDING' && gameOptions.honorSystemCheats && !myCheatUsed && (
                     <div className="cheat-selection parchment-panel" style={{ padding: '0.8rem 1rem', marginBottom: '1rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                            <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 'bold' }}>Choose Your Cheat:</p>
+                            <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 'bold' }}>Dare to Cheat?</p>
                             <button
                                 onClick={() => setShowCheatInfo(true)}
                                 style={{
