@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-export type DiceStyle = 'pixel' | 'doodle' | 'html';
+export type DiceStyle = 'pixel' | 'doodle' | 'html' | 'laser-ghost';
 
 interface UserSettings {
     diceStyle: DiceStyle;

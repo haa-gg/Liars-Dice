@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-100 -100 1200 1200" width="100%" height="100%">
+  <g style="filter:drop-shadow(rgb(255, 255, 255) 0px 0px 12px) drop-shadow(rgb(255, 255, 255) 0px 0px 24px) drop-shadow(rgba(195, 60, 60, 0.25) 0px 0px 36px) drop-shadow(rgba(195, 60, 60, 0.75) 0px 0px 36px) drop-shadow(rgb(165, 65, 156) 0px 0px 120px);">
+    <rect x="40" y="40" width="920" height="920" rx="160" ry="160" fill="none" stroke="#FFFFFF" stroke-width="60"/>
+    <circle cx="250" cy="250" r="107" fill="#FFFFFF"/>
+    <circle cx="750" cy="250" r="107" fill="#FFFFFF"/>
+    <circle cx="500" cy="500" r="107" fill="#FFFFFF"/>
+    <circle cx="250" cy="750" r="107" fill="#FFFFFF"/>
+    <circle cx="750" cy="750" r="107" fill="#FFFFFF"/>
+  </g>
+</svg>

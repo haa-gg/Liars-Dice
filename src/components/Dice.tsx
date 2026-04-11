@@ -13,19 +13,23 @@ interface DiceProps {
 }
 
 const renderHtmlDie = (value: number) => {
-    switch(value) {
-        case 1: return <div className="dice-html"><div className="dice-row center" style={{marginTop:'auto', marginBottom:'auto'}}><span className="dice-dot"/></div></div>;
-        case 2: return <div className="dice-html"><div className="dice-row"><span className="dice-dot"/></div><div className="dice-row right"><span className="dice-dot"/></div></div>;
-        case 3: return <div className="dice-html"><div className="dice-row"><span className="dice-dot"/></div><div className="dice-row center"><span className="dice-dot"/></div><div className="dice-row right"><span className="dice-dot"/></div></div>;
-        case 4: return <div className="dice-html"><div className="dice-row"><span className="dice-dot"/><span className="dice-dot"/></div><div className="dice-row"><span className="dice-dot"/><span className="dice-dot"/></div></div>;
-        case 5: return <div className="dice-html"><div className="dice-row"><span className="dice-dot"/><span className="dice-dot"/></div><div className="dice-row center"><span className="dice-dot"/></div><div className="dice-row"><span className="dice-dot"/><span className="dice-dot"/></div></div>;
-        case 6: return <div className="dice-html"><div className="dice-row"><span className="dice-dot"/><span className="dice-dot"/></div><div className="dice-row"><span className="dice-dot"/><span className="dice-dot"/></div><div className="dice-row"><span className="dice-dot"/><span className="dice-dot"/></div></div>;
-        default: return <div className="dice-html"/>;
+    switch (value) {
+        case 1: return <div className="dice-html"><div className="dice-row center" style={{ marginTop: 'auto', marginBottom: 'auto' }}><span className="dice-dot" /></div></div>;
+        case 2: return <div className="dice-html"><div className="dice-row"><span className="dice-dot" /></div><div className="dice-row right"><span className="dice-dot" /></div></div>;
+        case 3: return <div className="dice-html"><div className="dice-row"><span className="dice-dot" /></div><div className="dice-row center"><span className="dice-dot" /></div><div className="dice-row right"><span className="dice-dot" /></div></div>;
+        case 4: return <div className="dice-html"><div className="dice-row"><span className="dice-dot" /><span className="dice-dot" /></div><div className="dice-row"><span className="dice-dot" /><span className="dice-dot" /></div></div>;
+        case 5: return <div className="dice-html"><div className="dice-row"><span className="dice-dot" /><span className="dice-dot" /></div><div className="dice-row center"><span className="dice-dot" /></div><div className="dice-row"><span className="dice-dot" /><span className="dice-dot" /></div></div>;
+        case 6: return <div className="dice-html"><div className="dice-row"><span className="dice-dot" /><span className="dice-dot" /></div><div className="dice-row"><span className="dice-dot" /><span className="dice-dot" /></div><div className="dice-row"><span className="dice-dot" /><span className="dice-dot" /></div></div>;
+        default: return <div className="dice-html" />;
     }
 };
 
 const Dice: React.FC<DiceProps> = ({ value, rolling, isSlipped, isMagic }) => {
     const { settings } = useUserSettings();
+
+    const imagePath = settings.diceStyle === 'laser-ghost'
+        ? `${BASE_URL}images/dice/laser-ghost-dice-${value}.svg`
+        : `${BASE_URL}images/dice/${settings.diceStyle}-dice-${value}.png`;
 
     return (
         <div className={`dice-img-container ${rolling ? 'rolling' : ''} ${isSlipped ? 'slipped' : ''} ${isMagic ? 'magic' : ''}`}>
@@ -33,7 +37,7 @@ const Dice: React.FC<DiceProps> = ({ value, rolling, isSlipped, isMagic }) => {
                 renderHtmlDie(value)
             ) : (
                 <img
-                    src={`${BASE_URL}images/dice/${settings.diceStyle}-dice-${value}.png`}
+                    src={imagePath}
                     alt={`Die showing ${value}`}
                     className="dice-img"
                     draggable={false}

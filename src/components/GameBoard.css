@@ -207,6 +207,25 @@
     z-index: 1;
 }
 
+.current-bid-display::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.10;
+    background-image: url('/images/bg-distress-2.png');
+    background-size: 400%;
+    background-position: initial;
+    border-radius: inherit;
+    transform: rotate(180deg);
+}
+
+.current-bid-display>* {
+    position: relative;
+    z-index: 1;
+}
+
 .bid-inputs {
     display: flex;
     gap: 1rem;
@@ -928,9 +947,17 @@
 
 /* ── TUTORIAL HIGHLIGHT ANIMATION ── */
 @keyframes highlight-pulse {
-    0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); }
-    70% { box-shadow: 0 0 0 10px rgba(255, 215, 0, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(255, 215, 0, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 215, 0, 0);
+    }
 }
 
 .tutorial-highlight {
@@ -948,10 +975,15 @@
     font-size: 1.5rem;
     animation: point-left 1s infinite alternate ease-in-out;
     pointer-events: none;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
 }
 
 @keyframes point-left {
-    0% { transform: translate(0, -50%); }
-    100% { transform: translate(8px, -50%); }
+    0% {
+        transform: translate(0, -50%);
+    }
+
+    100% {
+        transform: translate(8px, -50%);
+    }
 }
