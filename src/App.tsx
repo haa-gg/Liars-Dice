@@ -545,13 +545,13 @@ export default function App({ config }: { config?: AppConfig } = {}) {
                                     <h4>Global Rules</h4>
 
                                     <div className="settings-row">
-                                        <label>Starting Dice</label>
+                                        <label style={{ opacity: inDmTutorial && dmTutorialGame.dmTutorialStep === 0 ? 0.35 : 1 }}>Starting Dice</label>
                                         <select
                                             className="input-nautical settings-select"
                                             value={gameOptions.startingDice}
                                             onChange={e => setGameOptions({ startingDice: Number(e.target.value) })}
-                                            disabled={gameState !== 'LOBBY'}
-                                            style={{ opacity: gameState !== 'LOBBY' ? 0.5 : 1 }}
+                                            disabled={gameState !== 'LOBBY' || (inDmTutorial && dmTutorialGame.dmTutorialStep === 0)}
+                                            style={{ opacity: gameState !== 'LOBBY' || (inDmTutorial && dmTutorialGame.dmTutorialStep === 0) ? 0.35 : 1 }}
                                         >
                                             {[3, 4, 5, 6, 7].map(n => (
                                                 <option key={n} value={n}>{n} dice</option>
@@ -560,13 +560,13 @@ export default function App({ config }: { config?: AppConfig } = {}) {
                                     </div>
 
                                     <div className="settings-row">
-                                        <label>Eliminate At</label>
+                                        <label style={{ opacity: inDmTutorial && dmTutorialGame.dmTutorialStep === 0 ? 0.35 : 1 }}>Eliminate At</label>
                                         <select
                                             className="input-nautical settings-select"
                                             value={gameOptions.eliminationThreshold}
                                             onChange={e => setGameOptions({ eliminationThreshold: Number(e.target.value) })}
-                                            disabled={gameState !== 'LOBBY'}
-                                            style={{ opacity: gameState !== 'LOBBY' ? 0.5 : 1 }}
+                                            disabled={gameState !== 'LOBBY' || (inDmTutorial && dmTutorialGame.dmTutorialStep === 0)}
+                                            style={{ opacity: gameState !== 'LOBBY' || (inDmTutorial && dmTutorialGame.dmTutorialStep === 0) ? 0.35 : 1 }}
                                         >
                                             <option value={0}>0 dice (standard)</option>
                                             <option value={1}>1 die left</option>
@@ -577,12 +577,12 @@ export default function App({ config }: { config?: AppConfig } = {}) {
                                     </div>
 
                                     <div className="settings-row">
-                                        <label>1s Are Wild</label>
+                                        <label style={{ opacity: inDmTutorial && dmTutorialGame.dmTutorialStep === 0 ? 0.35 : 1 }}>1s Are Wild</label>
                                         <button
                                             className={`toggle-btn ${gameOptions.wildsEnabled ? 'on' : 'off'}`}
                                             onClick={() => setGameOptions({ wildsEnabled: !gameOptions.wildsEnabled })}
-                                            disabled={gameState !== 'LOBBY'}
-                                            style={{ opacity: gameState !== 'LOBBY' ? 0.5 : 1, cursor: gameState !== 'LOBBY' ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+                                            disabled={gameState !== 'LOBBY' || (inDmTutorial && dmTutorialGame.dmTutorialStep === 0)}
+                                            style={{ opacity: gameState !== 'LOBBY' || (inDmTutorial && dmTutorialGame.dmTutorialStep === 0) ? 0.35 : 1, cursor: gameState !== 'LOBBY' || (inDmTutorial && dmTutorialGame.dmTutorialStep === 0) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
                                         >
                                             {gameOptions.wildsEnabled ? <><IconCheck /> On</> : <><IconCross /> Off</>}
                                         </button>
@@ -698,6 +698,7 @@ export default function App({ config }: { config?: AppConfig } = {}) {
                             onShowRules={() => setShowRules(v => !v)}
                             onLeaveGame={handleLeaveGame}
                             onAddBot={addBot}
+                            dmTutorialStep={inDmTutorial ? dmTutorialGame.dmTutorialStep : undefined}
                         />
                     </div>
                 )}

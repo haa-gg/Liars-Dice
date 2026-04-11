@@ -9,7 +9,7 @@ import { GameState, Player, Bid, ChallengeResult, CheatType } from '../types';
  *  1  – LOBBY State; prompt user to close settings and start round
  *  2  – Cheat panel visible; "tap any option"       (user taps a cheat → step 3)
  *  3  – Peek target picker visible                  (user picks a target → step 4)
- *  4  – Peek result modal                           (auto-advance after 3.5 s → step 5)
+ *  4  – Peek result modal                           (Continue →)
  *  5  – Slip info; an extra die is dropped in       (Continue →)
  *  6  – Panel reset; explain Loaded Die/Shield/Magic(Continue →)
  *  7  – Tabletop Tips                               (Continue →)
@@ -71,32 +71,27 @@ export const useDmTutorial = (onLeaveTutorial: () => void) => {
 
 
 
-    // Step 4 → auto-advance after 3.5 s (peek result modal auto-dismisses)
+    // Step 5 → dismiss peek modal; re-show cheat panel so DM can pick Slip
     useEffect(() => {
-        if (dmTutorialStep === 4) {
-            const timer = setTimeout(() => {
-                setPeekInfo(null);
-                setMyCheat('slip');
-                setMyCheatUsed(true);
-                setMyDice(prev => [...prev, 6]);
-                setDmTutorialStep(5);
-            }, 3500);
-            return () => clearTimeout(timer);
+        if (dmTutorialStep === 5) {
+            setPeekInfo(null);
+            setMyCheat(null);
+            setMyCheatUsed(false);
         }
     }, [dmTutorialStep]);
 
-    // Step 6 → reset cheat so the cheat-selection panel reappears
+    // Step 7 → reset cheat so the cheat-selection panel reappears
     useEffect(() => {
-        if (dmTutorialStep === 6) {
+        if (dmTutorialStep === 7) {
             setMyCheat(null);
             setMyCheatUsed(false);
             setMyDice([2, 3, 3, 5, 1]);
         }
     }, [dmTutorialStep]);
 
-    // Step 9 (sentinel) → exit
+    // Step 10 (sentinel) → exit
     useEffect(() => {
-        if (dmTutorialStep === 9) {
+        if (dmTutorialStep === 10) {
             resetDmTutorial();
             onLeaveTutorial();
         }
@@ -123,12 +118,18 @@ export const useDmTutorial = (onLeaveTutorial: () => void) => {
         }
     }, [dmTutorialStep]);
 
-    // Step 2 → 3: any cheat tapped routes through Peek for the demo
+    // Step 2 → 3: only Peek is enabled here; any tap advances through Peek
+    // Step 5 → 6: only Slip is enabled; clicking Slip applies it and advances
     const selectCheat = useCallback((_cheatType: CheatType) => {
         if (dmTutorialStep === 2) {
             setMyCheat('peek');
-            setPeekTargetIdState(null); // null = show target picker in GameBoard
+            setPeekTargetIdState(null);
             setDmTutorialStep(3);
+        } else if (dmTutorialStep === 5 && _cheatType === 'slip') {
+            setMyCheat('slip');
+            setMyCheatUsed(true);
+            setMyDice(prev => prev.length === 5 ? [...prev, 6] : prev);
+            setDmTutorialStep(6);
         }
     }, [dmTutorialStep]);
 

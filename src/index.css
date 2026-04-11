@@ -94,13 +94,13 @@ h1 {
   text-align: center;
 }
 
-.btn-nautical:hover {
+.btn-nautical:not(:disabled):hover {
   background: var(--color-wood-mid);
   transform: translateY(-2px);
   box-shadow: 0 7px 0 var(--color-wood-dark);
 }
 
-.btn-nautical:active {
+.btn-nautical:not(:disabled):active {
   transform: translateY(3px);
   box-shadow: 0 2px 0 var(--color-wood-dark);
 }

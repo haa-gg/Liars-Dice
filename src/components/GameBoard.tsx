@@ -56,6 +56,7 @@ interface GameBoardProps {
     onShowRules?: () => void;
     onLeaveGame?: () => void;
     onAddBot?: () => void;
+    dmTutorialStep?: number;
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({
@@ -97,6 +98,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
     onShowRules,
     onLeaveGame,
     onAddBot,
+    dmTutorialStep,
 }) => {
     const [bidCount, setBidCount] = useState<number>(currentBid?.count || 1);
     const [bidFace, setBidFace] = useState<number>(currentBid?.face || 2);
@@ -104,6 +106,11 @@ const GameBoard: React.FC<GameBoardProps> = ({
     const [showCheatInfo, setShowCheatInfo] = useState<boolean>(false);
     const [showStartConfirmation, setShowStartConfirmation] = useState<boolean>(false);
     const [bidError, setBidError] = useState<string>('');
+    const [d20Roll, setD20Roll] = useState<number | null>(null);
+    const [slightBonus, setSlightBonus] = useState<number>(0);
+    const [deceptionBonus, setDeceptionBonus] = useState<number>(0);
+    const [isRolling, setIsRolling] = useState<boolean>(false);
+    const [showD20Roller, setShowD20Roller] = useState<boolean>(false);
 
     // Generate text preview of game log
     const gameLogText = formatGameLogAsText(gameLog, gameOptions);
@@ -475,39 +482,160 @@ const GameBoard: React.FC<GameBoardProps> = ({
                 {/* Honor System Cheat Selection */}
                 {!myCheat && gameState === 'BIDDING' && gameOptions.honorSystemCheats && !myCheatUsed && (
                     <div className="cheat-selection parchment-panel" style={{ padding: '0.8rem 1rem', marginBottom: '1rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                        {/* Header */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
                             <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 'bold' }}>Dare to Cheat?</p>
-                            <button
-                                onClick={() => setShowCheatInfo(true)}
-                                style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    fontSize: '1.2rem',
-                                    cursor: 'pointer',
-                                    padding: '0.2rem',
-                                    color: 'var(--color-ink)',
-                                    opacity: 0.7,
-                                    lineHeight: 1,
-                                    display: 'flex',
-                                    alignItems: 'center'
-                                }}
-                                title="Cheat descriptions"
-                                aria-label="Show cheat information"
-                            >
-                                <IconInfo />
-                            </button>
-                        </div>
-                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                            {(['peek', 'shield', 'loaded_die', 'slip', 'magic_dice'] as CheatType[]).map(cheatType => (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                                 <button
-                                    key={cheatType}
-                                    className="btn-nautical cheat-btn"
-                                    style={{ fontSize: '0.75rem', padding: '0.4rem 0.7rem' }}
-                                    onClick={() => onSelectCheat(cheatType)}
+                                    id="toggle-d20-roller"
+                                    onClick={() => setShowD20Roller(v => !v)}
+                                    title={showD20Roller ? 'Hide skill check roller' : 'Show skill check roller'}
+                                    style={{
+                                        background: 'none',
+                                        border: '1px solid var(--color-ink )',
+                                        borderRadius: '4px',
+                                        fontSize: '0.7rem',
+                                        cursor: 'pointer',
+                                        padding: '0.15rem 0.4rem',
+                                        color: 'var(--color-ink)',
+                                        lineHeight: 1.4,
+                                        whiteSpace: 'nowrap',
+                                    }}
                                 >
-                                    {cheatType === 'loaded_die' ? 'Loaded Die' : cheatType === 'magic_dice' ? 'Magic Dice' : cheatType.charAt(0).toUpperCase() + cheatType.slice(1)}
+                                    <img src={`${BASE_URL}images/d20-icon.svg`} alt="D20" style={{ width: '1rem', height: '1rem', verticalAlign: 'middle', marginRight: '0.25rem' }} />
+                                    {showD20Roller ? 'Skill Check ▾' : 'Skill Check ▸'}
                                 </button>
-                            ))}
+                                <button
+                                    onClick={() => setShowCheatInfo(true)}
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        fontSize: '1.2rem',
+                                        cursor: 'pointer',
+                                        padding: '0.2rem',
+                                        color: 'var(--color-ink)',
+                                        opacity: 0.7,
+                                        lineHeight: 1,
+                                        display: 'flex',
+                                        alignItems: 'center'
+                                    }}
+                                    title="Cheat descriptions"
+                                    aria-label="Show cheat information"
+                                >
+                                    <IconInfo />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* D20 Skill Check Roller — collapsible */}
+                        {showD20Roller && (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '0.6rem' }}>
+                                {/* Row 1: Bonus inputs + Roll button */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                    <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                                        <label style={{ fontSize: '0.7rem', opacity: 0.75, whiteSpace: 'nowrap' }}>Sleight</label>
+                                        <input
+                                            id="slight-of-hand-bonus"
+                                            type="number"
+                                            value={slightBonus}
+                                            onChange={e => setSlightBonus(Number(e.target.value))}
+                                            style={{
+                                                width: '3rem',
+                                                padding: '0.2rem 0.3rem',
+                                                fontSize: '0.8rem',
+                                                background: 'var(--color-wood-dark)',
+                                                color: 'var(--color-parchment)',
+                                                border: '1px solid var(--color-gold)',
+                                                borderRadius: '4px',
+                                                textAlign: 'center',
+                                            }}
+                                        />
+                                        <label style={{ fontSize: '0.7rem', opacity: 0.75, whiteSpace: 'nowrap' }}>Deception</label>
+                                        <input
+                                            id="deception-bonus"
+                                            type="number"
+                                            value={deceptionBonus}
+                                            onChange={e => setDeceptionBonus(Number(e.target.value))}
+                                            style={{
+                                                width: '3rem',
+                                                padding: '0.2rem 0.3rem',
+                                                fontSize: '0.8rem',
+                                                background: 'var(--color-wood-dark)',
+                                                color: 'var(--color-parchment)',
+                                                border: '1px solid var(--color-gold)',
+                                                borderRadius: '4px',
+                                                textAlign: 'center',
+                                            }}
+                                        />
+                                    </div>
+                                    <button
+                                        id="roll-d20-btn"
+                                        className="btn-nautical"
+                                        disabled={isRolling}
+                                        onClick={() => {
+                                            setIsRolling(true);
+                                            setD20Roll(null);
+                                            setTimeout(() => {
+                                                setD20Roll(Math.floor(Math.random() * 20) + 1);
+                                                setIsRolling(false);
+                                            }, 400);
+                                        }}
+                                        style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', whiteSpace: 'nowrap' }}
+                                    >
+                                        {isRolling
+                                            ? <><img src={`${BASE_URL}images/d20-icon-red-white-border.svg`} alt="" style={{ width: '0.9rem', height: '0.9rem', verticalAlign: 'middle', marginRight: '0.25rem' }} />Rolling…</>
+                                            : <><img src={`${BASE_URL}images/d20-icon-red-white-border.svg`} alt="" style={{ width: '0.9rem', height: '0.9rem', verticalAlign: 'middle', marginRight: '0.25rem' }} />Roll D20</>
+                                        }
+                                    </button>
+                                </div>
+
+                                {/* Row 2: Results */}
+                                {d20Roll !== null && (
+                                    <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                                        <span style={{
+                                            fontSize: '0.75rem',
+                                            fontWeight: 'bold',
+                                            color: d20Roll === 20 ? 'gold' : d20Roll === 1 ? '#e74c3c' : 'var(--color-parchment)',
+                                        }}>
+                                            {d20Roll === 20 ? '✨' : d20Roll === 1 ? '💀' : ''} Rolled: {d20Roll}
+                                        </span>
+                                        <span style={{ fontSize: '0.7rem', opacity: 0.8, whiteSpace: 'nowrap' }}>
+                                            Sleight: <strong>{d20Roll + slightBonus}</strong>
+                                        </span>
+                                        <span style={{ fontSize: '0.7rem', opacity: 0.8, whiteSpace: 'nowrap' }}>
+                                            Deception: <strong>{d20Roll + deceptionBonus}</strong>
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Cheat buttons */}
+                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                            {(['peek', 'shield', 'loaded_die', 'slip', 'magic_dice'] as CheatType[]).map(cheatType => {
+                                // During DM tutorial: only allow the target cheat for each step
+                                const tutorialTargetCheat: CheatType | null =
+                                    dmTutorialStep === 2 ? 'peek' :
+                                    dmTutorialStep === 5 ? 'slip' :
+                                    null;
+                                const isDisabledByTutorial = tutorialTargetCheat !== null && cheatType !== tutorialTargetCheat;
+                                return (
+                                    <button
+                                        key={cheatType}
+                                        className="btn-nautical cheat-btn"
+                                        disabled={isDisabledByTutorial}
+                                        style={{
+                                            fontSize: '0.75rem',
+                                            padding: '0.4rem 0.7rem',
+                                            opacity: isDisabledByTutorial ? 0.35 : 1,
+                                            cursor: isDisabledByTutorial ? 'not-allowed' : 'pointer',
+                                        }}
+                                        onClick={() => !isDisabledByTutorial && onSelectCheat(cheatType)}
+                                    >
+                                        {cheatType === 'loaded_die' ? 'Loaded Die' : cheatType === 'magic_dice' ? 'Magic Dice' : cheatType.charAt(0).toUpperCase() + cheatType.slice(1)}
+                                    </button>
+                                );
+                            })}
                         </div>
                     </div>
                 )}

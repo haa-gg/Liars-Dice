@@ -125,7 +125,7 @@ const MainMenu: React.FC<MainMenuProps> = ({
                                     onClick={() => { setShowMenu(false); onPlayTutorial(); }}
                                     style={menuItemStyle}
                                 >
-                                    Play Tutorial
+                                    Quick Play Tutorial
                                 </button>
                             )}
                             {onPlayDmTutorial && (
@@ -133,7 +133,7 @@ const MainMenu: React.FC<MainMenuProps> = ({
                                     onClick={() => { setShowMenu(false); onPlayDmTutorial(); }}
                                     style={menuItemStyle}
                                 >
-                                    DM Tutorial (Cheats)
+                                    Expanded Game Tutorial
                                 </button>
                             )}
                         </>
