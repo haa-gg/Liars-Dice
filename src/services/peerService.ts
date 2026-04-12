@@ -91,7 +91,18 @@ class PeerService {
                     err.type === 'socket-closed' ||
                     err.message?.includes('Lost connection');
 
-                if (isNetworkError && retries > 0) {
+                if (err.type === 'unavailable-id' && !id && retries > 0) {
+                    console.log('Generated Room ID is taken. Generating a new one...');
+                    // the initial setup failed due to taken ID, try again with a brand new ID
+                    setTimeout(async () => {
+                        try {
+                            const retryId = await this.init(null, retries - 1);
+                            resolve(retryId);
+                        } catch (retryErr) {
+                            reject(retryErr);
+                        }
+                    }, 500);
+                } else if (isNetworkError && retries > 0) {
                     console.log(`Connection dropped during init. Retrying in 1s...`);
                     setTimeout(async () => {
                         try {

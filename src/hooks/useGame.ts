@@ -372,7 +372,7 @@ export const useGame = (): UseGameReturn => {
             syncState();
             return id;
         } catch (err) {
-            return null;
+            throw err;
         }
     };
 

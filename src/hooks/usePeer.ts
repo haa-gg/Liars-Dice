@@ -78,7 +78,7 @@ export const usePeer = (): UsePeerReturn => {
         } catch (err: any) {
             setIsReconnecting(false);
             setError("Failed to reconnect: " + err.message);
-            return null;
+            throw err;
         }
     }, [initialize]);
 
