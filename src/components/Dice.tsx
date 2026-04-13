@@ -32,7 +32,7 @@ const Dice: React.FC<DiceProps> = ({ value, rolling, isSlipped, isMagic }) => {
         : `${BASE_URL}images/dice/${settings.diceStyle}-dice-${value}.png`;
 
     return (
-        <div className={`dice-img-container ${rolling ? 'rolling' : ''} ${isSlipped ? 'slipped' : ''} ${isMagic ? 'magic' : ''} ${settings.diceStyle === 'laser-ghost' ? 'scanlines' : ''}`}>
+        <div className={`dice-img-container ${rolling ? 'rolling' : ''} ${isSlipped ? 'slipped' : ''} ${isMagic ? 'magic' : ''} ${settings.diceStyle === 'laser-ghost' ? 'scanlines-2' : ''}`}>
             {settings.diceStyle === 'html' ? (
                 renderHtmlDie(value)
             ) : (

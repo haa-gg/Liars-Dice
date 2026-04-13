@@ -191,6 +191,7 @@ const MainMenu: React.FC<MainMenuProps> = ({
                                     <option value="doodle">Hand-Drawn Doodle</option>
                                     <option value="html">Clean n' Classic</option>
                                     <option value="laser-ghost">Laser Ghost Dice</option>
+                                    <option value="metal">Metal Dice</option>
                                 </select>
                             </div>
                         </div>
