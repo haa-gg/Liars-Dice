@@ -908,6 +908,7 @@
     pointer-events: none;
     content: "";
     position: absolute;
+    mix-blend-mode: multiply;
 }
 
 .scanlines:before {

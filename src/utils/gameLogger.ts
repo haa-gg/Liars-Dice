@@ -90,6 +90,14 @@ export const formatGameLogAsText = (gameLog: GameLogEntry[], gameOptions: Partia
             output.push(`[${time}] ${event.playerName} used ${event.cheatType}: ${event.details}`);
         }
 
+        // Skill checks
+        if (event.event === 'SKILL_CHECK') {
+            const time = new Date(event.timestamp).toLocaleTimeString();
+            output.push(`[${time}] ${event.playerName} rolled a skill check: ${event.roll}`);
+            output.push(`  Sleight: ${event.totalSleight} (Bonus: ${event.sleightBonus})`);
+            output.push(`  Deception: ${event.totalDeception} (Bonus: ${event.deceptionBonus})`);
+        }
+
         // Dice lost
         if (event.event === 'DICE_LOST') {
             const time = new Date(event.timestamp).toLocaleTimeString();

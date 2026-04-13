@@ -72,6 +72,7 @@ export type ClientMessage =
     | { type: 'USE_SLIP';        data: Record<string, never> }
     | { type: 'USE_MAGIC_DICE';  data: Record<string, never> }
     | { type: 'REROLL_DIE';      data: { index: number } }
+    | { type: 'ROLL_SKILL_CHECK'; data: { roll: number; sleightBonus: number; deceptionBonus: number } }
     | { type: 'SELECT_CHEAT';    data: { cheat: CheatType } }
     | { type: 'VOTE_NEXT_ROUND'; data: Record<string, never> }
     | { type: 'SPECTATE';        data: { targetId: string } }

@@ -44,6 +44,7 @@ interface GameBoardProps {
     onUseSlip: () => void;
     onUseMagicDice: () => void;
     onSelectCheat: (cheatType: CheatType) => void;
+    onRollSkillCheck?: (roll: number, sleightBonus: number, deceptionBonus: number) => void;
     onDownloadTextLog: () => void;
     onDownloadJSONLog: () => void;
     onKickPlayer: (playerId: string) => void;
@@ -86,6 +87,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
     onUseSlip,
     onUseMagicDice,
     onSelectCheat,
+    onRollSkillCheck,
     onDownloadTextLog,
     onDownloadJSONLog,
     onKickPlayer,
@@ -111,6 +113,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
     const [deceptionBonus, setDeceptionBonus] = useState<number>(0);
     const [isRolling, setIsRolling] = useState<boolean>(false);
     const [showD20Roller, setShowD20Roller] = useState<boolean>(false);
+    const [hasRolledSkillCheck, setHasRolledSkillCheck] = useState<boolean>(false);
 
     // Generate text preview of game log
     const gameLogText = formatGameLogAsText(gameLog, gameOptions);
@@ -120,6 +123,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
         setBidCount(currentBid?.count || 1);
         setBidFace(currentBid?.face || 2);
         setBidError(''); // Clear error on new round
+        if (currentBid && currentBid.count === 0) {
+            setD20Roll(null);
+            setHasRolledSkillCheck(false);
+        }
     }, [currentBid]);
 
     // Handle bid with validation
@@ -571,13 +578,18 @@ const GameBoard: React.FC<GameBoardProps> = ({
                                     <button
                                         id="roll-d20-btn"
                                         className="btn-nautical"
-                                        disabled={isRolling}
+                                        disabled={isRolling || hasRolledSkillCheck}
                                         onClick={() => {
                                             setIsRolling(true);
                                             setD20Roll(null);
                                             setTimeout(() => {
-                                                setD20Roll(Math.floor(Math.random() * 20) + 1);
+                                                const roll = Math.floor(Math.random() * 20) + 1;
+                                                setD20Roll(roll);
                                                 setIsRolling(false);
+                                                setHasRolledSkillCheck(true);
+                                                if (onRollSkillCheck) {
+                                                    onRollSkillCheck(roll, slightBonus, deceptionBonus);
+                                                }
                                             }, 400);
                                         }}
                                         style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', whiteSpace: 'nowrap' }}

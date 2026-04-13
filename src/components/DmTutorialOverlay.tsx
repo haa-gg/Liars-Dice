@@ -7,7 +7,7 @@ interface DmTutorialOverlayProps {
 
 interface StepDef {
     title: string;
-    message: string;
+    message: React.ReactNode;
     showContinue: boolean;
     continueLabel?: string;
 }

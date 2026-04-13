@@ -57,6 +57,7 @@ export interface UseGameReturn {
     setPeekTargetId: (id: string | null) => void;
     setSpectateTarget: (targetId: string) => void;
     leaveRoom: () => void;
+    rollSkillCheck: (roll: number, sleightBonus: number, deceptionBonus: number) => void;
 }
 
 export const useGame = (): UseGameReturn => {
@@ -201,6 +202,10 @@ export const useGame = (): UseGameReturn => {
             }
             if (type === 'SELECT_CHEAT') {
                 engine.assignCheat(lastMessage.from, data.cheat);
+                syncState();
+            }
+            if (type === 'ROLL_SKILL_CHECK') {
+                engine.logSkillCheck(lastMessage.from, data.roll, data.sleightBonus, data.deceptionBonus);
                 syncState();
             }
             if (type === 'VOTE_NEXT_ROUND') {
@@ -527,6 +532,16 @@ export const useGame = (): UseGameReturn => {
         }
     };
 
+    const rollSkillCheck = (roll: number, sleightBonus: number, deceptionBonus: number) => {
+        if (!gameOptions.honorSystemCheats) return;
+        if (isHost) {
+            engine.logSkillCheck(peerId as string, roll, sleightBonus, deceptionBonus);
+            syncState();
+        } else {
+            sendToHost({ type: 'ROLL_SKILL_CHECK', data: { roll, sleightBonus, deceptionBonus } });
+        }
+    };
+
     const downloadTextLog = () => {
         const textLog = formatGameLogAsText(engine.gameLog, engine.options);
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
@@ -669,6 +684,6 @@ export const useGame = (): UseGameReturn => {
         startRoom, joinRoom, rejoinRoom, startRound, placeBid, challenge,
         usePeek, activateLoadedDie, rerollDie, dismissPeek, useSlip, useMagicDice, selectCheat,
         downloadTextLog, downloadJSONLog, voteNextRound, kickPlayer,
-        setPeekTargetId, setSpectateTarget, addBot, leaveRoom,
+        setPeekTargetId, setSpectateTarget, addBot, leaveRoom, rollSkillCheck,
     };
 };

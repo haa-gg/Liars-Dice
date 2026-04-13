@@ -367,6 +367,23 @@ class GameEngine {
         return { playerName: rp.name, dieValue };
     }
 
+    logSkillCheck(playerId: string, roll: number, sleightBonus: number, deceptionBonus: number) {
+        const player = this.players.find(p => p.id === playerId);
+        if (!player) return;
+        this.gameLog.push({
+            timestamp: new Date().toISOString(),
+            round: this.currentRoundNumber,
+            event: 'SKILL_CHECK',
+            playerId: playerId,
+            playerName: player.name,
+            roll,
+            sleightBonus,
+            deceptionBonus,
+            totalSleight: roll + sleightBonus,
+            totalDeception: roll + deceptionBonus
+        });
+    }
+
     placeBid(playerId: string, count: number, face: number): boolean {
         if (count > this.currentBid.count || (count === this.currentBid.count && face > this.currentBid.face)) {
             const player = this.players.find(p => p.id === playerId);

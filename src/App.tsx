@@ -94,7 +94,7 @@ export default function App({ config }: { config?: AppConfig } = {}) {
         setGameOptions, assignCheat,
         startRoom, joinRoom, rejoinRoom, placeBid, challenge,
         usePeek, activateLoadedDie, rerollDie, dismissPeek, useSlip, useMagicDice, selectCheat,
-        downloadTextLog, downloadJSONLog, voteNextRound, kickPlayer, setPeekTargetId, setSpectateTarget, addBot, leaveRoom,
+        downloadTextLog, downloadJSONLog, voteNextRound, kickPlayer, setPeekTargetId, setSpectateTarget, addBot, leaveRoom, rollSkillCheck,
     } = game;
 
     const [playerName, setPlayerName] = useState<string>(() => {
@@ -688,6 +688,7 @@ export default function App({ config }: { config?: AppConfig } = {}) {
                             onUseSlip={useSlip}
                             onUseMagicDice={useMagicDice}
                             onSelectCheat={selectCheat}
+                            onRollSkillCheck={rollSkillCheck}
                             onDownloadTextLog={downloadTextLog}
                             onDownloadJSONLog={downloadJSONLog}
                             onKickPlayer={kickPlayer}
