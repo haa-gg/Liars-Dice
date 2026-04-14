@@ -283,8 +283,19 @@
 }
 
 .danger {
-    border-color: var(--color-blood) !important;
-    color: var(--color-blood) !important;
+    background: var(--color-blood) !important;
+    color: var(--color-parchment) !important;
+    border-color: var(--color-gold) !important;
+    box-shadow: 0 5px 0 var(--color-wood-dark) !important;
+}
+
+.danger:not(:disabled):hover {
+    background: #a00000 !important;
+    box-shadow: 0 7px 0 #291c0c !important;
+}
+
+.danger:not(:disabled):active {
+    box-shadow: 0 2px 0 #291c0c !important;
 }
 
 /* ── Rules Button ── */
@@ -796,6 +807,8 @@
         flex-wrap: wrap;
         gap: 0.5rem;
     }
+
+
 
     .bid-btns .btn-nautical {
         flex: 1;

@@ -109,8 +109,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
     const [showStartConfirmation, setShowStartConfirmation] = useState<boolean>(false);
     const [bidError, setBidError] = useState<string>('');
     const [d20Roll, setD20Roll] = useState<number | null>(null);
-    const [slightBonus, setSlightBonus] = useState<number>(0);
-    const [deceptionBonus, setDeceptionBonus] = useState<number>(0);
+    const [slightBonus, setSlightBonus] = useState<number | ''>('');
+    const [deceptionBonus, setDeceptionBonus] = useState<number | ''>('');
     const [isRolling, setIsRolling] = useState<boolean>(false);
     const [showD20Roller, setShowD20Roller] = useState<boolean>(false);
     const [hasRolledSkillCheck, setHasRolledSkillCheck] = useState<boolean>(false);
@@ -437,15 +437,132 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
             <div className="my-hand-area">
                 {myCheat && gameState !== 'GAME_OVER' && (
-                    <div className="cheat-badge parchment-panel" style={{ padding: '0.4rem 1rem', display: 'flex', gap: '1rem', alignItems: 'center', boxShadow: 'none' }}>
-                        <span>
-                            <strong>Secret:</strong> {CHEAT_LABELS[myCheat]}
-                        </span>
-                        <span style={{ fontSize: '0.8rem', opacity: myCheatUsed ? 0.5 : 1 }}>
-                            {myCheatUsed ? ' (Used)' : ' (Ready)'}
-                        </span>
+                    <div className="cheat-badge parchment-panel" style={{ padding: '0.4rem 1rem', display: 'flex', flexDirection: 'column', gap: '0.6rem', boxShadow: 'none' }}>
+                        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                            <span>
+                                <strong>Secret:</strong> {CHEAT_LABELS[myCheat]}
+                            </span>
+                            <span style={{ fontSize: '0.8rem', opacity: myCheatUsed ? 0.5 : 1 }}>
+                                {myCheatUsed ? ' (Used)' : ' (Ready)'}
+                            </span>
+                            {/* Cheat actions moved to bottom */}
+
+                            {/* Skill Check Toggle (Only show if Honor System is active) */}
+                            {isMyTurn && gameState === 'BIDDING' && !myCheatUsed && gameOptions.honorSystemCheats && (
+                                <button
+                                    id="toggle-d20-roller"
+                                    onClick={() => setShowD20Roller(v => !v)}
+                                    title={showD20Roller ? 'Hide skill check roller' : 'Show skill check roller'}
+                                    style={{
+                                        background: 'none',
+                                        border: '1px solid var(--color-ink )',
+                                        borderRadius: '4px',
+                                        fontSize: '0.7rem',
+                                        cursor: 'pointer',
+                                        padding: '0.15rem 0.4rem',
+                                        color: 'var(--color-ink)',
+                                        lineHeight: 1.4,
+                                        whiteSpace: 'nowrap',
+                                        marginLeft: 'auto'
+                                    }}
+                                >
+                                    <img src={`${BASE_URL}images/d20-icon.svg`} alt="D20" style={{ width: '1rem', height: '1rem', verticalAlign: 'middle', marginRight: '0.25rem' }} />
+                                    {showD20Roller ? 'Skill Check ▾' : 'Skill Check ▸'}
+                                </button>
+                            )}
+                        </div>
+
+                        {/* D20 Skill Check Roller */}
+                        {isMyTurn && gameState === 'BIDDING' && !myCheatUsed && gameOptions.honorSystemCheats && showD20Roller && (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', borderTop: '1px solid rgba(0,0,0,0.1)', paddingTop: '0.6rem' }}>
+                                {/* Row 1: Bonus inputs + Roll button */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                    <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                                        <label style={{ fontSize: '0.7rem', opacity: 0.75, whiteSpace: 'nowrap' }}>Sleight</label>
+                                        <input
+                                            id="slight-of-hand-bonus"
+                                            type="number"
+                                            value={slightBonus}
+                                            onChange={e => setSlightBonus(e.target.value === '' ? '' : Number(e.target.value))}
+                                            style={{
+                                                width: '3rem',
+                                                padding: '0.2rem 0.3rem',
+                                                fontSize: '0.8rem',
+                                                background: 'var(--color-wood-dark)',
+                                                color: 'var(--color-parchment)',
+                                                border: '1px solid var(--color-gold)',
+                                                borderRadius: '4px',
+                                                textAlign: 'center',
+                                            }}
+                                        />
+                                        <label style={{ fontSize: '0.7rem', opacity: 0.75, whiteSpace: 'nowrap' }}>Deception</label>
+                                        <input
+                                            id="deception-bonus"
+                                            type="number"
+                                            value={deceptionBonus}
+                                            onChange={e => setDeceptionBonus(e.target.value === '' ? '' : Number(e.target.value))}
+                                            style={{
+                                                width: '3rem',
+                                                padding: '0.2rem 0.3rem',
+                                                fontSize: '0.8rem',
+                                                background: 'var(--color-wood-dark)',
+                                                color: 'var(--color-parchment)',
+                                                border: '1px solid var(--color-gold)',
+                                                borderRadius: '4px',
+                                                textAlign: 'center',
+                                            }}
+                                        />
+                                    </div>
+                                    <button
+                                        id="roll-d20-btn"
+                                        className="btn-nautical"
+                                        disabled={isRolling || hasRolledSkillCheck}
+                                        onClick={() => {
+                                            setIsRolling(true);
+                                            setD20Roll(null);
+                                            setTimeout(() => {
+                                                const roll = Math.floor(Math.random() * 20) + 1;
+                                                setD20Roll(roll);
+                                                setIsRolling(false);
+                                                setHasRolledSkillCheck(true);
+                                                if (onRollSkillCheck) {
+                                                    onRollSkillCheck(roll, Number(slightBonus) || 0, Number(deceptionBonus) || 0);
+                                                }
+                                            }, 400);
+                                        }}
+                                        style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', whiteSpace: 'nowrap' }}
+                                    >
+                                        {isRolling
+                                            ? <><img src={`${BASE_URL}images/d20-icon-red-white-border.svg`} alt="" style={{ width: '0.9rem', height: '0.9rem', verticalAlign: 'middle', marginRight: '0.25rem' }} />Rolling…</>
+                                            : <><img src={`${BASE_URL}images/d20-icon-red-white-border.svg`} alt="" style={{ width: '0.9rem', height: '0.9rem', verticalAlign: 'middle', marginRight: '0.25rem' }} />Roll D20</>
+                                        }
+                                    </button>
+                                </div>
+
+                                {/* Row 2: Results */}
+                                {d20Roll !== null && (
+                                    <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                                        <span style={{
+                                            fontSize: '0.75rem',
+                                            fontWeight: 'bold',
+                                            color: d20Roll === 20 ? 'gold' : d20Roll === 1 ? '#e74c3c' : 'var(--color-parchment)',
+                                        }}>
+                                            {d20Roll === 20 ? '✨' : d20Roll === 1 ? '💀' : ''} Rolled: {d20Roll}
+                                        </span>
+                                        <span style={{ fontSize: '0.7rem', opacity: 0.8, whiteSpace: 'nowrap' }}>
+                                            Sleight: <strong>{d20Roll + (Number(slightBonus) || 0)}</strong>
+                                        </span>
+                                        <span style={{ fontSize: '0.7rem', opacity: 0.8, whiteSpace: 'nowrap' }}>
+                                            Deception: <strong>{d20Roll + (Number(deceptionBonus) || 0)}</strong>
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* CHEAT ACTIONS NOW ON THE BOTTOM ROW */}
                         {isMyTurn && gameState === 'BIDDING' && !myCheatUsed && (
-                            <div className="cheat-actions">
+                            <div className="cheat-actions" style={{ borderTop: showD20Roller ? '1px dashed rgba(0,0,0,0.1)' : 'none', paddingTop: showD20Roller ? '0.5rem' : '0', width: '100%' }}>
                                 {myCheat === 'peek' && (
                                     peekTargetId === undefined || peekTargetId === null ? (
                                         // Step 1: show target picker
@@ -494,7 +611,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
                             <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 'bold' }}>Dare to Cheat?</p>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                                 <button
-                                    id="toggle-d20-roller"
                                     onClick={() => setShowD20Roller(v => !v)}
                                     title={showD20Roller ? 'Hide skill check roller' : 'Show skill check roller'}
                                     style={{
@@ -534,18 +650,16 @@ const GameBoard: React.FC<GameBoardProps> = ({
                             </div>
                         </div>
 
-                        {/* D20 Skill Check Roller — collapsible */}
+                        {/* D20 Skill Check Inputs (BEFORE CHEAT SELECTION) */}
                         {showD20Roller && (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '0.6rem' }}>
-                                {/* Row 1: Bonus inputs + Roll button */}
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                                     <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
                                         <label style={{ fontSize: '0.7rem', opacity: 0.75, whiteSpace: 'nowrap' }}>Sleight</label>
                                         <input
-                                            id="slight-of-hand-bonus"
                                             type="number"
                                             value={slightBonus}
-                                            onChange={e => setSlightBonus(Number(e.target.value))}
+                                            onChange={e => setSlightBonus(e.target.value === '' ? '' : Number(e.target.value))}
                                             style={{
                                                 width: '3rem',
                                                 padding: '0.2rem 0.3rem',
@@ -559,10 +673,9 @@ const GameBoard: React.FC<GameBoardProps> = ({
                                         />
                                         <label style={{ fontSize: '0.7rem', opacity: 0.75, whiteSpace: 'nowrap' }}>Deception</label>
                                         <input
-                                            id="deception-bonus"
                                             type="number"
                                             value={deceptionBonus}
-                                            onChange={e => setDeceptionBonus(Number(e.target.value))}
+                                            onChange={e => setDeceptionBonus(e.target.value === '' ? '' : Number(e.target.value))}
                                             style={{
                                                 width: '3rem',
                                                 padding: '0.2rem 0.3rem',
@@ -575,50 +688,10 @@ const GameBoard: React.FC<GameBoardProps> = ({
                                             }}
                                         />
                                     </div>
-                                    <button
-                                        id="roll-d20-btn"
-                                        className="btn-nautical"
-                                        disabled={isRolling || hasRolledSkillCheck}
-                                        onClick={() => {
-                                            setIsRolling(true);
-                                            setD20Roll(null);
-                                            setTimeout(() => {
-                                                const roll = Math.floor(Math.random() * 20) + 1;
-                                                setD20Roll(roll);
-                                                setIsRolling(false);
-                                                setHasRolledSkillCheck(true);
-                                                if (onRollSkillCheck) {
-                                                    onRollSkillCheck(roll, slightBonus, deceptionBonus);
-                                                }
-                                            }, 400);
-                                        }}
-                                        style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', whiteSpace: 'nowrap' }}
-                                    >
-                                        {isRolling
-                                            ? <><img src={`${BASE_URL}images/d20-icon-red-white-border.svg`} alt="" style={{ width: '0.9rem', height: '0.9rem', verticalAlign: 'middle', marginRight: '0.25rem' }} />Rolling…</>
-                                            : <><img src={`${BASE_URL}images/d20-icon-red-white-border.svg`} alt="" style={{ width: '0.9rem', height: '0.9rem', verticalAlign: 'middle', marginRight: '0.25rem' }} />Roll D20</>
-                                        }
-                                    </button>
+                                    <span style={{ fontSize: '0.65rem', opacity: 0.6, fontStyle: 'italic' }}>
+                                        Select a cheat below to roll ▾
+                                    </span>
                                 </div>
-
-                                {/* Row 2: Results */}
-                                {d20Roll !== null && (
-                                    <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                                        <span style={{
-                                            fontSize: '0.75rem',
-                                            fontWeight: 'bold',
-                                            color: d20Roll === 20 ? 'gold' : d20Roll === 1 ? '#e74c3c' : 'var(--color-parchment)',
-                                        }}>
-                                            {d20Roll === 20 ? '✨' : d20Roll === 1 ? '💀' : ''} Rolled: {d20Roll}
-                                        </span>
-                                        <span style={{ fontSize: '0.7rem', opacity: 0.8, whiteSpace: 'nowrap' }}>
-                                            Sleight: <strong>{d20Roll + slightBonus}</strong>
-                                        </span>
-                                        <span style={{ fontSize: '0.7rem', opacity: 0.8, whiteSpace: 'nowrap' }}>
-                                            Deception: <strong>{d20Roll + deceptionBonus}</strong>
-                                        </span>
-                                    </div>
-                                )}
                             </div>
                         )}
 

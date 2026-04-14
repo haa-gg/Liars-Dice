@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node -e \"const fs=require('fs'); fs.mkdirSync('dist/privacy',{recursive:true}); fs.copyFileSync('dist/index.html', 'dist/privacy/index.html'); fs.copyFileSync('dist/index.html', 'dist/404.html');\"",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest",

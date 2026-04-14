@@ -513,7 +513,9 @@ export default function App({ config }: { config?: AppConfig } = {}) {
 
                         {/* ── HOST SETTINGS PANEL ── */}
                         {isHost && showSettings && (
-                            <div className="settings-panel parchment-panel">
+                            <>
+                                <div className="menu-backdrop" onClick={() => setShowSettings(false)} style={{ zIndex: 99, background: 'transparent', backdropFilter: 'none' }} />
+                                <div className="settings-panel parchment-panel">
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                                     <h3 style={{ margin: 0 }}>⚙ Game Settings</h3>
                                     <button
@@ -654,6 +656,7 @@ export default function App({ config }: { config?: AppConfig } = {}) {
                                     </div>
                                 )}
                             </div>
+                            </>
                         )}
 
                         {inTutorial && <TutorialOverlay tutorialStep={tutorialGame.tutorialStep} />}
