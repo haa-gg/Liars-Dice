@@ -291,11 +291,11 @@
 
 .danger:not(:disabled):hover {
     background: #a00000 !important;
-    box-shadow: 0 7px 0 #291c0c !important;
+    box-shadow: 0 7px 0 var(--color-wood-dark) !important;
 }
 
 .danger:not(:disabled):active {
-    box-shadow: 0 2px 0 #291c0c !important;
+    box-shadow: 0 2px 0 var(--color-wood-dark) !important;
 }
 
 /* ── Rules Button ── */

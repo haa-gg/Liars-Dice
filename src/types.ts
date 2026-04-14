@@ -25,6 +25,7 @@ export interface ChallengeResult {
     count: number;
     actualCount: number;
     shieldUsed: boolean;
+    allDice?: { playerId: string; playerName: string; dice: number[] }[];
 }
 
 export interface GameOptions {

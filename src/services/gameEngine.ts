@@ -369,6 +369,7 @@ class GameEngine {
 
     logSkillCheck(playerId: string, roll: number, sleightBonus: number, deceptionBonus: number) {
         const player = this.players.find(p => p.id === playerId);
+        console.log('[engine.logSkillCheck] playerId:', playerId, '— found:', player?.name ?? 'NOT FOUND', '— all IDs:', this.players.map(p => p.id));
         if (!player) return;
         this.gameLog.push({
             timestamp: new Date().toISOString(),
@@ -382,6 +383,7 @@ class GameEngine {
             totalSleight: roll + sleightBonus,
             totalDeception: roll + deceptionBonus
         });
+        console.log('[engine.logSkillCheck] pushed to log! log length:', this.gameLog.length);
     }
 
     placeBid(playerId: string, count: number, face: number): boolean {
@@ -462,7 +464,12 @@ class GameEngine {
         });
 
         const shieldUsed = this.resolveRound(loserId);
-        return { loserId, count, actualCount: count, shieldUsed };
+        const allDice = this.currentRoundSnapshot?.map(p => ({
+            playerId: p.id,
+            playerName: p.name,
+            dice: p.dice
+        }));
+        return { loserId, count, actualCount: count, shieldUsed, allDice };
     }
 
     resolveRound(loserId: string): boolean {
