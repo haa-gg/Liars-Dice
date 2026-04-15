@@ -26,6 +26,7 @@ export interface UseGameReturn {
     peekInfo: { playerName: string; dieValue: number } | null;
     peekTargetId: string | null;
     loadedDieActive: boolean;
+    rerolledDieIndex: number | null;
     gameLog: GameLogEntry[];
     nextRoundVotes: Set<string>;
     spectatingId: string | null;
@@ -73,6 +74,7 @@ export const useGame = (): UseGameReturn => {
     const [peekInfo, setPeekInfo] = useState<{ playerName: string; dieValue: number } | null>(null);
     const [peekTargetId, setPeekTargetId] = useState<string | null>(null);
     const [loadedDieActive, setLoadedDieActive] = useState<boolean>(false);
+    const [rerolledDieIndex, setRerolledDieIndex] = useState<number | null>(null);
     const [gameLog, setGameLog] = useState<GameLogEntry[]>([]);
     const [nextRoundVotes, setNextRoundVotes] = useState<Set<string>>(new Set());
     const [spectatingId, setSpectatingId] = useState<string | null>(null);
@@ -514,7 +516,12 @@ export const useGame = (): UseGameReturn => {
         setLoadedDieActive(false);
         if (isHost) {
             const newDice = engine.rerollDie(peerId as string, index);
-            if (newDice) { setMyDice([...newDice]); syncState(); }
+            if (newDice) {
+                setMyDice([...newDice]);
+                setRerolledDieIndex(index);
+                setTimeout(() => setRerolledDieIndex(null), 2500);
+                syncState();
+            }
         } else {
             sendToHost({ type: 'REROLL_DIE', data: { index } });
         }
@@ -680,7 +687,7 @@ export const useGame = (): UseGameReturn => {
         gameState, players, currentTurn, currentBid, myDice,
         isHost, error, peerId, connections,
         challengeResult, gameOptions, myCheat, myCheatUsed,
-        peekInfo, peekTargetId, loadedDieActive, gameLog, nextRoundVotes,
+        peekInfo, peekTargetId, loadedDieActive, rerolledDieIndex, gameLog, nextRoundVotes,
         spectatingId, spectatingDice, spectatingName,
         isReconnecting, reconnect, reconnectAsHost,
         setGameOptions, assignCheat,

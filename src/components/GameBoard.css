@@ -639,6 +639,34 @@
     filter: drop-shadow(0 0 10px var(--color-gold));
 }
 
+/* ── Loaded Die reroll flash ── */
+@keyframes reroll-flash {
+    0%   { transform: scale(1.35); filter: drop-shadow(0 0 14px var(--color-gold)); }
+    20%  { transform: scale(1.2);  filter: drop-shadow(0 0 10px var(--color-gold)); }
+    60%  { transform: scale(1.05); filter: drop-shadow(0 0 6px var(--color-gold)); }
+    100% { transform: scale(1);    filter: none; }
+}
+
+.die-wrapper--rerolled {
+    animation: reroll-flash 2.5s ease-out forwards;
+    position: relative;
+}
+
+.die-wrapper--rerolled::after {
+    content: 'New!';
+    position: absolute;
+    top: -1.2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--color-gold);
+    white-space: nowrap;
+    pointer-events: none;
+    animation: reroll-flash 2.5s ease-out forwards;
+    opacity: 1;
+}
+
 
 /* ════════════════════════════════════════
    RESPONSIVE / MOBILE

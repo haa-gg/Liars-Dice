@@ -77,7 +77,7 @@ export const useTutorialGame = (onLeaveTutorial: () => void) => {
         isHost: true, error: null, peerId, connections: [],
         challengeResult, gameOptions: { startingDice: 5, eliminationThreshold: 0, wildsEnabled: true, honorSystemCheats: false },
         myCheat: null as any, myCheatUsed: false,
-        peekInfo: null, peekTargetId: null, loadedDieActive: false, gameLog: [], nextRoundVotes: new Set<string>(),
+        peekInfo: null, peekTargetId: null, loadedDieActive: false, rerolledDieIndex: null, gameLog: [], nextRoundVotes: new Set<string>(),
         spectatingId: null, spectatingDice: [], spectatingName: null,
         isReconnecting: false, reconnect: () => { }, reconnectAsHost: () => { },
         setGameOptions: () => { }, assignCheat: () => { },

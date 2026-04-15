@@ -174,6 +174,7 @@ export const useDmTutorial = (onLeaveTutorial: () => void) => {
         peekInfo,
         peekTargetId,
         loadedDieActive: false,
+        rerolledDieIndex: null,
 
         // Misc
         gameLog: [],
@@ -208,6 +209,8 @@ export const useDmTutorial = (onLeaveTutorial: () => void) => {
         setSpectateTarget: () => {},
         addBot: () => {},
         leaveRoom: () => {},
+        rollSkillCheck: () => {},
+        startRound: () => {},
 
         // Tutorial controls (consumed by App.tsx + DmTutorialOverlay)
         dmTutorialStep,

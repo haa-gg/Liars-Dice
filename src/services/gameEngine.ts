@@ -464,12 +464,7 @@ class GameEngine {
         });
 
         const shieldUsed = this.resolveRound(loserId);
-        const allDice = this.currentRoundSnapshot?.map(p => ({
-            playerId: p.id,
-            playerName: p.name,
-            dice: p.dice
-        }));
-        return { loserId, count, actualCount: count, shieldUsed, allDice };
+        return { loserId, count, actualCount: count, shieldUsed };
     }
 
     resolveRound(loserId: string): boolean {

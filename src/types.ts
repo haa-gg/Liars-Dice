@@ -25,7 +25,6 @@ export interface ChallengeResult {
     count: number;
     actualCount: number;
     shieldUsed: boolean;
-    allDice?: { playerId: string; playerName: string; dice: number[] }[];
 }
 
 export interface GameOptions {
@@ -66,25 +65,25 @@ export interface StateSyncPayload {
 
 /** Messages sent from a client → host. */
 export type ClientMessage =
-    | { type: 'JOIN';             data: { name: string; asSpectator: boolean } }
-    | { type: 'PLACE_BID';       data: { count: number; face: number } }
-    | { type: 'CHALLENGE';       data: Record<string, never> }
-    | { type: 'USE_PEEK';        data: { targetPlayerId: string } }
-    | { type: 'USE_SLIP';        data: Record<string, never> }
-    | { type: 'USE_MAGIC_DICE';  data: Record<string, never> }
-    | { type: 'REROLL_DIE';      data: { index: number } }
+    | { type: 'JOIN'; data: { name: string; asSpectator: boolean } }
+    | { type: 'PLACE_BID'; data: { count: number; face: number } }
+    | { type: 'CHALLENGE'; data: Record<string, never> }
+    | { type: 'USE_PEEK'; data: { targetPlayerId: string } }
+    | { type: 'USE_SLIP'; data: Record<string, never> }
+    | { type: 'USE_MAGIC_DICE'; data: Record<string, never> }
+    | { type: 'REROLL_DIE'; data: { index: number } }
     | { type: 'ROLL_SKILL_CHECK'; data: { roll: number; sleightBonus: number; deceptionBonus: number } }
-    | { type: 'SELECT_CHEAT';    data: { cheat: CheatType } }
+    | { type: 'SELECT_CHEAT'; data: { cheat: CheatType } }
     | { type: 'VOTE_NEXT_ROUND'; data: Record<string, never> }
-    | { type: 'SPECTATE';        data: { targetId: string } }
-    | { type: 'LEAVE';           data: Record<string, never> }
-    | { type: 'PING';            data: Record<string, never> };
+    | { type: 'SPECTATE'; data: { targetId: string } }
+    | { type: 'LEAVE'; data: Record<string, never> }
+    | { type: 'PING'; data: Record<string, never> };
 
 /** Messages sent from host → clients. */
 export type HostMessage =
     | { type: 'STATE_SYNC'; data: StateSyncPayload }
-    | { type: 'KICKED';     data: Record<string, never> }
-    | { type: 'PONG';       data: Record<string, never> };
+    | { type: 'KICKED'; data: Record<string, never> }
+    | { type: 'PONG'; data: Record<string, never> };
 
 /** Union of all peer messages (convenience alias). */
 export type PeerMessage = ClientMessage | HostMessage;

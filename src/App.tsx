@@ -88,7 +88,7 @@ export default function App({ config }: { config?: AppConfig } = {}) {
     const {
         gameState, players, currentTurn, currentBid, myDice,
         isHost, error, peerId, challengeResult,
-        gameOptions, myCheat, myCheatUsed, peekInfo, peekTargetId, loadedDieActive, gameLog, nextRoundVotes,
+        gameOptions, myCheat, myCheatUsed, peekInfo, peekTargetId, loadedDieActive, rerolledDieIndex, gameLog, nextRoundVotes,
         spectatingId, spectatingDice, spectatingName,
         isReconnecting, reconnect, reconnectAsHost,
         setGameOptions, assignCheat,
@@ -680,6 +680,7 @@ export default function App({ config }: { config?: AppConfig } = {}) {
                             peekInfo={peekInfo}
                             peekTargetId={peekTargetId}
                             loadedDieActive={loadedDieActive}
+                            rerolledDieIndex={rerolledDieIndex}
                             gameLog={gameLog}
                             gameOptions={gameOptions}
                             nextRoundVotes={nextRoundVotes}

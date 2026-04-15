@@ -34,6 +34,7 @@ interface GameBoardProps {
     myCheatUsed?: boolean;
     peekInfo?: { playerName: string; dieValue: number } | null;
     loadedDieActive?: boolean;
+    rerolledDieIndex?: number | null;
     gameLog?: GameLogEntry[];
     gameOptions?: GameOptions;
     nextRoundVotes?: Set<string>;
@@ -77,6 +78,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
     myCheatUsed = false,
     peekInfo = null,
     loadedDieActive = false,
+    rerolledDieIndex = null,
     gameLog = [],
     gameOptions = { startingDice: 5, eliminationThreshold: 0, wildsEnabled: true, honorSystemCheats: false },
     nextRoundVotes = new Set(),
@@ -758,8 +760,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
                                 // During DM tutorial: only allow the target cheat for each step
                                 const tutorialTargetCheat: CheatType | null =
                                     dmTutorialStep === 2 ? 'peek' :
-                                    dmTutorialStep === 5 ? 'slip' :
-                                    null;
+                                        dmTutorialStep === 5 ? 'slip' :
+                                            null;
                                 const isDisabledByTutorial = tutorialTargetCheat !== null && cheatType !== tutorialTargetCheat;
                                 return (
                                     <button
@@ -792,7 +794,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
                     {me && me.active && myDice.map((val, i) => (
                         <div
                             key={i}
-                            className={`die-wrapper ${loadedDieActive ? 'clickable' : ''}`}
+                            className={`die-wrapper ${loadedDieActive ? 'clickable' : ''} ${rerolledDieIndex === i ? 'die-wrapper--rerolled' : ''}`}
                             onClick={() => {
                                 if (loadedDieActive) {
                                     console.log('Rerolling die at index:', i);
