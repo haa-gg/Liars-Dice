@@ -250,7 +250,12 @@ export default function App({ config }: { config?: AppConfig } = {}) {
 
     const copyInviteLink = () => {
         const code = (isHost ? peerId : roomId) || '';
-        const url = `${window.location.origin}${window.location.pathname}?join=${code}`;
+        let baseUrl = `${window.location.origin}${window.location.pathname}`;
+        // If we're inside the Android wrapper or otherwise serving on localhost, use the public URL
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            baseUrl = 'https://haa-gg.github.io/Liars-Dice/';
+        }
+        const url = `${baseUrl}?join=${code}`;
         navigator.clipboard.writeText(url);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);

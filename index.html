@@ -42,20 +42,49 @@
   <meta name="theme-color" content="#8B4513" />
   <meta name="msapplication-TileColor" content="#8B4513" />
 
-  <!-- Start SPA Redirect Hack -->
   <script type="text/javascript">
-    (function(l) {
-      if (l.search[1] === '/' ) {
-        var decoded = l.search.slice(1).split('&').map(function(s) { 
-          return s.replace(/~and~/g, '&') 
+    (function (l) {
+      if (l.search[1] === '/') {
+        var decoded = l.search.slice(1).split('&').map(function (s) {
+          return s.replace(/~and~/g, '&')
         }).join('?');
         window.history.replaceState(null, null,
-            l.pathname.slice(0, -1) + decoded + l.hash
+          l.pathname.slice(0, -1) + decoded + l.hash
         );
       }
     }(window.location))
   </script>
   <!-- End SPA Redirect Hack -->
+
+  <!-- Android Deep Link Redirect -->
+  <script type="text/javascript">
+      (function () {
+        // Only run on Android devices
+        if (/android/i.test(navigator.userAgent)) {
+          // Only run on the public domain (prevent running identically in localhost wrapper)
+          if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+            // If we detect the "fallback=true" param, the user came from a failed intent
+            if (window.location.search.indexOf('fallback=true') > -1) {
+              return;
+            }
+
+            var fallbackUrl = window.location.origin + window.location.pathname +
+              (window.location.search ? window.location.search + '&fallback=true' : '?fallback=true') +
+              window.location.hash;
+
+            var androidPackage = 'com.haagg.liarsdice';
+            var host = 'haa-gg.github.io';
+            var path = '/Liars-Dice/';
+
+            var intentUrl = 'intent://' + host + path + window.location.search + window.location.hash +
+              '#Intent;scheme=https;package=' + androidPackage + ';S.browser_fallback_url=' + encodeURIComponent(fallbackUrl) + ';end';
+
+            window.location.replace(intentUrl);
+          }
+        }
+      })();
+  </script>
+  <!-- End Android Deep Link Redirect -->
 </head>
 
 <body>
