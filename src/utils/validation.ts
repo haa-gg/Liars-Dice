@@ -68,6 +68,18 @@ export const validateMessage = (msg: any): msg is PeerMessage => {
                 ['peek', 'shield', 'loaded_die', 'slip', 'magic_dice'].includes(msg.data.cheat as CheatType)
             );
 
+        case 'ROLL_SKILL_CHECK':
+            return (
+                typeof msg.data.roll === 'number' &&
+                typeof msg.data.sleightBonus === 'number' &&
+                typeof msg.data.deceptionBonus === 'number' &&
+                Number.isFinite(msg.data.roll) &&
+                Number.isFinite(msg.data.sleightBonus) &&
+                Number.isFinite(msg.data.deceptionBonus) &&
+                msg.data.roll >= 1 &&
+                msg.data.roll <= 20
+            );
+
         case 'STATE_SYNC':
             // Basic validation for state sync from host
             return (

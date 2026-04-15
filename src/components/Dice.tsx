@@ -27,8 +27,8 @@ const renderHtmlDie = (value: number) => {
 const Dice: React.FC<DiceProps> = ({ value, rolling, isSlipped, isMagic }) => {
     const { settings } = useUserSettings();
 
-    const imagePath = settings.diceStyle === 'laser-ghost'
-        ? `${BASE_URL}images/dice/laser-ghost-dice-${value}.svg`
+    const imagePath = (settings.diceStyle === 'laser-ghost' || settings.diceStyle === 'gold')
+        ? `${BASE_URL}images/dice/${settings.diceStyle}-dice-${value}.svg`
         : `${BASE_URL}images/dice/${settings.diceStyle}-dice-${value}.png`;
 
     return (
