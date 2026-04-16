@@ -45,4 +45,5 @@ npm run build
 - PeerJS for WebRTC connections
 
 ## License
-Apache-2.0
+- **Software Logic & Code**: [Apache-2.0](LICENSE)
+- **Creative Assets (Art & Copy)**: "All Rights Reserved" (Proprietary assets are not covered by the software license)
