@@ -251,8 +251,9 @@ export default function App({ config }: { config?: AppConfig } = {}) {
     const copyInviteLink = () => {
         const code = (isHost ? peerId : roomId) || '';
         let baseUrl = `${window.location.origin}${window.location.pathname}`;
-        // If we're inside the Android wrapper or otherwise serving on localhost, use the public URL
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        // If we're inside the Android wrapper (via Capacitor) or otherwise serving on localhost, use the public URL
+        // @ts-ignore - Window.Capacitor is injected by the native runtime
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.Capacitor) {
             baseUrl = 'https://haa-gg.github.io/Liars-Dice/';
         }
         const url = `${baseUrl}?join=${code}`;
@@ -377,6 +378,7 @@ export default function App({ config }: { config?: AppConfig } = {}) {
                                 setInLobby(false);
                             }}
                             onPlayDmTutorial={() => {
+                                realGame.setGameOptions({ ...realGame.gameOptions, honorSystemCheats: false });
                                 dmTutorialGame.resetDmTutorial();
                                 setInDmTutorial(true);
                                 setInLobby(false);
@@ -665,7 +667,7 @@ export default function App({ config }: { config?: AppConfig } = {}) {
                         )}
 
                         {inTutorial && <TutorialOverlay tutorialStep={tutorialGame.tutorialStep} />}
-                        {inDmTutorial && <DmTutorialOverlay dmTutorialStep={dmTutorialGame.dmTutorialStep} onContinue={dmTutorialGame.advanceDmTutorial} />}
+                        {inDmTutorial && <DmTutorialOverlay dmTutorialStep={dmTutorialGame.dmTutorialStep} onContinue={dmTutorialGame.advanceDmTutorial} showSettings={showSettings} />}
 
                         <GameBoard
                             players={players}

@@ -3,6 +3,7 @@ import React from 'react';
 interface DmTutorialOverlayProps {
     dmTutorialStep: number;
     onContinue: () => void;
+    showSettings?: boolean;
 }
 
 interface StepDef {
@@ -23,8 +24,7 @@ const STEPS: StepDef[] = [
                 {'Before starting the game, open ⚙ Settings (top bar) and flip "Honor System Cheats" to On.'}
             </>
         ),
-        showContinue: true,
-        continueLabel: 'Got it',
+        showContinue: false,
     },
     // 1 - Start the match
     {
@@ -141,12 +141,44 @@ const TOTAL_STEPS = STEPS.length; // 10
 export const DmTutorialOverlay: React.FC<DmTutorialOverlayProps> = ({
     dmTutorialStep,
     onContinue,
+    showSettings,
 }) => {
     const step = STEPS[dmTutorialStep];
     if (!step) return null;
 
     const progress = ((dmTutorialStep + 1) / TOTAL_STEPS) * 100;
 
+    // When the settings panel is open during step 0, show a compact nudge
+    // so the overlay doesn't block the Honor System Cheats toggle the user
+    // is supposed to tap.
+    if (dmTutorialStep === 0 && showSettings) {
+        return (
+            <div
+                style={{
+                    position: 'absolute',
+                    // Sit just above the top bar, well clear of the settings panel
+                    top: '5%',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: 'var(--color-wood-dark)',
+                    color: 'var(--color-parchment)',
+                    padding: '0.55rem 1.1rem',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.65)',
+                    border: '2px solid var(--color-gold)',
+                    zIndex: 2300,
+                    maxWidth: '90%',
+                    width: '320px',
+                    textAlign: 'center',
+                    pointerEvents: 'none',
+                    fontSize: '0.875rem',
+                    opacity: 0.95,
+                }}
+            >
+                <span style={{ color: 'var(--color-gold)', fontWeight: 'bold' }}>👆 Flip "Honor System Cheats" to On</span>
+            </div>
+        );
+    }
     return (
         <div
             style={{
@@ -160,7 +192,7 @@ export const DmTutorialOverlay: React.FC<DmTutorialOverlayProps> = ({
                 borderRadius: '8px',
                 boxShadow: '0 6px 24px rgba(0,0,0,0.65)',
                 border: '2px solid var(--color-gold)',
-                zIndex: 3000,
+                zIndex: 2300,
                 maxWidth: '90%',
                 width: '430px',
                 textAlign: 'center',

@@ -69,7 +69,12 @@ export const useDmTutorial = (onLeaveTutorial: () => void) => {
 
     // ── Side-effects keyed on step ────────────────────────────────────────────
 
-
+    // Step 0 → Step 1: when the user flips the settings toggle
+    useEffect(() => {
+        if (dmTutorialStep === 0 && gameOptions.honorSystemCheats) {
+            setDmTutorialStep(1);
+        }
+    }, [dmTutorialStep, gameOptions.honorSystemCheats]);
 
     // Step 5 → dismiss peek modal; re-show cheat panel so DM can pick Slip
     useEffect(() => {

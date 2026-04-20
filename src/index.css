@@ -7,7 +7,7 @@
   --color-ink: #2c2c2c;
   --color-gold: #ffd700;
   --color-blood: #8b0000;
-
+  --color-ocean: #00aaff;
   --font-main: 'Inter', sans-serif;
   --font-header: 'Pirata One', cursive;
 
@@ -58,6 +58,16 @@ h1 {
   overflow: hidden;
   max-width: 600px;
   margin: 40px auto 0px auto;
+}
+
+.parchment-panel a {
+  color: var(--color-ocean);
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.parchment-panel a:hover {
+  text-decoration: underline;
 }
 
 .main-lobby-panel::before {

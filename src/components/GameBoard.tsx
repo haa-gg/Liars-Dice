@@ -558,6 +558,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
                                                 if (onRollSkillCheck) {
                                                     onRollSkillCheck(effective, Number(slightBonus) || 0, Number(deceptionBonus) || 0);
                                                 }
+
                                             }, 400);
                                         }}
                                         style={{ fontSize: '0.75rem', padding: '0.3rem 0.6rem', whiteSpace: 'nowrap', alignSelf: 'center' }}

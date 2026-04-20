@@ -540,14 +540,10 @@ export const useGame = (): UseGameReturn => {
     };
 
     const rollSkillCheck = (roll: number, sleightBonus: number, deceptionBonus: number) => {
-        console.log('[rollSkillCheck] called — roll:', roll, 'sleight:', sleightBonus, 'deception:', deceptionBonus, 'honorSystem:', gameOptions.honorSystemCheats, 'isHost:', isHost, 'peerId:', peerId);
-        if (!gameOptions.honorSystemCheats) { console.warn('[rollSkillCheck] BLOCKED — honorSystemCheats is false'); return; }
         if (isHost) {
-            console.log('[rollSkillCheck] host path — logging to engine for peerId:', peerId);
             engine.logSkillCheck(peerId as string, roll, sleightBonus, deceptionBonus);
             syncState();
         } else {
-            console.log('[rollSkillCheck] client path — sending to host');
             sendToHost({ type: 'ROLL_SKILL_CHECK', data: { roll, sleightBonus, deceptionBonus } });
         }
     };

@@ -321,3 +321,50 @@ describe('nextTurn', () => {
         expect(engine.players[engine.currentTurnIndex].id).toBe('p3');
     });
 });
+
+// ─── logSkillCheck ────────────────────────────────────────────────────────────
+
+describe('logSkillCheck', () => {
+    beforeEach(() => {
+        engine.addPlayer('p1', 'Alice');
+        engine.addPlayer('p2', 'Bob');
+        engine.startRound();
+    });
+
+    it('appends a SKILL_CHECK entry to the game log', () => {
+        engine.logSkillCheck('p1', 14, 2, 0);
+
+        const entry = engine.gameLog.find(e => e.event === 'SKILL_CHECK');
+        expect(entry).toBeDefined();
+        expect(entry?.playerId).toBe('p1');
+        expect(entry?.playerName).toBe('Alice');
+        expect(entry?.roll).toBe(14);
+        expect(entry?.sleightBonus).toBe(2);
+        expect(entry?.deceptionBonus).toBe(0);
+        expect(entry?.totalSleight).toBe(16);   // 14 + 2
+        expect(entry?.totalDeception).toBe(14);  // 14 + 0
+    });
+
+    it('logs skill checks from multiple different players', () => {
+        engine.logSkillCheck('p1', 10, 1, 0);
+        engine.logSkillCheck('p2', 18, 0, 3);
+
+        const checks = engine.gameLog.filter(e => e.event === 'SKILL_CHECK');
+        expect(checks).toHaveLength(2);
+        expect(checks[0].playerName).toBe('Alice');
+        expect(checks[1].playerName).toBe('Bob');
+    });
+
+    it('does NOT log if the player ID is unknown', () => {
+        const beforeLength = engine.gameLog.length;
+        engine.logSkillCheck('ghost-id', 12, 0, 0);
+        // Log should not have grown
+        expect(engine.gameLog).toHaveLength(beforeLength);
+    });
+
+    it('correctly sets round number on the entry', () => {
+        engine.logSkillCheck('p1', 8, 0, 0);
+        const entry = engine.gameLog.find(e => e.event === 'SKILL_CHECK');
+        expect(entry?.round).toBe(engine.currentRoundNumber);
+    });
+});

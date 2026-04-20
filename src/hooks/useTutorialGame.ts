@@ -7,7 +7,7 @@ export const useTutorialGame = (onLeaveTutorial: () => void) => {
     const [players] = useState<Player[]>([
         { id: peerId, name: 'You (Captain)', active: true, diceCount: 5, connected: true, dice: [], cheat: null, cheatUsed: false },
         { id: 'BOT_1', name: 'Botbeard', active: true, diceCount: 5, connected: true, dice: [], cheat: null, cheatUsed: false },
-        { id: 'BOT_2', name: 'Mister Roboto', active: true, diceCount: 5, connected: true, dice: [], cheat: null, cheatUsed: false },
+        { id: 'BOT_2', name: 'Marauder Roboto', active: true, diceCount: 5, connected: true, dice: [], cheat: null, cheatUsed: false },
     ]);
     const [currentTurn, setCurrentTurn] = useState<string | null>(null);
     const [currentBid, setCurrentBid] = useState<Bid>({ count: 0, face: 2 });
