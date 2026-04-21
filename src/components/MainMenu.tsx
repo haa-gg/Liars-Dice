@@ -13,6 +13,7 @@ interface MainMenuProps {
     onPlayTutorial?: () => void;
     onPlayDmTutorial?: () => void;
     gameLogEmpty?: boolean;
+    hideDonation?: boolean;
 }
 
 const MainMenu: React.FC<MainMenuProps> = ({
@@ -22,6 +23,7 @@ const MainMenu: React.FC<MainMenuProps> = ({
     onPlayTutorial,
     onPlayDmTutorial,
     gameLogEmpty = false,
+    hideDonation = false,
 }) => {
     const [showMenu, setShowMenu] = useState(false);
     const [showCredits, setShowCredits] = useState(false);
@@ -209,7 +211,9 @@ const MainMenu: React.FC<MainMenuProps> = ({
                         <div style={{ textAlign: 'left', lineHeight: 1.7, fontSize: '0.9rem' }}>
                             <p><strong>Design & Development</strong><br />
                                 By <a href="https://designerofstuff.com" target="_blank" rel="noopener noreferrer">Glendon Gengel</a><br />
-                                Like the game? <a href="https://buy.stripe.com/bJe3cu35NaEt8LO5Hq9bO00">Buy me an ale!</a>
+                                {!hideDonation && (
+                                    <>Like the game? <a href="https://buy.stripe.com/bJe3cu35NaEt8LO5Hq9bO00">Buy me an ale!</a></>
+                                )}
                             </p>
                             <p><strong>QA, Creative Direction, and Putting Up With My Nonsense</strong><br />
                                 <em>Y'all know who you are, let me know if you want real names in here!</em>

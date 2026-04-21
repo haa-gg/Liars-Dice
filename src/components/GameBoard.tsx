@@ -59,6 +59,7 @@ interface GameBoardProps {
     onLeaveGame?: () => void;
     onAddBot?: () => void;
     dmTutorialStep?: number;
+    hideDonation?: boolean;
 }
 
 const GameBoard: React.FC<GameBoardProps> = ({
@@ -103,6 +104,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
     onLeaveGame,
     onAddBot,
     dmTutorialStep,
+    hideDonation = false,
 }) => {
     const [bidCount, setBidCount] = useState<number>(currentBid?.count || 1);
     const [bidFace, setBidFace] = useState<number>(currentBid?.face || 2);
@@ -186,6 +188,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
                 onShowGameLog={() => setShowGameLog(true)}
                 onLeaveGame={onLeaveGame}
                 gameLogEmpty={!gameLog || gameLog.length === 0}
+                hideDonation={hideDonation}
             />
 
             {/* ── GAME LOG PANEL ── */}

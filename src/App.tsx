@@ -383,6 +383,7 @@ export default function App({ config }: { config?: AppConfig } = {}) {
                                 setInDmTutorial(true);
                                 setInLobby(false);
                             }}
+                            hideDonation={config?.hideDonation}
                         />
                         <div className="logo-container">
                             <div className="scanlines-1">
@@ -679,6 +680,7 @@ export default function App({ config }: { config?: AppConfig } = {}) {
                             onChallenge={challenge}
                             gameState={gameState}
                             challengeResult={challengeResult}
+                            hideDonation={config?.hideDonation}
                             isHost={isHost}
                             onNextRound={voteNextRound}
                             peerId={peerId}
