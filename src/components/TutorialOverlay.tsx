@@ -23,10 +23,11 @@ export const TutorialOverlay: React.FC<TutorialOverlayProps> = ({ tutorialStep }
     return (
         <div style={{
             position: 'absolute',
-            top: '20%',
+            top: '35%',
             left: '50%',
             transform: 'translateX(-50%)',
-            background: 'var(--color-wood-dark)',
+            background: 'rgba(62, 39, 35, 0.85)',
+            backdropFilter: 'blur(6px)',
             color: 'var(--color-parchment)',
             padding: '1rem 1.5rem',
             borderRadius: '8px',

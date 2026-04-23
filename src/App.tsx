@@ -27,7 +27,7 @@ interface CheatOption {
 const CHEAT_OPTIONS: CheatOption[] = [
     { value: '', label: 'None', description: 'No cheat assigned' },
     { value: 'peek', label: 'Peek', description: 'See one opponent die' },
-    { value: 'shield', label: 'Shield', description: 'Absorb one hit' },
+    // { value: 'shield', label: 'Shield', description: 'Absorb one hit' },
     { value: 'loaded_die', label: 'Loaded Die', description: 'Re-roll one die' },
     { value: 'slip', label: 'Slip', description: 'Gain 1 extra die' },
     { value: 'magic_dice', label: 'Magic Dice', description: 'Gain 2 extra dice' },

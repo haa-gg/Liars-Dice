@@ -246,12 +246,14 @@ const GameBoard: React.FC<GameBoardProps> = ({
                                     See one random die from an opponent's hand. Use this to gather information before making your bid.
                                 </p>
                             </div>
+                            {/* Shield temporarily disabled due to balance issues
                             <div>
                                 <h3 style={{ margin: '0 0 0.3rem 0', fontSize: '1rem', color: 'var(--color-ink)' }}>Shield</h3>
                                 <p style={{ margin: 0, fontSize: '0.9rem', opacity: 0.8 }}>
                                     Absorb one hit when you lose a challenge. You won't lose a die this round. Use it to stay in the game longer.
                                 </p>
                             </div>
+                            */}
                             <div>
                                 <h3 style={{ margin: '0 0 0.3rem 0', fontSize: '1rem', color: 'var(--color-ink)' }}>Loaded Die</h3>
                                 <p style={{ margin: 0, fontSize: '0.9rem', opacity: 0.8 }}>
@@ -760,7 +762,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
 
                         {/* Cheat buttons */}
                         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                            {(['peek', 'shield', 'loaded_die', 'slip', 'magic_dice'] as CheatType[]).map(cheatType => {
+                            {(['peek', 'loaded_die', 'slip', 'magic_dice'] as CheatType[]).map(cheatType => {
                                 // During DM tutorial: only allow the target cheat for each step
                                 const tutorialTargetCheat: CheatType | null =
                                     dmTutorialStep === 2 ? 'peek' :

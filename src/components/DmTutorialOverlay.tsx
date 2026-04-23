@@ -160,7 +160,8 @@ export const DmTutorialOverlay: React.FC<DmTutorialOverlayProps> = ({
                     top: '5%',
                     left: '50%',
                     transform: 'translateX(-50%)',
-                    background: 'var(--color-wood-dark)',
+                    background: 'rgba(62, 39, 35, 0.85)',
+                    backdropFilter: 'blur(6px)',
                     color: 'var(--color-parchment)',
                     padding: '0.55rem 1.1rem',
                     borderRadius: '8px',
@@ -183,10 +184,11 @@ export const DmTutorialOverlay: React.FC<DmTutorialOverlayProps> = ({
         <div
             style={{
                 position: 'absolute',
-                top: '18%',
+                top: '20%',
                 left: '50%',
                 transform: 'translateX(-50%)',
-                background: 'var(--color-wood-dark)',
+                background: 'rgba(62, 39, 35, 0.85)',
+                backdropFilter: 'blur(6px)',
                 color: 'var(--color-parchment)',
                 padding: '1rem 1.4rem 1.1rem',
                 borderRadius: '8px',
