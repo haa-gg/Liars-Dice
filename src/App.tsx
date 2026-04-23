@@ -489,16 +489,20 @@ export default function App({ config }: { config?: AppConfig } = {}) {
                 ) : (
                     <div className="game-screen" style={{ width: '100%', height: '100%', position: 'relative' }}>
                         <div className="room-info">
-                            <div className="room-id-badge" onClick={copyRoomId} title="Click to copy Room ID">
-                                <span className="room-id-label">Room ID</span>
-                                <span className="room-id-value">{isHost ? peerId : roomId}</span>
-                                <span className={`room-id-copy ${copied ? 'copied' : ''}`}>
-                                    {copied ? <><IconCheck style={{ marginRight: '0.2rem' }} /> Copied!</> : <><IconCopy style={{ marginRight: '0.2rem' }} /> Copy</>}
-                                </span>
-                            </div>
-                            <button className="room-id-badge" onClick={copyInviteLink} style={{ color: 'var(--color-parchment)', opacity: '0.6' }} title="Copy invite link">
-                                {copied ? <><IconCheck /> Copied!</> : <>🔗 Invite Link</>}
-                            </button>
+                            {!(inTutorial || inDmTutorial) && (
+                                <>
+                                    <div className="room-id-badge" onClick={copyRoomId} title="Click to copy Room ID">
+                                        <span className="room-id-label">Room ID</span>
+                                        <span className="room-id-value">{isHost ? peerId : roomId}</span>
+                                        <span className={`room-id-copy ${copied ? 'copied' : ''}`}>
+                                            {copied ? <><IconCheck style={{ marginRight: '0.2rem' }} /> Copied!</> : <><IconCopy style={{ marginRight: '0.2rem' }} /> Copy</>}
+                                        </span>
+                                    </div>
+                                    <button className="room-id-badge" onClick={copyInviteLink} style={{ color: 'var(--color-parchment)', opacity: '0.6' }} title="Copy invite link">
+                                        {copied ? <><IconCheck /> Copied!</> : <>🔗 Invite Link</>}
+                                    </button>
+                                </>
+                            )}
                             <span className="room-player-count">
                                 <IconUsers style={{ marginRight: '0.3rem' }} /> {players.length} player{players.length !== 1 ? 's' : ''}
                             </span>
