@@ -1079,3 +1079,23 @@
         transform: translate(8px, -50%);
     }
 }
+
+/* ── REDUCED MOTION ──
+   Lighthouse (and users who prefer reduced motion) enable this media query.
+   Infinite animations prevent Lighthouse from ever reaching "visual stability",
+   which causes a NO_FCP timeout/crash. Pausing them fixes the issue and is
+   also a WCAG 2.1 AA requirement (2.3.3 Animation from Interactions). */
+@media (prefers-reduced-motion: reduce) {
+
+    .scanlines-1:before,
+    .scanlines-1:after,
+    .scanlines-2,
+    .scanlines-2:after,
+    .tutorial-highlight {
+        animation: none !important;
+    }
+
+    .active-turn:not(.eliminated) {
+        transition: none;
+    }
+}
