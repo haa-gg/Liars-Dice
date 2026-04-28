@@ -140,6 +140,18 @@ export default function App({ config }: { config?: AppConfig } = {}) {
         }
     }, [playerName]);
 
+    // Handle Escape key to close modals
+    useEffect(() => {
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                if (showSettings) setShowSettings(false);
+                else if (showRules) setShowRules(false);
+            }
+        };
+        window.addEventListener('keydown', handleEsc);
+        return () => window.removeEventListener('keydown', handleEsc);
+    }, [showSettings, showRules]);
+
     // Session expiration and renewal logic
     useEffect(() => {
         const checkOrRenewSession = async () => {
@@ -232,11 +244,16 @@ export default function App({ config }: { config?: AppConfig } = {}) {
         // Fire immediately on mount
         checkOrRenewSession();
 
-        // Check every 5 seconds
-        if (pingIntervalRef.current) clearInterval(pingIntervalRef.current);
-        pingIntervalRef.current = window.setInterval(checkOrRenewSession, 5000);
+        // Check every 5 seconds, but ONLY if we actually have a session to check
+        // This prevents the interval from constantly resetting Lighthouse's 'CPU Idle' metric on fresh page loads
+        let intervalId: number | null = null;
+        if (localStorage.getItem('liarsDiceSession')) {
+            intervalId = window.setInterval(checkOrRenewSession, 5000);
+            pingIntervalRef.current = intervalId;
+        }
 
         return () => {
+            if (intervalId) clearInterval(intervalId);
             if (pingIntervalRef.current) clearInterval(pingIntervalRef.current);
         };
     }, [inLobby]);
@@ -731,7 +748,7 @@ export default function App({ config }: { config?: AppConfig } = {}) {
                             onClick={e => e.stopPropagation()}
                             style={{ '--bg-stain': `url(${BASE_URL}images/stain-distress.png)` } as React.CSSProperties}
                         >
-                            <button className="rules-close" onClick={() => setShowRules(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCross size="0.8em" /></button>
+                            <button className="rules-close" onClick={() => setShowRules(false)} aria-label="Close rules" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCross size="0.8em" /></button>
                             <h2>How to Play</h2>
                             <ul className="rules-list">
                                 {RULES.map((r, i) => (

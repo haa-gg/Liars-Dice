@@ -136,6 +136,19 @@ const GameBoard: React.FC<GameBoardProps> = ({
         }
     }, [currentBid]);
 
+    // Handle Escape key to close modals
+    useEffect(() => {
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                if (showGameLog) setShowGameLog(false);
+                else if (showCheatInfo) setShowCheatInfo(false);
+                else if (showStartConfirmation) setShowStartConfirmation(false);
+            }
+        };
+        window.addEventListener('keydown', handleEsc);
+        return () => window.removeEventListener('keydown', handleEsc);
+    }, [showGameLog, showCheatInfo, showStartConfirmation]);
+
     // Handle bid with validation
     const handleRaiseBid = () => {
         // Check if bid is actually higher
@@ -195,7 +208,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
             {showGameLog && (
                 <div className="rules-overlay" onClick={() => setShowGameLog(false)}>
                     <div className="history-panel parchment-panel" onClick={e => e.stopPropagation()}>
-                        <button className="rules-close" onClick={() => setShowGameLog(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCross size="0.8em" /></button>
+                        <button className="rules-close" onClick={() => setShowGameLog(false)} aria-label="Close game log" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCross size="0.8em" /></button>
                         <h2>Game Log</h2>
                         <p className="history-subtitle">Complete game history</p>
 
@@ -237,7 +250,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
                             '--bg-stain': `url(${BASE_URL}images/stain-distress.png)`
                         } as React.CSSProperties}
                     >
-                        <button className="rules-close" onClick={() => setShowCheatInfo(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCross size="0.8em" /></button>
+                        <button className="rules-close" onClick={() => setShowCheatInfo(false)} aria-label="Close cheat info" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCross size="0.8em" /></button>
                         <h2>Cheat Abilities</h2>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
                             <div>

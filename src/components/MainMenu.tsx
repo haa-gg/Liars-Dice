@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useUserSettings, DiceStyle } from '../hooks/SettingsContext';
 import { IconMenu, IconCross, IconRules, IconGear, IconScroll, IconInfo } from './Icons';
@@ -31,6 +31,19 @@ const MainMenu: React.FC<MainMenuProps> = ({
     const [showFaq, setShowFaq] = useState(false);
     const { settings, updateSettings } = useUserSettings();
 
+    useEffect(() => {
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                if (showCredits) setShowCredits(false);
+                else if (showFaq) setShowFaq(false);
+                else if (showUserSettings) setShowUserSettings(false);
+                else if (showMenu) setShowMenu(false);
+            }
+        };
+        window.addEventListener('keydown', handleEsc);
+        return () => window.removeEventListener('keydown', handleEsc);
+    }, [showCredits, showFaq, showUserSettings, showMenu]);
+
     const menuItemStyle: React.CSSProperties = {
         background: 'none',
         border: 'none',
@@ -54,6 +67,7 @@ const MainMenu: React.FC<MainMenuProps> = ({
                     onClick={() => setShowMenu(true)}
                     title="Menu"
                     aria-label="Open menu"
+                    aria-expanded={showMenu}
                     style={{ position: 'relative' }}
                 >
                     <IconMenu size="1.4em" />
@@ -71,7 +85,7 @@ const MainMenu: React.FC<MainMenuProps> = ({
             >
                 <div className="side-menu-header">
                     <h2>Menu</h2>
-                    <button className="side-menu-close" onClick={() => setShowMenu(false)}>
+                    <button className="side-menu-close" onClick={() => setShowMenu(false)} aria-label="Close menu">
                         <IconCross size="1.2em" />
                     </button>
                 </div>
@@ -177,7 +191,7 @@ const MainMenu: React.FC<MainMenuProps> = ({
             {showUserSettings && (
                 <div className="rules-overlay" onClick={() => setShowUserSettings(false)}>
                     <div className="parchment-panel" style={{ maxWidth: 420, width: '90%' }} onClick={e => e.stopPropagation()}>
-                        <button className="rules-close" onClick={() => setShowUserSettings(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCross size="0.8em" /></button>
+                        <button className="rules-close" onClick={() => setShowUserSettings(false)} aria-label="Close settings" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCross size="0.8em" /></button>
                         <h2 style={{ marginTop: 0, textAlign: 'center' }}>Player Settings</h2>
 
                         <div style={{ marginTop: '1.5rem' }}>
@@ -206,7 +220,7 @@ const MainMenu: React.FC<MainMenuProps> = ({
             {showCredits && (
                 <div className="rules-overlay" onClick={() => setShowCredits(false)}>
                     <div className="parchment-panel" style={{ maxWidth: 420, width: '90%', textAlign: 'center' }} onClick={e => e.stopPropagation()}>
-                        <button className="rules-close" onClick={() => setShowCredits(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCross size="0.8em" /></button>
+                        <button className="rules-close" onClick={() => setShowCredits(false)} aria-label="Close credits" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCross size="0.8em" /></button>
                         <h2 style={{ marginTop: 0 }}>Credits</h2>
                         <div style={{ textAlign: 'left', lineHeight: 1.7, fontSize: '0.9rem' }}>
                             <p><strong>Design & Development</strong><br />
@@ -248,7 +262,7 @@ const MainMenu: React.FC<MainMenuProps> = ({
                     <div className="parchment-panel"
                         style={{ maxWidth: 420, width: '90%', '--bg-stain': `url(${BASE_URL}images/stain-distress.png)` } as React.CSSProperties}
                         onClick={e => e.stopPropagation()}>
-                        <button className="rules-close" onClick={() => setShowFaq(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCross size="0.8em" /></button>
+                        <button className="rules-close" onClick={() => setShowFaq(false)} aria-label="Close FAQ" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCross size="0.8em" /></button>
                         <h2 style={{ marginTop: 0, textAlign: 'center' }}>FAQ</h2>
                         <div style={{ marginTop: '1.5rem', textAlign: 'left', lineHeight: 1.6, fontSize: '0.95rem' }}>
                             <div style={{ marginBottom: '1.5rem', borderBottom: '1px solid rgba(0,0,0,0.1)', paddingBottom: '1rem' }}>
