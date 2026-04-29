@@ -63,8 +63,15 @@
         if (/android/i.test(navigator.userAgent)) {
           // Only run on the public domain (prevent running identically in localhost wrapper)
           if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-            // If we detect the "fallback=true" param, the user came from a failed intent
+            // If we detect the "fallback=true" param, the user came from a failed intent.
+            // Clean it from the URL so it doesn't linger in the address bar.
             if (window.location.search.indexOf('fallback=true') > -1) {
+              var cleanSearch = window.location.search
+                .replace(/[?&]fallback=true/, '')
+                .replace(/^\&/, '?');
+              var cleanUrl = window.location.origin + window.location.pathname +
+                cleanSearch + window.location.hash;
+              window.history.replaceState(null, '', cleanUrl);
               return;
             }
 
