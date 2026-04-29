@@ -298,6 +298,28 @@
     box-shadow: 0 2px 0 var(--color-wood-dark) !important;
 }
 
+/* ── Liar Button ── */
+.btn-liar {
+    position: relative;
+}
+
+.btn-liar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: var(--sabers-bg);
+    background-size: 80%;
+    background-position: bottom center;
+    background-repeat: no-repeat;
+    opacity: 0.2;
+    pointer-events: none;
+}
+
+.btn-liar span {
+    position: relative;
+    z-index: 1;
+}
+
 /* ── Rules Button ── */
 .rules-btn {
     position: fixed;
@@ -641,10 +663,25 @@
 
 /* ── Loaded Die reroll flash ── */
 @keyframes reroll-flash {
-    0%   { transform: scale(1.35); filter: drop-shadow(0 0 14px var(--color-gold)); }
-    20%  { transform: scale(1.2);  filter: drop-shadow(0 0 10px var(--color-gold)); }
-    60%  { transform: scale(1.05); filter: drop-shadow(0 0 6px var(--color-gold)); }
-    100% { transform: scale(1);    filter: none; }
+    0% {
+        transform: scale(1.35);
+        filter: drop-shadow(0 0 14px var(--color-gold));
+    }
+
+    20% {
+        transform: scale(1.2);
+        filter: drop-shadow(0 0 10px var(--color-gold));
+    }
+
+    60% {
+        transform: scale(1.05);
+        filter: drop-shadow(0 0 6px var(--color-gold));
+    }
+
+    100% {
+        transform: scale(1);
+        filter: none;
+    }
 }
 
 .die-wrapper--rerolled {
@@ -986,6 +1023,7 @@
     0% {
         transform: translateY(0);
     }
+
     100% {
         transform: translateY(4px);
     }

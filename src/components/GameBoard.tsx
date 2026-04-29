@@ -921,7 +921,13 @@ const GameBoard: React.FC<GameBoardProps> = ({
                         <div className="bid-btns">
                             <button className="btn-nautical" onClick={handleRaiseBid}>Raise Bid</button>
                             {currentBid.count > 0 && (
-                                <button className="btn-nautical danger" onClick={onChallenge}>Liar!</button>
+                                <button 
+                                    className="btn-nautical btn-liar" 
+                                    onClick={onChallenge}
+                                    style={{ '--sabers-bg': `url('${BASE_URL}images/crossed-sabers.svg')` } as React.CSSProperties}
+                                >
+                                    <span>Liar!</span>
+                                </button>
                             )}
                         </div>
                         {bidError && (
