@@ -195,10 +195,10 @@ h1 {
   }
 
   .lobby-footer {
-    position: absolute;
-    bottom: 1.5rem;
-    left: 0;
-    right: 0;
+    position: relative;
+    bottom: auto;
+    margin-top: 1rem;
+    padding-top: 0;
     padding-left: 5px;
     padding-right: 5px;
   }
