@@ -1,9 +1,11 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 export type DiceStyle = 'pixel' | 'doodle' | 'html' | 'laser-ghost' | 'gold' | 'metal';
+export type ThemeMode = 'dark' | 'light';
 
 interface UserSettings {
     diceStyle: DiceStyle;
+    theme: ThemeMode;
 }
 
 interface SettingsContextType {
@@ -13,6 +15,7 @@ interface SettingsContextType {
 
 const defaultSettings: UserSettings = {
     diceStyle: 'pixel',
+    theme: 'dark',
 };
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -33,6 +36,11 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
     useEffect(() => {
         localStorage.setItem('liarsDicePreferences', JSON.stringify(settings));
     }, [settings]);
+
+    // Apply theme to the document root whenever it changes
+    useEffect(() => {
+        document.documentElement.setAttribute('data-theme', settings.theme);
+    }, [settings.theme]);
 
     const updateSettings = (newSettings: Partial<UserSettings>) => {
         setSettings(prev => ({ ...prev, ...newSettings }));

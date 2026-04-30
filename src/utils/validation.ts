@@ -50,6 +50,7 @@ export const validateMessage = (msg: any): msg is PeerMessage => {
         case 'LEAVE':
         case 'PING':
         case 'KICKED':
+        case 'HOST_CLOSED':
             return true;  // No data validation needed
 
         case 'SPECTATE':

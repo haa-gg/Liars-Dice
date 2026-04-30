@@ -59,6 +59,8 @@
   <!-- Android Deep Link Redirect -->
   <script type="text/javascript">
       (function () {
+        // Skip for Lighthouse audits (Lighthouse emulates Android UA and triggers the intent redirect)
+        if (/Chrome-Lighthouse/i.test(navigator.userAgent)) return;
         // Only run on Android devices
         if (/android/i.test(navigator.userAgent)) {
           // Only run on the public domain (prevent running identically in localhost wrapper)

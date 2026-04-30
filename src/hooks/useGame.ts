@@ -58,6 +58,7 @@ export interface UseGameReturn {
     setPeekTargetId: (id: string | null) => void;
     setSpectateTarget: (targetId: string) => void;
     leaveRoom: () => void;
+    closeRoom: () => void;
     rollSkillCheck: (roll: number, sleightBonus: number, deceptionBonus: number) => void;
 }
 
@@ -297,6 +298,15 @@ export const useGame = (): UseGameReturn => {
 
             if (type === 'KICKED') {
                 alert("You have been kicked from the table by the host.");
+                localStorage.removeItem('liarsDiceSession');
+                localStorage.removeItem('liarsDicePeerId');
+                window.location.reload();
+            }
+
+            if (type === 'HOST_CLOSED') {
+                alert("The host has closed the table. Returning to the lobby.");
+                localStorage.removeItem('liarsDiceSession');
+                localStorage.removeItem('liarsDicePeerId');
                 window.location.reload();
             }
         }
@@ -438,6 +448,12 @@ export const useGame = (): UseGameReturn => {
     const leaveRoom = () => {
         if (!isHost) {
             sendToHost({ type: 'LEAVE', data: {} as Record<string, never> });
+        }
+    };
+
+    const closeRoom = () => {
+        if (isHost) {
+            broadcast({ type: 'HOST_CLOSED', data: {} });
         }
     };
 
@@ -690,6 +706,6 @@ export const useGame = (): UseGameReturn => {
         startRoom, joinRoom, rejoinRoom, startRound, placeBid, challenge,
         usePeek, activateLoadedDie, rerollDie, dismissPeek, useSlip, useMagicDice, selectCheat,
         downloadTextLog, downloadJSONLog, voteNextRound, kickPlayer,
-        setPeekTargetId, setSpectateTarget, addBot, leaveRoom, rollSkillCheck,
+        setPeekTargetId, setSpectateTarget, addBot, leaveRoom, closeRoom, rollSkillCheck,
     };
 };

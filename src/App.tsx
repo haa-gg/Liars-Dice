@@ -94,7 +94,7 @@ export default function App({ config }: { config?: AppConfig } = {}) {
         setGameOptions, assignCheat,
         startRoom, joinRoom, rejoinRoom, placeBid, challenge,
         usePeek, activateLoadedDie, rerollDie, dismissPeek, useSlip, useMagicDice, selectCheat,
-        downloadTextLog, downloadJSONLog, voteNextRound, kickPlayer, setPeekTargetId, setSpectateTarget, addBot, leaveRoom, rollSkillCheck,
+        downloadTextLog, downloadJSONLog, voteNextRound, kickPlayer, setPeekTargetId, setSpectateTarget, addBot, leaveRoom, closeRoom, rollSkillCheck,
     } = game;
 
     const [playerName, setPlayerName] = useState<string>(() => {
@@ -355,9 +355,13 @@ export default function App({ config }: { config?: AppConfig } = {}) {
     const handleLeaveGame = () => {
         if (isHost) {
             if (window.confirm("Are you sure you want to permanently close the table? This will clear your session and end the game for everyone.")) {
+                closeRoom();
                 localStorage.removeItem('liarsDiceSession');
                 localStorage.removeItem('liarsDicePeerId');
-                window.location.href = window.location.pathname;
+                // Small delay to let the broadcast reach clients before navigating
+                setTimeout(() => {
+                    window.location.href = window.location.pathname;
+                }, 200);
             }
         } else {
             if (window.confirm("Are you sure you want to permanently leave the game? Your spot at the table will be lost.")) {

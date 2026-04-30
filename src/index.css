@@ -203,3 +203,55 @@ h1 {
     padding-right: 5px;
   }
 }
+
+/* ════════════════════════════════════════
+   LIGHT THEME (Experimental)
+   ════════════════════════════════════════ */
+[data-theme="light"] {
+  --color-ocean-dark: #c4a882;
+  --color-parchment: #fff8ee;
+  --color-ink: #2c2c2c;
+  --color-wood-dark: #6d4c2e;
+  --color-wood-mid: #8b6f4e;
+  --color-gold: #c9a000;
+  --color-blood: #a52222;
+}
+
+[data-theme="light"] body {
+  background-color: #e8d8c0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.3)),
+    url('./assets/dark-wood.png');
+  color: var(--color-ink);
+}
+
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3 {
+  color: var(--color-wood-dark);
+}
+
+[data-theme="light"] h1 {
+  color: var(--color-blood);
+}
+
+[data-theme="light"] .parchment-panel {
+  background: var(--color-parchment);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), inset 0 0 30px rgba(0, 0, 0, 0.05);
+  border-color: #cfc3a5;
+}
+
+[data-theme="light"] .btn-nautical {
+  background: var(--color-wood-dark);
+  color: var(--color-gold);
+  box-shadow: 0 5px 0 var(--color-wood-mid);
+}
+
+[data-theme="light"] .btn-nautical:not(:disabled):hover {
+  background: var(--color-wood-mid);
+  box-shadow: 0 7px 0 var(--color-wood-dark);
+}
+
+[data-theme="light"] .lobby-footer {
+  color: var(--color-wood-dark);
+}

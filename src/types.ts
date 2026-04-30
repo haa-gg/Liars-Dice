@@ -83,6 +83,7 @@ export type ClientMessage =
 export type HostMessage =
     | { type: 'STATE_SYNC'; data: StateSyncPayload }
     | { type: 'KICKED'; data: Record<string, never> }
+    | { type: 'HOST_CLOSED'; data: Record<string, never> }
     | { type: 'PONG'; data: Record<string, never> };
 
 /** Union of all peer messages (convenience alias). */

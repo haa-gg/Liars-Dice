@@ -1142,3 +1142,22 @@
         transition: none;
     }
 }
+
+/* ── LIGHT THEME – Scanline Adjustments ──
+   multiply blend on a light bg makes the lines too harsh.
+   Switch to overlay + lower opacity for a subtle CRT look. */
+[data-theme="light"] .scanlines-1:before,
+[data-theme="light"] .scanlines-1:after {
+    mix-blend-mode: overlay;
+    opacity: 0.15;
+}
+
+[data-theme="light"] .scanlines-2 {
+    -webkit-mask-image: none;
+    mask-image: none;
+}
+
+[data-theme="light"] .scanlines-2:after {
+    mix-blend-mode: overlay;
+    opacity: 0.2;
+}

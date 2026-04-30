@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useUserSettings, DiceStyle } from '../hooks/SettingsContext';
+import { useUserSettings, DiceStyle, ThemeMode } from '../hooks/SettingsContext';
 import { IconMenu, IconCross, IconRules, IconGear, IconScroll, IconInfo } from './Icons';
 
 // @ts-ignore
@@ -211,6 +211,37 @@ const MainMenu: React.FC<MainMenuProps> = ({
                                     <option value="metal">Metal Dice</option>
                                 </select>
                             </div>
+                        </div>
+
+                        {/* Theme Toggle – disabled for now, re-enable when light theme is polished
+                        <div style={{ marginTop: '1.5rem' }}>
+                            <h3 style={{ fontSize: '1.1rem', borderBottom: '1px solid rgba(0,0,0,0.1)', paddingBottom: '0.5rem' }}>Theme</h3>
+                            <div style={{ marginTop: '1rem' }}>
+                                <select
+                                    className="input-nautical"
+                                    value={settings.theme}
+                                    onChange={e => updateSettings({ theme: e.target.value as ThemeMode })}
+                                    style={{ width: '100%', fontSize: '1rem' }}
+                                >
+                                    <option value="dark">Dark (Default)</option>
+                                    <option value="light">Light (Experimental)</option>
+                                </select>
+                            </div>
+                        </div>
+                        */}
+
+                        {/* Rate App */}
+                        <div style={{ marginTop: '1.5rem', textAlign: 'center', borderTop: '1px solid rgba(0,0,0,0.1)', paddingTop: '1rem' }}>
+                            <a
+                                href="https://play.google.com/store/apps/details?id=com.haagg.liarsdice"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn-nautical"
+                                style={{ display: 'inline-block', fontSize: '1rem', padding: '0.6rem 1.4rem', textDecoration: 'none', color: 'var(--color-gold)' }}
+                            >
+                                Rate the App
+                            </a>
+                            <p style={{ marginTop: '0.5rem', fontSize: '0.8rem', opacity: 0.6 }}>Enjoying the game? Leave a review!</p>
                         </div>
                     </div>
                 </div>
