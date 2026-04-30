@@ -59,9 +59,11 @@
   <!-- Android Deep Link Redirect -->
   <script type="text/javascript">
       (function () {
-        // Skip for Lighthouse audits (Lighthouse emulates Android UA and triggers the intent redirect)
-        if (/Chrome-Lighthouse/i.test(navigator.userAgent)) return;
-        // Only run on Android devices
+        // Skip for automated tools like Lighthouse that emulate Android UA
+        // but can't handle intent:// redirects (causes blank page)
+        if (/Chrome-Lighthouse|HeadlessChrome/i.test(navigator.userAgent)) return;
+        if (navigator.webdriver) return;
+        // Only run on real Android devices
         if (/android/i.test(navigator.userAgent)) {
           // Only run on the public domain (prevent running identically in localhost wrapper)
           if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
