@@ -300,14 +300,14 @@ export const useGame = (): UseGameReturn => {
                 alert("You have been kicked from the table by the host.");
                 localStorage.removeItem('liarsDiceSession');
                 localStorage.removeItem('liarsDicePeerId');
-                window.location.reload();
+                window.location.href = window.location.pathname;
             }
 
             if (type === 'HOST_CLOSED') {
                 alert("The host has closed the table. Returning to the lobby.");
                 localStorage.removeItem('liarsDiceSession');
                 localStorage.removeItem('liarsDicePeerId');
-                window.location.reload();
+                window.location.href = window.location.pathname;
             }
         }
     }, [lastMessage, isHost, syncState, sendDirect]);
