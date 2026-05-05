@@ -16,7 +16,7 @@ export function getBotAction(engine: any): { type: 'BID', count: number, face: n
         bot.dice.forEach((d: number) => counts[d]++);
         let bestFace = 2;
         let maxCount = 0;
-        for (let i = 2; i <= 6; i++) {
+        for (let i = 1; i <= 6; i++) {
             if (counts[i] > maxCount) {
                 maxCount = counts[i];
                 bestFace = i;
@@ -50,8 +50,9 @@ export function getBotAction(engine: any): { type: 'BID', count: number, face: n
     let bestFace = currentBid.face;
     let maxCount = counts[currentBid.face] + (engine.options.wildsEnabled ? counts[1] : 0);
     
-    for (let i = 2; i <= 6; i++) {
-        const faceTotal = counts[i] + (engine.options.wildsEnabled ? counts[1] : 0);
+    for (let i = 1; i <= 6; i++) {
+        // When bidding 1s, they only match 1s, even with wilds enabled, so don't double count 1s if i === 1
+        const faceTotal = counts[i] + (engine.options.wildsEnabled && i !== 1 ? counts[1] : 0);
         // Frequently changes face just because it feels like it (70% chance to switch if face > current)
         if (i > currentBid.face && (faceTotal > maxCount || Math.random() > 0.7)) {
             bestFace = i;

@@ -107,7 +107,8 @@ const GameBoard: React.FC<GameBoardProps> = ({
     hideDonation = false,
 }) => {
     const [bidCount, setBidCount] = useState<number>(currentBid?.count || 1);
-    const [bidFace, setBidFace] = useState<number>(currentBid?.face || 2);
+    const [bidFace, setBidFace] = useState<number>(currentBid?.face || 1);
+    const [isFaceDropdownOpen, setIsFaceDropdownOpen] = useState<boolean>(false);
     const [showGameLog, setShowGameLog] = useState<boolean>(false);
     const [showCheatInfo, setShowCheatInfo] = useState<boolean>(false);
     const [showStartConfirmation, setShowStartConfirmation] = useState<boolean>(false);
@@ -127,7 +128,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
     // Keep bid inputs in sync when currentBid updates (new round, etc.)
     useEffect(() => {
         setBidCount(currentBid?.count || 1);
-        setBidFace(currentBid?.face || 2);
+        setBidFace(currentBid?.face || 1);
         setBidError(''); // Clear error on new round
         if (currentBid && currentBid.count === 0) {
             setD20Roll(null);
@@ -900,7 +901,7 @@ const GameBoard: React.FC<GameBoardProps> = ({
                                 >
                                     −
                                 </button>
-                                <div className="stepper-value">{bidCount}</div>
+                                <div className="stepper-value">{bidCount}&nbsp;x</div>
                                 <button
                                     className="stepper-btn"
                                     onClick={() => setBidCount(bidCount + 1)}
@@ -908,21 +909,57 @@ const GameBoard: React.FC<GameBoardProps> = ({
                                     +
                                 </button>
                             </div>
-                            <select
-                                value={bidFace}
-                                onChange={(e) => setBidFace(parseInt(e.target.value))}
-                                className="input-nautical"
-                            >
-                                {[2, 3, 4, 5, 6].map(f => (
-                                    <option key={f} value={f}>{f}</option>
-                                ))}
-                            </select>
+                            <div style={{ position: 'relative' }}>
+                                <button
+                                    className="input-nautical"
+                                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', padding: '0 0.8rem', cursor: 'pointer', gap: '0.4rem' }}
+                                    onClick={() => setIsFaceDropdownOpen(!isFaceDropdownOpen)}
+                                >
+                                    <div style={{ width: '1.2rem', height: '1.2rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <Dice value={bidFace} className="dice-compact" />
+                                    </div>
+                                    <span style={{ fontSize: '0.6rem', color: 'var(--color-ink)', opacity: 0.8 }}>▼</span>
+                                </button>
+                                {isFaceDropdownOpen && (
+                                    <>
+                                        <div
+                                            style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 99 }}
+                                            onClick={() => setIsFaceDropdownOpen(false)}
+                                        />
+                                        <div className="parchment-panel" style={{
+                                            position: 'absolute',
+                                            bottom: '100%',
+                                            left: 0,
+                                            marginBottom: '0.2rem',
+                                            zIndex: 100,
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: '0.4rem',
+                                            padding: '0.5rem',
+                                            minWidth: '3.5rem',
+                                            alignItems: 'center',
+                                            boxShadow: '0 -4px 6px rgba(0,0,0,0.5)',
+                                            border: '1px solid var(--color-ink)'
+                                        }}>
+                                            {[6, 5, 4, 3, 2, 1].map(f => (
+                                                <div
+                                                    key={f}
+                                                    style={{ width: '1.5rem', height: '1.5rem', cursor: 'pointer', padding: '0.2rem', opacity: bidFace === f ? 1 : 0.5, transform: bidFace === f ? 'scale(1.1)' : 'scale(1)', transition: 'all 0.1s' }}
+                                                    onClick={() => { setBidFace(f); setIsFaceDropdownOpen(false); }}
+                                                >
+                                                    <Dice value={f} className="dice-compact" />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </>
+                                )}
+                            </div>
                         </div>
                         <div className="bid-btns">
                             <button className="btn-nautical" onClick={handleRaiseBid}>Raise Bid</button>
                             {currentBid.count > 0 && (
-                                <button 
-                                    className="btn-nautical btn-liar" 
+                                <button
+                                    className="btn-nautical btn-liar"
                                     onClick={onChallenge}
                                     style={{ '--sabers-bg': `url('${BASE_URL}images/crossed-sabers.svg')` } as React.CSSProperties}
                                 >

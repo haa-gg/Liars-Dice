@@ -10,6 +10,7 @@ interface DiceProps {
     rolling?: boolean;
     isSlipped?: boolean;
     isMagic?: boolean;
+    className?: string;
 }
 
 const renderHtmlDie = (value: number) => {
@@ -24,7 +25,7 @@ const renderHtmlDie = (value: number) => {
     }
 };
 
-const Dice: React.FC<DiceProps> = ({ value, rolling, isSlipped, isMagic }) => {
+const Dice: React.FC<DiceProps> = ({ value, rolling, isSlipped, isMagic, className }) => {
     const { settings } = useUserSettings();
 
     const imagePath = (settings.diceStyle === 'laser-ghost' || settings.diceStyle === 'gold')
@@ -32,7 +33,7 @@ const Dice: React.FC<DiceProps> = ({ value, rolling, isSlipped, isMagic }) => {
         : `${BASE_URL}images/dice/${settings.diceStyle}-dice-${value}.png`;
 
     return (
-        <div className={`dice-img-container ${rolling ? 'rolling' : ''} ${isSlipped ? 'slipped' : ''} ${isMagic ? 'magic' : ''} ${settings.diceStyle === 'laser-ghost' ? 'scanlines-2' : ''}`}>
+        <div className={`dice-img-container ${rolling ? 'rolling' : ''} ${isSlipped ? 'slipped' : ''} ${isMagic ? 'magic' : ''} ${settings.diceStyle === 'laser-ghost' ? 'scanlines-2' : ''} ${className ?? ''}`}>
             {settings.diceStyle === 'html' ? (
                 renderHtmlDie(value)
             ) : (

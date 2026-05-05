@@ -41,7 +41,7 @@ const STEPS: StepDef[] = [
         title: 'The Cheat Panel',
         message: (
             <>
-                {'On each player\'s turn a "Dare to Cheat?" panel appears at the bottom. They now have an array of cheats they can attempt on their turn.'}
+                {'On each player\'s turn a "Dare to Cheat?" panel appears above your dice. They now have an array of cheats they can attempt on their turn.'}
                 <br /><br />
                 {"In our tabletop setting you'd have them roll a skill check (e.g. Sleight of Hand, Deception, etc.) to determine if they pull it off or get busted. Tap the Peek ability to see how it works →"}
             </>
