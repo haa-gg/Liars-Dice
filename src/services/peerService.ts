@@ -38,25 +38,38 @@ class PeerService {
         // Generate a short room code if no ID provided
         const roomId = id || generateRoomCode(6);
 
+        const iceServers: any[] = [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' },
+            { urls: 'stun:stun2.l.google.com:19302' },
+            { urls: 'stun:stun3.l.google.com:19302' },
+            { urls: 'stun:stun4.l.google.com:19302' }
+        ];
+
+        // Add custom TURN server if configured via environment variables
+        if (import.meta.env.VITE_TURN_URL && import.meta.env.VITE_TURN_USERNAME && import.meta.env.VITE_TURN_CREDENTIAL) {
+            iceServers.push({
+                urls: import.meta.env.VITE_TURN_URL.split(','),
+                username: import.meta.env.VITE_TURN_USERNAME,
+                credential: import.meta.env.VITE_TURN_CREDENTIAL
+            });
+        } else {
+            // Fallback to the public (but unreliable) TURN server
+            iceServers.push({
+                urls: [
+                    'turn:turn.anyfirewall.com:3478?transport=udp',
+                    'turn:turn.anyfirewall.com:3478?transport=tcp'
+                ],
+                username: 'webrtc',
+                credential: 'webrtc'
+            });
+        }
+
         console.log(`Initializing PeerJS with ID: ${roomId} (Retries left: ${retries})`);
         this.peer = new Peer(roomId, {
             debug: 2, // Increased for better troubleshooting
             config: {
-                iceServers: [
-                    { urls: 'stun:stun.l.google.com:19302' },
-                    { urls: 'stun:stun1.l.google.com:19302' },
-                    { urls: 'stun:stun2.l.google.com:19302' },
-                    { urls: 'stun:stun3.l.google.com:19302' },
-                    { urls: 'stun:stun4.l.google.com:19302' },
-                    { 
-                        urls: [
-                            'turn:turn.anyfirewall.com:3478?transport=udp',
-                            'turn:turn.anyfirewall.com:3478?transport=tcp'
-                        ], 
-                        username: 'webrtc', 
-                        credential: 'webrtc' 
-                    }
-                ],
+                iceServers,
                 iceCandidatePoolSize: 10
             }
         });
