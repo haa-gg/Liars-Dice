@@ -28,7 +28,6 @@ class PeerService {
 
     async init(id: string | null = null, retries: number = 3): Promise<string> {
         if (this.peer) {
-            console.log('Destroying existing peer instance...');
             this.peer.removeAllListeners();
             this.peer.destroy();
             // Brief delay to allow WebSocket closure before opening a new one
@@ -65,7 +64,6 @@ class PeerService {
             });
         }
 
-        console.log(`Initializing PeerJS with ID: ${roomId} (Retries left: ${retries})`);
         this.peer = new Peer(roomId, {
             debug: 2, // Increased for better troubleshooting
             config: {
@@ -75,12 +73,10 @@ class PeerService {
         });
 
         this.peer.on('connection', (conn: DataConnection) => {
-            console.log('Incoming connection from:', conn.peer);
             this._setupConnection(conn);
         });
 
         this.peer.on('disconnected', () => {
-            console.log('PeerJS disconnected from signaling server. Attempting reconnect...');
             if (this.peer && !this.peer.destroyed) {
                 this.peer.reconnect();
             }
@@ -91,7 +87,6 @@ class PeerService {
 
             this.peer.on('open', (assignedId: string) => {
                 const finalId = assignedId || (this.peer as Peer).id;
-                console.log('PeerJS opened with ID:', finalId);
                 resolve(finalId);
             });
 
@@ -105,7 +100,6 @@ class PeerService {
                     err.message?.includes('Lost connection');
 
                 if (err.type === 'unavailable-id' && !id && retries > 0) {
-                    console.log('Generated Room ID is taken. Generating a new one...');
                     // the initial setup failed due to taken ID, try again with a brand new ID
                     setTimeout(async () => {
                         try {
@@ -116,7 +110,6 @@ class PeerService {
                         }
                     }, 500);
                 } else if (isNetworkError && retries > 0) {
-                    console.log(`Connection dropped during init. Retrying in 1s...`);
                     setTimeout(async () => {
                         try {
                             // Pass the exact same roomId so we don't generate a new one on retry
@@ -176,7 +169,6 @@ class PeerService {
 
     closeConnection(peerId: string) {
         if (this.connections[peerId]) {
-            console.log(`Closing connection to peer: ${peerId}`);
             this.connections[peerId].close();
             delete this.connections[peerId];
         }

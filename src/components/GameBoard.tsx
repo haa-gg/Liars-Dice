@@ -817,7 +817,6 @@ const GameBoard: React.FC<GameBoardProps> = ({
                             className={`die-wrapper ${loadedDieActive ? 'clickable' : ''} ${rerolledDieIndex === i ? 'die-wrapper--rerolled' : ''}`}
                             onClick={() => {
                                 if (loadedDieActive) {
-                                    console.log('Rerolling die at index:', i);
                                     onRerollDie(i);
                                 }
                             }}
@@ -939,12 +938,14 @@ const GameBoard: React.FC<GameBoardProps> = ({
                                             minWidth: '3.5rem',
                                             alignItems: 'center',
                                             boxShadow: '0 -4px 6px rgba(0,0,0,0.5)',
-                                            border: '1px solid var(--color-ink)'
+                                            border: '1px solid var(--color-gold)',
+                                            background: 'linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.45)), var(--color-parchment)',
+                                            color: 'var(--color-ink)',
                                         }}>
                                             {[6, 5, 4, 3, 2, 1].map(f => (
                                                 <div
                                                     key={f}
-                                                    style={{ width: '1.5rem', height: '1.5rem', cursor: 'pointer', padding: '0.2rem', opacity: bidFace === f ? 1 : 0.5, transform: bidFace === f ? 'scale(1.1)' : 'scale(1)', transition: 'all 0.1s' }}
+                                                    style={{ width: bidFace === f ? '2rem' : '1.8rem', height: bidFace === f ? '2rem' : '1.8rem', cursor: 'pointer', padding: '0.1rem', opacity: bidFace === f ? 1 : 0.7, transition: 'all 0.1s' }}
                                                     onClick={() => { setBidFace(f); setIsFaceDropdownOpen(false); }}
                                                 >
                                                     <Dice value={f} className="dice-compact" />

@@ -113,7 +113,6 @@ export const useGame = (): UseGameReturn => {
         for (const [spectatorId, targetId] of Object.entries(specMap)) {
             const target = engine.players.find(p => p.id === targetId);
             if (target && target.active) {
-                console.log(`[Host] Syncing spectated dice for ${spectatorId}: target=${target.name}, dice=${target.dice.length}`);
                 // If it's for the host (local state), update host state directly
                 if (spectatorId === peerId) {
                     setSpectatingDice([...target.dice]);
@@ -231,9 +230,7 @@ export const useGame = (): UseGameReturn => {
             if (type === 'SPECTATE') {
                 const sPlayer = engine.players.find(p => p.id === lastMessage.from);
                 const tPlayer = engine.players.find(p => p.id === data.targetId);
-                console.log(`[Host] SPECTATE msg from ${lastMessage.from}: target=${data.targetId}, foundS=${!!sPlayer}, foundT=${!!tPlayer}`);
                 if (sPlayer && !sPlayer.active && tPlayer && tPlayer.active) {
-                    console.log(`[Host] spectated target dice length: ${tPlayer.dice.length}`);
                     spectatorMapRef.current[lastMessage.from] = data.targetId;
                     // Send spectated dice immediately
                     sendDirect(lastMessage.from, {
@@ -272,11 +269,9 @@ export const useGame = (): UseGameReturn => {
                 if (data.gameLog) setGameLog(data.gameLog);
                 if (data.nextRoundVotes !== undefined) setNextRoundVotes(new Set(data.nextRoundVotes));
                 if (data.spectatingDice) {
-                    console.log(`[Client] Received spectatingDice: ${data.spectatingDice.length}`);
                     setSpectatingDice(data.spectatingDice);
                 }
                 if (data.spectatingName) {
-                    console.log(`[Client] Received spectatingName: ${data.spectatingName}`);
                     setSpectatingName(data.spectatingName);
                 }
 
@@ -320,7 +315,6 @@ export const useGame = (): UseGameReturn => {
 
         if (disconnectedPlayers.length > 0) {
             disconnectedPlayers.forEach(p => {
-                console.log(`Player ${p.name} disconnected`);
                 engine.gameLog.push({
                     timestamp: new Date().toISOString(),
                     round: engine.currentRoundNumber,
