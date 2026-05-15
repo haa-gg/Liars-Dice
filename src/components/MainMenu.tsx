@@ -61,7 +61,7 @@ const MainMenu: React.FC<MainMenuProps> = ({
     return (
         <>
             {/* ── HAMBURGER MENU BUTTON ── */}
-            <div style={{ position: 'absolute', top: '1.5rem', right: '0.75rem', zIndex: 2000 }}>
+            <div style={{ position: 'absolute', top: 'calc(env(safe-area-inset-top) + 1.5rem)', right: '0.75rem', zIndex: 2000 }}>
                 <button
                     className="log-btn"
                     onClick={() => setShowMenu(true)}
