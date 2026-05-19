@@ -133,6 +133,51 @@ export default function App({ config }: { config?: AppConfig } = {}) {
         return () => window.removeEventListener('beforeunload', handleBeforeUnload);
     }, [inLobby]);
 
+    const wakeLockRef = useRef<any>(null);
+
+    // Screen Wake Lock API to prevent phone sleeping during game
+    useEffect(() => {
+        const requestWakeLock = async () => {
+            if (!inLobby && 'wakeLock' in navigator) {
+                try {
+                    wakeLockRef.current = await (navigator as any).wakeLock.request('screen');
+                } catch (err) {
+                    console.warn('Wake Lock error:', err);
+                }
+            }
+        };
+
+        const releaseWakeLock = async () => {
+            if (wakeLockRef.current) {
+                try {
+                    await wakeLockRef.current.release();
+                    wakeLockRef.current = null;
+                } catch (err) {
+                    console.warn('Wake Lock release error:', err);
+                }
+            }
+        };
+
+        if (!inLobby) {
+            requestWakeLock();
+        } else {
+            releaseWakeLock();
+        }
+
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible' && !inLobby) {
+                requestWakeLock();
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            releaseWakeLock();
+        };
+    }, [inLobby]);
+
     // Persist player name
     useEffect(() => {
         if (playerName) {
